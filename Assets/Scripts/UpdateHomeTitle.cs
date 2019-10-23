@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class UpdateHomeTitle : MonoBehaviour
 {
-    public string name = "Nicolas";
+    public GameObject homeText; 
+
     void Start()
     {
-        
+        homeText.GetComponent<UnityEngine.UI.Text>().text = "Bienvenue Nicolas";
     }
 
-    // Update is called once per frame
     void Update()
     {
         
