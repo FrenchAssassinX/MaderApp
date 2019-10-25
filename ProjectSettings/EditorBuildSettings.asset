@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/ConnectionScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/Scenes/ResponsiveScene.unity
+    guid: 6b7da7337aaf94b458bec27aeb0923a4
   m_configObjects: {}
