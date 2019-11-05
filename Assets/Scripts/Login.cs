@@ -1,107 +1,83 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-<<<<<<< HEAD
-=======
 using UnityEngine.UI;
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
+using UnityEngine.SceneManagement;
 
 public class Login : MonoBehaviour
 {
-    private string loginUrl = "http://madera-figueiredo.space/v1/login";
-<<<<<<< HEAD
+    // Const object and properties to transfer datas on every scenes of the project
+    public GameObject CONST;
+    private string url;
+
+    private string loginUrl = "v1/login";       // Specific url for this scene
+
+    public InputField username;                 /*** Text infos UI Elements ***/
+    public InputField password;                 /*                            */
+    public Button connection;                   /******************************/
+    public GameObject textConnectionError;      // Error message display if connection failed
 
     void Start()
     {
-        StartCoroutine(PostLogin());
+        // Get the url of CONST
+        url = CONST.GetComponent<CONST>().url;
+
+        // Disable error message by default
+        textConnectionError.transform.gameObject.SetActive(false);
+
+        // Declare button and the behaviour of the button
+        Button btn = connection.GetComponent<Button>();
+        btn.onClick.AddListener(SendConnection);
     }
 
-    IEnumerator PostLogin()
-    {
-        WWWForm form = new WWWForm();
-        form.AddField("matricule", "THAZEA0898");
-        form.AddField("password", "dede");
-=======
-    public InputField username;
-    public InputField password;
-    public Button connexion;
-    public Text infoCo = null;
-    
-    
-    
-
-    void Start()
-    {
-        Button btn = connexion.GetComponent<Button>();
-        btn.onClick.AddListener(SendConnexion);
-        
-    }
-
-    void SendConnexion()
+    /* Function starting when the connection button will be pressed */
+    void SendConnection()
     {
         //When you click on the login button you start this function
         StartCoroutine(PostLogin());
     }
-    
+
+    /* Function to connect user with the database */
     IEnumerator PostLogin()
     {
-        WWWForm form = new WWWForm();
-        form.AddField("matricule", username.text);
-        form.AddField("password", password.text);
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
+        WWWForm form = new WWWForm();                   // New form for web request
+        form.AddField("matricule", username.text);      // Add to the form the value of the UI Element 'Matricule'
+        form.AddField("password", password.text);       // Add to the form the value of the UI Element 'Password'
 
-        using (UnityWebRequest request = UnityWebRequest.Post(loginUrl, form))
+        /* New webrequest with: CONST url, local url and the form */
+        using (UnityWebRequest request = UnityWebRequest.Post(url + loginUrl, form))
         {
             yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
+
+            // If connection failed
+            if (request.isNetworkError || request.isHttpError)  
             {
-<<<<<<< HEAD
-                Debug.Log(request.error);
-=======
-                //request error, error message.
-                Debug.Log(request.error);
-                Debug.Log("erreur dans l'identification");
-                string inf = "erreur dans l'identification";
-                infoCo.text = inf;
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
+                // Display UI Element error message 
+                textConnectionError.transform.gameObject.SetActive(true);
             }
+            // If connection succeeded
             else
             {
                 if (request.isDone)
                 {
+                    // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-<<<<<<< HEAD
-                    Debug.Log(jsonResult);
+                    // Create a root object thanks to the JSON file
                     RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
 
-                    //User user = entity.user;
+                    // Get token and users info before changing scene
+                    CONST.GetComponent<CONST>().token = entity.token.ToString();
+                    CONST.GetComponent<CONST>().userID = entity.user._id.ToString();
+                    CONST.GetComponent<CONST>().userName = entity.user.prenom.ToString();
 
-                    Debug.Log(entity.user.email);
-
-                    /*foreach (RootObject rootObject in entities)
-                    {
-                        Debug.Log(rootObject.name);
-                    }*/
+                    // Keep the CONST gameObject between scenes
+                    DontDestroyOnLoad(CONST.transform);
+                    // Go to Home Scene
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
                 }
+
             }
         }
     }
+
 }
-
-=======
-                    //delete soon
-                    Debug.Log(jsonResult);
-                    RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
-                    //delete soon
-                    Debug.Log("bienvenu");
-                    //going into home.
-
-                }
-                
-            }
-            }
-        }
-
-    }
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382

@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-﻿using System.Collections;
-=======
-﻿using System;
-using System.Collections;
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Serializer
 {
+    /* Array for all the datas of the JSON file returned by the database */
     public static T[] getJsonArray<T>(string json)
     {
         string newJson = "{ \"array\": " + json + "}";
@@ -23,23 +17,21 @@ public class Serializer
     }
 }
 
+/* Token constructor */
 [System.Serializable]
 public class Token
 {
     public string token;
 }
 
+/* Text constructor */
 [System.Serializable]
 public class Text
 {
     public string text;
-<<<<<<< HEAD
-=======
-
-    
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
 }
 
+/* User constructor */
 [System.Serializable]
 public class User
 {
@@ -54,15 +46,12 @@ public class User
     public string __v;
 }
 
+/* Root object constructor */
 [System.Serializable]
 public class RootObject
 {
     public Token token;
     public Text text;
     public User user;
-<<<<<<< HEAD
-}
-=======
     internal string message;
 }
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
