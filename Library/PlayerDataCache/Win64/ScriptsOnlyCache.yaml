@@ -1,3 +1,4 @@
+
 ScriptsOnlyBuild:
   usedScripts:
     UnityEditor.Graphs.dll:
@@ -8,82 +9,21 @@ ScriptsOnlyBuild:
     - UnityEditor.Graphs.AnimatorControllerTool
     UnityEditor.TestRunner.dll:
     - UnityEditor.TestTools.TestRunner.TestListCacheData
-    UnityEngine.UI.dll:
-<<<<<<< HEAD
-    - UnityEngine.EventSystems.EventSystem
-    - UnityEngine.EventSystems.StandaloneInputModule
-=======
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
-    - UnityEngine.UI.Button
-    - UnityEngine.UI.CanvasScaler
-    - UnityEngine.UI.GraphicRaycaster
-    - UnityEngine.UI.Image
-<<<<<<< HEAD
-    - UnityEngine.UI.Text
-  sceneClasses:
-    Assets/Scenes/ResponsiveScene.unity:
-=======
-    - UnityEngine.UI.InputField
-    - UnityEngine.UI.Text
   sceneClasses:
     Assets/Scenes/ConnectionScene.unity:
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
     - Class: 1
       Script: {instanceID: 0}
     - Class: 4
       Script: {instanceID: 0}
     - Class: 20
       Script: {instanceID: 0}
-    - Class: 21
-      Script: {instanceID: 0}
     - Class: 28
-      Script: {instanceID: 0}
-    - Class: 48
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
     - Class: 104
       Script: {instanceID: 0}
-    - Class: 114
-<<<<<<< HEAD
-      Script: {instanceID: 9322}
-    - Class: 114
-      Script: {instanceID: 9324}
-    - Class: 114
-      Script: {instanceID: 9330}
-    - Class: 114
-      Script: {instanceID: 9336}
-=======
-      Script: {instanceID: 9320}
-    - Class: 114
-      Script: {instanceID: 9322}
-    - Class: 114
-      Script: {instanceID: 9334}
-    - Class: 114
-      Script: {instanceID: 9342}
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
-    - Class: 114
-      Script: {instanceID: 9344}
-    - Class: 114
-      Script: {instanceID: 9380}
-<<<<<<< HEAD
-    - Class: 114
-      Script: {instanceID: 9382}
-=======
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
-    - Class: 115
-      Script: {instanceID: 0}
-    - Class: 128
-      Script: {instanceID: 0}
     - Class: 157
-      Script: {instanceID: 0}
-    - Class: 213
-      Script: {instanceID: 0}
-    - Class: 222
-      Script: {instanceID: 0}
-    - Class: 223
-      Script: {instanceID: 0}
-    - Class: 224
       Script: {instanceID: 0}
   scriptHashData:
   - hash:
@@ -694,6 +634,12 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
+      Hash: 2c2f01d7bd0ca83af3a9cd39eb60b849
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: UpdateHomeTitle
+  - hash:
+      serializedVersion: 2
       Hash: 5372ed2ce39229b1ac910757999a8be2
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
@@ -724,10 +670,5 @@ ScriptsOnlyBuild:
     className: PlayableTrack
   platform: 19
   scenePathNames:
-<<<<<<< HEAD
-  - Assets/Scenes/ResponsiveScene.unity
-  playerPath: A:/Dropbox/Dropbox/Madera/Builds/Windows/MaderApp.exe
-=======
   - Assets/Scenes/ConnectionScene.unity
-  playerPath: C:/Users/Robin/Desktop/projet/MaderApp/MaderApp.exe
->>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
+  playerPath: D:/MaderApp/MaderApp.exe
