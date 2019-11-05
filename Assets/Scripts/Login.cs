@@ -10,7 +10,7 @@ public class Login : MonoBehaviour
     public InputField username;
     public InputField password;
     public Button connexion;
-    static Text infoCo;
+    public Text infoCo = null;
     
     
     
@@ -42,7 +42,8 @@ public class Login : MonoBehaviour
                 //request error, error message.
                 Debug.Log(request.error);
                 Debug.Log("erreur dans l'identification");
-                infoCo.text = "erreur dans l'identification";
+                string inf = "erreur dans l'identification";
+                infoCo.text = inf;
             }
             else
             {
@@ -54,7 +55,6 @@ public class Login : MonoBehaviour
                     RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
                     //delete soon
                     Debug.Log("bienvenu");
-                    infoCo.text = "bienvenu";
                     //going into home.
 
                 }

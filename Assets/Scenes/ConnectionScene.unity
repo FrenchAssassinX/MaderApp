@@ -347,6 +347,8 @@ MonoBehaviour:
   username: {fileID: 1763747066}
   password: {fileID: 1350893161}
   connexion: {fileID: 362593889}
+  infoCo:
+    text: 
 --- !u!1 &464462077
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,6 +465,8 @@ MonoBehaviour:
   username: {fileID: 0}
   password: {fileID: 0}
   connexion: {fileID: 0}
+  infoCo:
+    text: 
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -851,7 +855,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136630880}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 112ae8754f1c6e44496db0bc0ce91bd0, type: 3}
   m_Name: 
@@ -859,6 +863,8 @@ MonoBehaviour:
   username: {fileID: 0}
   password: {fileID: 0}
   connexion: {fileID: 0}
+  infoCo:
+    text: 
 --- !u!1 &1262633953
 GameObject:
   m_ObjectHideFlags: 0
@@ -871,6 +877,7 @@ GameObject:
   - component: {fileID: 1262633957}
   - component: {fileID: 1262633956}
   - component: {fileID: 1262633955}
+  - component: {fileID: 1262633958}
   m_Layer: 5
   m_Name: infoCo
   m_TagString: Untagged
@@ -912,6 +919,8 @@ MonoBehaviour:
   username: {fileID: 0}
   password: {fileID: 0}
   connexion: {fileID: 0}
+  infoCo:
+    text: 
 --- !u!114 &1262633956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -954,6 +963,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1262633953}
   m_CullTransparentMesh: 0
+--- !u!114 &1262633958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262633953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 112ae8754f1c6e44496db0bc0ce91bd0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  username: {fileID: 0}
+  password: {fileID: 0}
+  connexion: {fileID: 0}
+  infoCo:
+    text: 
 --- !u!1 &1350893159
 GameObject:
   m_ObjectHideFlags: 0
@@ -1280,7 +1306,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1663662569}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 112ae8754f1c6e44496db0bc0ce91bd0, type: 3}
   m_Name: 
@@ -1288,6 +1314,8 @@ MonoBehaviour:
   username: {fileID: 0}
   password: {fileID: 0}
   connexion: {fileID: 0}
+  infoCo:
+    text: 
 --- !u!4 &1663662571
 Transform:
   m_ObjectHideFlags: 0
