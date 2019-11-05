@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 ﻿using System.Collections;
+=======
+﻿using System;
+using System.Collections;
+>>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +33,11 @@ public class Token
 public class Text
 {
     public string text;
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
 }
 
 [System.Serializable]
@@ -50,4 +60,9 @@ public class RootObject
     public Token token;
     public Text text;
     public User user;
+<<<<<<< HEAD
 }
+=======
+    internal string message;
+}
+>>>>>>> 26f194e22cb6451e4153689c131b7e56011bd382
