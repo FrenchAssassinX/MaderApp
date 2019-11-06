@@ -50,7 +50,7 @@ public class User
 [System.Serializable]
 public class RootObject
 {
-    public Token token;
+    public string token;
     public Text text;
     public User user;
     internal string message;
