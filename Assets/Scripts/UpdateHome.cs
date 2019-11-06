@@ -32,7 +32,8 @@ public class UpdateHome : MonoBehaviour
     //consult projects button function
     public void ConsultProjects()
     {
-        Debug.Log("Consult projects click");
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2); //Go to the Projects List Scene
     }
 
     //parameters button function
