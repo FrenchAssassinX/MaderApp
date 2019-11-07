@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Serializer
@@ -54,4 +55,60 @@ public class RootObject
     public Text text;
     public User user;
     internal string message;
+}
+
+/* Invoice object constructor */
+[System.Serializable]
+public class Invoice
+{
+    public string id;
+}
+
+/* Payement object constructor */
+[System.Serializable]
+public class Payement
+{
+    public string id;
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class Estimation
+{
+    public string id;
+}
+
+[System.Serializable]
+public class User2
+{
+    public string id;
+    public bool incharge;
+}
+
+/* Project object constructor */
+[System.Serializable]
+public class Project
+{
+    public User2 user;
+    public List<Invoice> invoice;
+    public List<Payement> payement;
+    public List<Estimation> estimation;
+    public string _id;
+    public string name;
+    public string date;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string reference;
+    public string customer;
+}
+
+/* Projects request constructor */
+[System.Serializable]
+public class RequestGetAllProject
+{
+    public string message;
+    public List<Project> projects;
 }
