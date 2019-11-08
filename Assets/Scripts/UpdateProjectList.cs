@@ -34,6 +34,18 @@ public class UpdateProjectList : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 2);   //Go back to Home Scene
     }
 
+    public void GoToViewProject(GameObject pItemSelected)
+    {
+        GameObject projectSelected = new GameObject();                                  // Create the project as a GameObject to pass in another scene
+        projectSelected.name = "ProjectSelected";                                       // Change name of the GameObject to find it easely ine the hierarchy
+        projectSelected.AddComponent<ProjectSelected>();                                // Assign Project script to the new GameObject
+        projectSelected.GetComponent<ProjectSelected>().id = pItemSelected.GetComponent<ItemListProject>().id;      // Assign the ID for the next scene
+
+        DontDestroyOnLoad(projectSelected);                                             // Pass the project selected to the next scene
+        DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);   //Go to Project Sheet Scene
+    }
+
     private IEnumerator GetAllProjects()
     {
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getProjectUrl);
@@ -68,7 +80,7 @@ public class UpdateProjectList : MonoBehaviour
                     // Set GridList as parent of prefab in project hierarchy
                     listItem.transform.SetParent(gridList.transform);
 
-                    // Find children in listItem
+                    // Find children in listItem to use their
                     GameObject dateValue = GameObject.Find("DateValue");
                     GameObject refValue = GameObject.Find("RefValue");
                     GameObject clientValue = GameObject.Find("ClientValue");
@@ -80,18 +92,26 @@ public class UpdateProjectList : MonoBehaviour
                     clientValue.name = clientValue.name + listItem.GetComponent<ItemListProject>().name;
                     sellerValue.name = sellerValue.name + listItem.GetComponent<ItemListProject>().name;
 
-                    // Change text value of the list item
+                    // Formating date to French time
                     string dateValueText = entity.date.ToString();
                     dateValueText = dateValueText.Remove(10, 14);
                     DateTime dateTimeText = Convert.ToDateTime(dateValueText);
                     dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
+                    // Change text value of the list item
                     dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
                     refValue.GetComponent<UnityEngine.UI.Text>().text = entity.reference.ToString();
                     clientValue.GetComponent<UnityEngine.UI.Text>().text = entity.customer.ToString();
                     sellerValue.GetComponent<UnityEngine.UI.Text>().text = entity.user.matricule.ToString();
+
+                    listItem.GetComponent<ItemListProject>().id = entity._id.ToString();
                 }
             }
         }
+    }
+
+    private IEnumerator DeleteProject()
+    {
+        return null;
     }
 }

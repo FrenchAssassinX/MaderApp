@@ -132,7 +132,6 @@ GameObject:
   - component: {fileID: 112443440}
   - component: {fileID: 112443439}
   - component: {fileID: 112443438}
-  - component: {fileID: 112443441}
   m_Layer: 5
   m_Name: HomeButton
   m_TagString: Untagged
@@ -203,7 +202,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 112443441}
+      - m_Target: {fileID: 0}
         m_MethodName: GoBackToMenu
         m_Mode: 1
         m_Arguments:
@@ -253,22 +252,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 112443436}
   m_CullTransparentMesh: 0
---- !u!114 &112443441
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 112443436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44839b98d69825949a0768240217a52a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CONST: {fileID: 0}
-  listItemPrefab: {fileID: 6868576898735282210, guid: 590eb03f046920949a73bae9853bac68,
-    type: 3}
-  gridList: {fileID: 0}
 --- !u!1 &157740251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1896,6 +1879,7 @@ GameObject:
   - component: {fileID: 927185313}
   - component: {fileID: 927185315}
   - component: {fileID: 927185314}
+  - component: {fileID: 927185316}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -1961,6 +1945,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927185312}
   m_CullTransparentMesh: 0
+--- !u!114 &927185316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 927185312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44839b98d69825949a0768240217a52a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CONST: {fileID: 0}
+  listItemPrefab: {fileID: 6868576898735282210, guid: 590eb03f046920949a73bae9853bac68,
+    type: 3}
+  gridList: {fileID: 1089605307}
 --- !u!1 &1083742991
 GameObject:
   m_ObjectHideFlags: 0
