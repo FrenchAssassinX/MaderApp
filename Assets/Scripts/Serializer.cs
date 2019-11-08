@@ -83,6 +83,7 @@ public class User2
 {
     public string id;
     public bool incharge;
+    public string matricule;
 }
 
 /* Project object constructor */
