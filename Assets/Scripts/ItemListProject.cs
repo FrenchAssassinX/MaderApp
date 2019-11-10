@@ -81,6 +81,7 @@ public class ItemListProject : MonoBehaviour
     {
         if (isSelected)
         {
+            Debug.Log("DeleteProject button pressed");
             GameObject.Find("Panel").GetComponent<UpdateProjectList>().DisplayDeleteProject(this.gameObject);             // Display Delete panel
         }
     }

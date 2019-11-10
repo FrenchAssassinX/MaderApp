@@ -9,33 +9,38 @@ using UnityEngine.UI;
 
 public class UpdateProjectList : MonoBehaviour
 {
-    public GameObject CONST;                                // CONST object contains server route, token and user infos
+    public GameObject CONST;                                    // CONST object contains server route, token and user infos
 
-    private string getProjectUrl = "v1/getallproject";      // Specific route to get all projects
-    private string deleteProjectUrl = "v1/deleteproject";   // Specific route to delete one project
+    private string getProjectUrl = "v1/getallproject";          // Specific route to get all projects
+    private string deleteProjectUrl = "v1/deleteproject";       // Specific route to delete one project
 
-    public GameObject listItemPrefab;                       // Prefab item to display all elements in project list
-    public GameObject gridList;                             // Grid to insert project prefab items
+    public GameObject listItemPrefab;                           // Prefab item to display all elements in project list
+    public GameObject gridList;                                 // Grid to insert project prefab items
 
-    public GameObject confirmPanels;                        // Panels to display confirm actions
-    public GameObject deletePanel;                          // Delete panel
-    public Button deletePanelConfirmButton;                 // Confirm button on Delete panel
-    public Button deletePanelCancelButton;                  // Cancel button on Delete panel
+    public GameObject confirmPanels;                            // Panels to display confirm actions
+    public GameObject deletePanel;                              // Delete panel
+    public Button deletePanelConfirmButton;                     // Confirm button on Delete panel
+    public Button deletePanelCancelButton;                      // Cancel button on Delete panel
 
-    public List<Project> listProjects;                      // List useful for filtering
+    public List<Project> listProjects;                          // List useful for filtering
+
+    ProjectSelected projectSelected = new ProjectSelected();    // Create the project as a GameObject to pass in another scene
 
     void Start()
     {
-        CONST = GameObject.Find("CONST");                   // Get const object
-        gridList = GameObject.Find("GridList");             // Get grid of the list 
+        CONST = GameObject.Find("CONST");                       // Get const object
+        gridList = GameObject.Find("GridList");                 // Get grid of the list 
 
-        confirmPanels.SetActive(false);                     // Don't display panels on start
+        /* Don't display panels of confirm action on start */
+        confirmPanels.SetActive(false);                         
         deletePanel.SetActive(false);
 
+        /* Assign OnClick behaviours to delete panel buttons */
         deletePanelCancelButton.GetComponent<Button>();
         deletePanelCancelButton.onClick.AddListener(HideDeletePanel);
+        deletePanelConfirmButton.onClick.AddListener(StartDeleteProject);
 
-        StartCoroutine(GetAllProjects());                   // Start script to find projects on databse
+        StartCoroutine(GetAllProjects());                       // Start script to find projects on databse
     }
 
     void Update()
@@ -45,20 +50,19 @@ public class UpdateProjectList : MonoBehaviour
 
     public void GoBackToMenu()
     {
-        DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 2);   //Go back to Home Scene
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 2);       //Go back to Home Scene
     }
 
+    /* Function useful when a project was selected on the list: Go to Project Sheet */
     public void GoToViewProject(GameObject pItemSelected)
     {
-        GameObject projectSelected = new GameObject();                                  // Create the project as a GameObject to pass in another scene
-        projectSelected.name = "ProjectSelected";                                       // Change name of the GameObject to find it easely ine the hierarchy
-        projectSelected.AddComponent<ProjectSelected>();                                // Assign Project script to the new GameObject
-        projectSelected.GetComponent<ProjectSelected>().id = pItemSelected.GetComponent<ItemListProject>().id;      // Assign the ID for the next scene
+        projectSelected.name = "ProjectSelected";                                   // Change name of the GameObject to find it easely ine the hierarchy
+        projectSelected.id = pItemSelected.GetComponent<ItemListProject>().id;      // Assign the ID for the next scene
 
-        DontDestroyOnLoad(projectSelected);                                             // Pass the project selected to the next scene
-        DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);   //Go to Project Sheet Scene
+        DontDestroyOnLoad(projectSelected);                                         // Pass the project selected to the next scene
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       //Go to Project Sheet Scene
     }
 
     private IEnumerator GetAllProjects()
@@ -133,10 +137,9 @@ public class UpdateProjectList : MonoBehaviour
         confirmPanels.SetActive(true);
         deletePanel.SetActive(true);
 
-        GameObject projectSelected = new GameObject();                                  // Create the project as a GameObject to pass in another scene
-        projectSelected.name = "ProjectSelected";                                       // Change name of the GameObject to find it easely ine the hierarchy
-        projectSelected.AddComponent<ProjectSelected>();                                // Assign Project script to the new GameObject
-        projectSelected.GetComponent<ProjectSelected>().id = pItemSelected.GetComponent<ItemListProject>().id;
+        projectSelected.id = pItemSelected.GetComponent<ItemListProject>().id;
+
+        Debug.Log("ID of selected project:" + projectSelected.id);
     }
 
     public void HideDeletePanel()
@@ -145,10 +148,17 @@ public class UpdateProjectList : MonoBehaviour
         deletePanel.SetActive(false);
     }
 
+    public void StartDeleteProject()
+    {
+        StartCoroutine(DeleteProject(projectSelected));
+    }
+
     private IEnumerator DeleteProject(ProjectSelected pProjectSelected)
     {
-        // CHANGE REQUEST TO DELETE
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + deleteProjectUrl);
+        WWWForm form = new WWWForm();                       // New form for web request
+        form.AddField("projectID", pProjectSelected.id);    // Add to the form the value of the ID of the project to delete
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteProjectUrl, form);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -162,7 +172,15 @@ public class UpdateProjectList : MonoBehaviour
         {
             if (request.isDone)
             {
-                Debug.Log("Project successfuly deleted");
+                HideDeletePanel();                          // Hide delete panel
+
+                /* Refresh list of projects */
+                foreach (Transform childList in gridList.transform)
+                {
+                    GameObject.Destroy(childList.gameObject);
+                }
+
+                StartCoroutine(GetAllProjects());           // Recall all projects from databse
             }
         }
 

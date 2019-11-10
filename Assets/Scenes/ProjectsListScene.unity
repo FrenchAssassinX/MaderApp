@@ -2259,8 +2259,9 @@ MonoBehaviour:
   gridList: {fileID: 1089605307}
   confirmPanels: {fileID: 391058344}
   deletePanel: {fileID: 1889498428}
-  deletePanelConfirmButton: {fileID: 0}
+  deletePanelConfirmButton: {fileID: 185713247}
   deletePanelCancelButton: {fileID: 1516169846}
+  listProjects: []
 --- !u!1 &941558647
 GameObject:
   m_ObjectHideFlags: 0
