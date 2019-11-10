@@ -10,7 +10,7 @@ public class NewProject : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLCreateCustomer = "/v1/createcustomer";
+    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for this scene
 
     //project (CanvasLeft)
     public InputField nameProject;
@@ -24,7 +24,7 @@ public class NewProject : MonoBehaviour
     public InputField surname;
     public InputField roadNum;
     public InputField road;
-    public InputField zipeCode;
+    public InputField zipcode;
     public InputField city;
     public InputField roadExtra;
     public InputField email;
@@ -65,12 +65,8 @@ public class NewProject : MonoBehaviour
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
         Debug.Log(btnHP);
-    }
 
-    void Update()
-    {
-        
-
+        Debug.Log("URL :" + url + URLCreateCustomer);
     }
 
     void DisplayCreateNewCustomer()
@@ -82,63 +78,99 @@ public class NewProject : MonoBehaviour
 
     void SendCreateProjet()
     {
-
+        Debug.Log("vous avez cliqué sur le boutton création du projet");
     }
 
     void SendCreateUser()
     {
         StartCoroutine(PostFormNewCustomer());
+        Debug.Log("vous avez cliqué sur le boutton création d'un utilisateur");
 
     }
 
     void ReturnHomePage()
     {
         //Send the previous scene (home page)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1); 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 
     IEnumerator PostFormNewCustomer()
     {
         WWWForm form = new WWWForm();                   // New form for web request
         form.AddField("name", name.text);
-        Debug.Log(name.text);
-        form.AddField("surname", surname.text);
-        Debug.Log(surname.text);
-        //form.AddField("roadNum", roadNum.int);
-        //Debug.Log(roadNum.text);
+        Debug.Log("name : " + name.text);
+        form.AddField("surename", surname.text);
+        Debug.Log("surename" + surname.text);
         form.AddField("road", road.text);
-        Debug.Log(road.text);
-        //form.AddField("zipeCode", zipeCode.int);
-        //Debug.Log(zipeCode.text);
+        Debug.Log("road" + road.text);
+        form.AddField("roadNum", roadNum.text);
+        Debug.Log("roadNum" + roadNum.text);
+        form.AddField("zipcode", zipcode.text);
+        Debug.Log("zipcode" + zipcode.text);
         form.AddField("city", city.text);
-        Debug.Log(city.text);
+        Debug.Log("city" + city.text);
         form.AddField("roadExtra", roadExtra.text);
-        Debug.Log(roadExtra.text);
+        Debug.Log("roadExtra" + roadExtra.text);
+        form.AddField("phone", phone.text);
+        Debug.Log("phone" + phone.text);
         form.AddField("email", email.text);
-        Debug.Log(email.text);
-        //form.AddField("phone", phone.int);
-        //Debug.Log(phone.text);
+        Debug.Log("email" + email.text);
+        form.AddField("_id", "12345");
+        form.AddField("__v", "0");
+
+        
 
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateCustomer, form))
         {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
                 // error
+                Debug.Log(request.error);
             }
             else
             {
                 if (request.isDone)
                 {
+                    Debug.Log("conexion au serveur");
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    // Create a root object thanks to the JSON file
+                    resultNewProject entity = JsonUtility.FromJson<resultNewProject>(jsonResult);
                     //ok
-                    DontDestroyOnLoad(CONST.transform);
+                    
+                        Debug.Log("send");
+
+                }
+                else
+                {
+                    Debug.Log("erreur conexion au serveur");
 
                 }
             }
         }
+            //using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateCustomer, form))
+            //{
+            //    yield return request.SendWebRequest();
+            //    if (request.isNetworkError || request.isHttpError)
+            //    {
+            //        // error
+            //        Debug.Log("erreur lors de la conexion au serveur");
+            //    }
+            //    else
+            //    {
+            //        if (request.isDone)
+            //        {
+
+
+            //        }
+            //    }
+            //}
+        }
+
     }
 
-    //return To acceuil page :         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1); //Send the previous scene (connectionScene)
-
-
-}

@@ -1586,13 +1586,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 392019673}
   m_TextComponent: {fileID: 962507864}
   m_Placeholder: {fileID: 1847093566}
-  m_ContentType: 3
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 2
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -2273,7 +2273,7 @@ MonoBehaviour:
   surname: {fileID: 1559895496}
   roadNum: {fileID: 392019672}
   road: {fileID: 580901652}
-  zipeCode: {fileID: 1225169910}
+  zipcode: {fileID: 1225169910}
   city: {fileID: 1782060908}
   roadExtra: {fileID: 1712561597}
   email: {fileID: 841981646}
@@ -2620,10 +2620,10 @@ RectTransform:
   m_Father: {fileID: 1650577938}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -845.78, y: 0.098779}
-  m_SizeDelta: {x: 196.15, y: 176.2}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 98.21997, y: -87.90122}
+  m_SizeDelta: {x: 196.15002, y: 176.20001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &786270577
 GameObject:
@@ -3974,7 +3974,7 @@ GameObject:
   - component: {fileID: 1225169911}
   - component: {fileID: 1225169910}
   m_Layer: 5
-  m_Name: ZipCode
+  m_Name: Zipcode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4043,13 +4043,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1225169911}
   m_TextComponent: {fileID: 345545994}
   m_Placeholder: {fileID: 1610644589}
-  m_ContentType: 3
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 2
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -4194,7 +4194,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Option A
+    - m_Text: ID du projet
       m_Image: {fileID: 0}
     - m_Text: Option B
       m_Image: {fileID: 0}
@@ -4325,13 +4325,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1404080531}
   m_TextComponent: {fileID: 82705932}
   m_Placeholder: {fileID: 905907881}
-  m_ContentType: 3
+  m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 2
+  m_KeyboardType: 0
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 2
+  m_CharacterValidation: 0
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -5976,7 +5976,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Option A
+  m_Text: ID du projet
 --- !u!222 &2056978335
 CanvasRenderer:
   m_ObjectHideFlags: 0

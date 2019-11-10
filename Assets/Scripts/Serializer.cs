@@ -55,3 +55,27 @@ public class RootObject
     public User user;
     internal string message;
 }
+/*Customer constructor*/
+ [System.Serializable] 
+public class Customer
+{
+    public string _id;
+    public string name;
+    public string surename;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string phone;
+    public string email;
+    public string __v;
+}
+
+[System.Serializable]
+public class resultNewProject
+{
+    public string token;
+    public string message;
+    public Customer customer;
+}
