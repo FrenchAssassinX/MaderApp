@@ -17,10 +17,14 @@ public class UpdateProjectList : MonoBehaviour
     public GameObject listItemPrefab;                           // Prefab item to display all elements in project list
     public GameObject gridList;                                 // Grid to insert project prefab items
 
+    /*                      ---------- Delete panel props ----------                                */
     public GameObject confirmPanels;                            // Panels to display confirm actions
     public GameObject deletePanel;                              // Delete panel
     public Button deletePanelConfirmButton;                     // Confirm button on Delete panel
     public Button deletePanelCancelButton;                      // Cancel button on Delete panel
+    public GameObject deletePanelText;                          // Text of Delete panel
+    public GameObject deletePanelTextError;                     // Error text of Delete panel
+    /*                      ---------- End delete panel props ----------                                */
 
     public List<Project> listProjects;                          // List useful for filtering
 
@@ -34,6 +38,7 @@ public class UpdateProjectList : MonoBehaviour
         /* Don't display panels of confirm action on start */
         confirmPanels.SetActive(false);                         
         deletePanel.SetActive(false);
+        deletePanelTextError.SetActive(false);
 
         /* Assign OnClick behaviours to delete panel buttons */
         deletePanelCancelButton.GetComponent<Button>();
@@ -41,11 +46,6 @@ public class UpdateProjectList : MonoBehaviour
         deletePanelConfirmButton.onClick.AddListener(StartDeleteProject);
 
         StartCoroutine(GetAllProjects());                       // Start script to find projects on databse
-    }
-
-    void Update()
-    {
-        
     }
 
     public void GoBackToMenu()
@@ -65,13 +65,14 @@ public class UpdateProjectList : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       //Go to Project Sheet Scene
     }
 
+    /* Function to get all current projects on database */
     private IEnumerator GetAllProjects()
     {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getProjectUrl);
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getProjectUrl);     // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        yield return request.SendWebRequest();
+        yield return request.SendWebRequest();                      // Send request                                                              
 
         if (request.isNetworkError || request.isHttpError)
         {
@@ -81,14 +82,11 @@ public class UpdateProjectList : MonoBehaviour
         {
             if (request.isDone)
             {
-                Debug.Log("*** Request Succeed :D ***");
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                Debug.Log(jsonResult);
+                RequestGetAllProject entities = JsonUtility.FromJson<RequestGetAllProject>(jsonResult);         // Convert JSON file
 
-                RequestGetAllProject entities = JsonUtility.FromJson<RequestGetAllProject>(jsonResult);
-                Debug.Log("*** Entities: " + entities + " ***");
-
+                // foreach to retrieve every projects
                 foreach (var item in entities.projects)
                 {
                     // Create project with datas from database
@@ -111,7 +109,7 @@ public class UpdateProjectList : MonoBehaviour
                     clientValue.name = clientValue.name + listItem.GetComponent<ItemListProject>().name;
                     sellerValue.name = sellerValue.name + listItem.GetComponent<ItemListProject>().name;
 
-                    // Formating date to French time
+                    // Formating date to French timeset
                     string dateValueText = entity.date.ToString();
                     dateValueText = dateValueText.Remove(10, 14);
                     DateTime dateTimeText = Convert.ToDateTime(dateValueText);
@@ -132,41 +130,51 @@ public class UpdateProjectList : MonoBehaviour
         }
     }
 
+    /* Function to display Delete project panel */
     public void DisplayDeleteProject(GameObject pItemSelected)
     {
+        /* Make panels visible */
         confirmPanels.SetActive(true);
         deletePanel.SetActive(true);
+        deletePanelText.SetActive(true);
 
+        // Keep the ID of the selected project
         projectSelected.id = pItemSelected.GetComponent<ItemListProject>().id;
-
-        Debug.Log("ID of selected project:" + projectSelected.id);
     }
 
+    /* Function to hide Delete panel */
     public void HideDeletePanel()
     {
+        /* Make panels not visible */
         confirmPanels.SetActive(false);
         deletePanel.SetActive(false);
+        deletePanelText.SetActive(false);
+        deletePanelTextError.SetActive(false);
     }
 
+    /* Intermediary function to run DeleteProject function. Necessary because OnClick don't support IEnumerator function as parameters */
     public void StartDeleteProject()
     {
-        StartCoroutine(DeleteProject(projectSelected));
+        StartCoroutine(DeleteProject(projectSelected));             // Lauch function
     }
 
+    /* Function to delete project in the database */
     private IEnumerator DeleteProject(ProjectSelected pProjectSelected)
     {
         WWWForm form = new WWWForm();                       // New form for web request
         form.AddField("projectID", pProjectSelected.id);    // Add to the form the value of the ID of the project to delete
 
-        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteProjectUrl, form);
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteProjectUrl, form);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
         {
-            Debug.Log("ERROR: " + request.error);
+            /* Display error message */
+            deletePanelText.SetActive(false);
+            deletePanelTextError.SetActive(true);
         }
         else
         {
@@ -186,17 +194,58 @@ public class UpdateProjectList : MonoBehaviour
 
     }
 
+    public void StartFilter()
+    {
+        /* Verify if dates fields are filled or not */
+        GameObject startingDate = GameObject.Find("StartingDateField");
+        GameObject endingDate = GameObject.Find("EndDateField");
+
+        if (!startingDate.GetComponent<InputField>().text.Equals(""))
+        {
+            if (endingDate.GetComponent<InputField>().text.Equals(""))
+            {
+                endingDate.GetComponent<InputField>().text = DateTime.Now.ToString();
+                Debug.Log("Ending date = " + endingDate.GetComponent<InputField>().text);
+            }
+
+            //FilterByDate();
+        }
+    }
+
     public void FilterByDate()
     {
+        /* Refresh list of projects */
+        foreach (Transform childList in gridList.transform)
+        {
+            GameObject.Destroy(childList.gameObject);
+        }
+
         GameObject startingDate = GameObject.Find("StartingDateText");
         GameObject endingDate = GameObject.Find("EndDateText");
 
         string startingFilter = startingDate.GetComponent<Text>().text;
         string endingFilter = endingDate.GetComponent<Text>().text;
 
-        foreach (Project project in listProjects)
-        {
+        DateTime startingDateFilter = Convert.ToDateTime(startingFilter);
+        DateTime endingDateFilter = Convert.ToDateTime(endingFilter);
 
+        /*foreach (Project project in listProjects)
+        {
+            if (project.date > )
+            {
+
+            }
+        }*/
+
+        foreach (Transform childList in gridList.transform)
+        {
+            DateTime childListDate = Convert.ToDateTime(childList.GetComponent<Project>().date);
+
+            if (childListDate < startingDateFilter || 
+                childListDate > endingDateFilter)
+            {
+                GameObject.Destroy(childList.gameObject);
+            }
         }
     }
 }
