@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Serializer
 {
@@ -73,9 +74,30 @@ public class Customer
 }
 
 [System.Serializable]
-public class resultNewProject
+public class getAllCustomer
 {
-    public string token;
-    public string message;
-    public Customer customer;
+    public string _id;
+    public string name;
+    public string surename;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string phone;
+    public string email;
+    public string __v;
+}
+
+[System.Serializable]
+public class CreateProject
+{
+    public string userID;
+    public string date;
+    public string road;
+    public string roadNum;
+    public string roadExtra;
+    public string zipcode;
+    public string city;
+    public string customerID;
 }

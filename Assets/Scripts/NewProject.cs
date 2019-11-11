@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -11,11 +12,11 @@ public class NewProject : MonoBehaviour
     public GameObject CONST;
     private string url;
     private string URLCreateCustomer = "v1/createcustomer"; // Specific url for this scene
+    private string URLCreateProject = "v1/createproject"; // Specific url for this scene
 
     //project (CanvasLeft)
     public InputField nameProject;
     public InputField referenceProject;
-    public Dropdown idClient;
     public Button ButtonCreateCustomer;
     public Button ButtonCreateProject;
 
@@ -32,6 +33,10 @@ public class NewProject : MonoBehaviour
     public Button ButtonCreateNewCustomer;
     public Canvas canvasNewClient;
 
+    //text information
+    public GameObject createValideCustomer;
+    public GameObject createValideProject;
+    public GameObject errorCreateCustomer;
     //Top
     public Button ButtonReturn;
 
@@ -45,7 +50,9 @@ public class NewProject : MonoBehaviour
 
         //it's not visible for now
         canvasNewClient.transform.gameObject.SetActive(false);
-
+        createValideCustomer.transform.gameObject.SetActive(false);
+        errorCreateCustomer.transform.gameObject.SetActive(false);
+        createValideProject.transform.gameObject.SetActive(false);
         //Active canvasRight for add new customer
         Button btnCC = ButtonCreateCustomer.GetComponent<Button>();
         btnCC.onClick.AddListener(DisplayCreateNewCustomer);
@@ -53,12 +60,12 @@ public class NewProject : MonoBehaviour
 
         //send new project
         Button btnCP = ButtonCreateProject.GetComponent<Button>();
-        btnCP.onClick.AddListener(SendCreateProjet);
+        btnCP.onClick.AddListener(SendCreateProject);
         Debug.Log(btnCP);
 
-        //send new user
+        //send new customer
         Button btnNC = ButtonCreateNewCustomer.GetComponent<Button>();
-        btnNC.onClick.AddListener(SendCreateUser);
+        btnNC.onClick.AddListener(SendCreateCustomer);
         Debug.Log(btnNC);
 
         //return home page
@@ -69,25 +76,47 @@ public class NewProject : MonoBehaviour
         Debug.Log("URL :" + url + URLCreateCustomer);
     }
 
+    //public static bool AllNull(InputField name, InputField surname, InputField road, InputField roadNum, InputField zipcode, InputField city, InputField phone, InputField email, InputField roadExtra, params string[] strings)
+    //{
+    //    return strings.All(s => s == "");
+    //}
+
+    void Update()
+    {
+
+        ////if form is empty ButtonCreateNewCustometr is disabled
+        //if (AllNull(name, surname, road, roadNum, zipcode, city, phone, email, roadExtra))
+        //{
+        //    ButtonCreateNewCustomer.enabled = false;
+        //}
+        //else { 
+        //    ButtonCreateNewCustomer.enabled = true;
+        //}
+    }
+
     void DisplayCreateNewCustomer()
     {
         //active CreateNewCient
         canvasNewClient.transform.gameObject.SetActive(true);
 
     }
-
-    void SendCreateProjet()
+    //add new project
+    void SendCreateProject()
     {
+        StartCoroutine(PostFormNewProject());
         Debug.Log("vous avez cliqué sur le boutton création du projet");
     }
 
-    void SendCreateUser()
+    //add new customer
+    void SendCreateCustomer()
     {
+
         StartCoroutine(PostFormNewCustomer());
         Debug.Log("vous avez cliqué sur le boutton création d'un utilisateur");
 
     }
-
+    
+    //return to home page
     void ReturnHomePage()
     {
         //Send the previous scene (home page)
@@ -118,19 +147,20 @@ public class NewProject : MonoBehaviour
         form.AddField("_id", "12345");
         form.AddField("__v", "0");
 
-        
 
+        /* New webrequest with: CONST url, local URLCreateCustomer and the form */
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateCustomer, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        
+
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
                 // error
                 Debug.Log(request.error);
+                errorCreateCustomer.transform.gameObject.SetActive(true);
             }
             else
             {
@@ -140,10 +170,10 @@ public class NewProject : MonoBehaviour
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
-                    resultNewProject entity = JsonUtility.FromJson<resultNewProject>(jsonResult);
-                    //ok
-                    
-                        Debug.Log("send");
+                    Customer entity = JsonUtility.FromJson<Customer>(jsonResult);
+                    //message validate new customer
+                    createValideCustomer.transform.gameObject.SetActive(true);
+                    Debug.Log("send");
 
                 }
                 else
@@ -153,24 +183,60 @@ public class NewProject : MonoBehaviour
                 }
             }
         }
-            //using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateCustomer, form))
-            //{
-            //    yield return request.SendWebRequest();
-            //    if (request.isNetworkError || request.isHttpError)
-            //    {
-            //        // error
-            //        Debug.Log("erreur lors de la conexion au serveur");
-            //    }
-            //    else
-            //    {
-            //        if (request.isDone)
-            //        {
 
 
-            //        }
-            //    }
-            //}
-        }
 
     }
 
+    IEnumerator PostFormNewProject()
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("userID", "");
+        form.AddField("date", "2019-01-21");
+        form.AddField("road", "rue des trucs");
+        form.AddField("roadNum", "25");
+        form.AddField("roadExtra", "rien");
+        form.AddField("zipcode", "71000");
+        form.AddField("city", "sance");
+        form.AddField("customerID", "");
+        form.AddField("projectName", "projectAlpha2");
+        form.AddField("reference", "testTruc");
+
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateProject, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                // error
+                Debug.Log(request.error);
+                //errorCreateCustomer.transform.gameObject.SetActive(true);
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                    Debug.Log("conexion au serveur");
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    // Create a root object thanks to the JSON file
+                    CreateProject entity = JsonUtility.FromJson<CreateProject>(jsonResult);
+                    //message validate new customer
+                    createValideProject.transform.gameObject.SetActive(true);
+                    Debug.Log("send");
+
+                }
+                else
+                {
+                    Debug.Log("erreur conexion au serveur");
+
+                }
+            }
+        }
+
+
+    }
+
+}
