@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
-
-public class ProjectSheet : MonoBehaviour
+using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+public class UpdateProjectSheet : MonoBehaviour
 {
     //project datas
     private string projectId;
@@ -43,6 +47,9 @@ public class ProjectSheet : MonoBehaviour
     public GameObject clientPhoneGO;
     public GameObject clientEmailGO;
 
+    public GameObject listItemPrefab;                           // Prefab item to display all elements in project list
+    public GameObject estimationList;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -78,11 +85,49 @@ public class ProjectSheet : MonoBehaviour
         clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text = clientPhone;
         clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = clientEmail;
 
+        estimationList = GameObject.Find("estimationListPanel");                 // Get grid of the list 
+
+        GetAllEstimations();                       // Start script to find estimations on databse
     }
 
-    // Update is called once per frame
-    void Update()
+    private void GetAllEstimations()
     {
-        
+        string jsonResult = "{\"estimations\": [{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"}]}";
+
+        EstimationList entities = JsonUtility.FromJson<EstimationList>(jsonResult);         // Convert JSON file
+
+        // foreach to retrieve every estimations
+        foreach (var item in entities.estimations)
+        {
+            Debug.Log("Test");
+            // Create project with datas from database
+            Estimation entity = item;
+
+            // Create prefab
+            GameObject listItem = Instantiate(listItemPrefab, estimationList.transform.position, Quaternion.identity);
+
+            // Set estimationListPanel as parent of prefab in project hierarchy
+            estimationList.transform.SetParent(estimationList.transform);
+
+            // Find children in listItem to use them
+            GameObject idValue = GameObject.Find("idText");
+            GameObject priceValue = GameObject.Find("priceText");
+            GameObject stateValue = GameObject.Find("stateText");
+            GameObject dateValue = GameObject.Find("dateText");
+
+            // Customize props name of the prefab to find it when it will be create
+            idValue.name = idValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            priceValue.name = priceValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            stateValue.name = stateValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            dateValue.name = dateValue.name + listItem.GetComponent<ItemListEstimation>().name;
+
+            // Change text value of the list item
+            idValue.GetComponent<UnityEngine.UI.Text>().text = entity.id.ToString();
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = entity.price.ToString();
+            stateValue.GetComponent<UnityEngine.UI.Text>().text = entity.state.ToString();
+            dateValue.GetComponent<UnityEngine.UI.Text>().text = entity.date.ToString();
+        }
     }
+
+    
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Serializer
@@ -54,4 +55,19 @@ public class RootObject
     public Text text;
     public User user;
     internal string message;
+}
+
+[System.Serializable]
+public class Estimation
+{
+    public string id;
+    public string price;
+    public string state;
+    public string date; 
+}
+
+[System.Serializable]
+public class EstimationList
+{
+    public List<Estimation> estimations;
 }
