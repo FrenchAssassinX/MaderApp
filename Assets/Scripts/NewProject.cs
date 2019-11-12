@@ -191,16 +191,17 @@ public class NewProject : MonoBehaviour
     IEnumerator PostFormNewProject()
     {
         WWWForm form = new WWWForm();
-        form.AddField("userID", "");
+        form.AddField("userID", "5dbee1c6e9b5241f704fdca9");
         form.AddField("date", "2019-01-21");
         form.AddField("road", "rue des trucs");
         form.AddField("roadNum", "25");
         form.AddField("roadExtra", "rien");
         form.AddField("zipcode", "71000");
         form.AddField("city", "sance");
-        form.AddField("customerID", "");
-        form.AddField("projectName", "projectAlpha2");
+        form.AddField("customerID", "5dbefd7e68ef8658edcde0c4");
         form.AddField("reference", "testTruc");
+        form.AddField("projectName", "projectAlpha2");
+        
 
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateProject, form))
         {
