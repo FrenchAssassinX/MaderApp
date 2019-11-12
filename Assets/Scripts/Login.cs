@@ -9,7 +9,6 @@ public class Login : MonoBehaviour
     // Const object and properties to transfer datas on every scenes of the project
     public GameObject CONST;
     private string url;
-
     private string loginUrl = "v1/login";       // Specific url for this scene
 
     public InputField username;                 /*** Text infos UI Elements ***/
@@ -64,12 +63,11 @@ public class Login : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
                     RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
-
                     // Get token and users info before changing scene
                     CONST.GetComponent<CONST>().token = entity.token.ToString();
                     CONST.GetComponent<CONST>().userID = entity.user._id.ToString();
                     CONST.GetComponent<CONST>().userName = entity.user.prenom.ToString();
-
+                    
                     // Keep the CONST gameObject between scenes
                     DontDestroyOnLoad(CONST.transform);
                     // Go to Home Scene

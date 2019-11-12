@@ -26,6 +26,10 @@ public class UpdateHome : MonoBehaviour
     //create project button function
     public void CreateProject()
     {
+        // Keep the CONST gameObject between scenes
+        DontDestroyOnLoad(CONST.transform);
+        // Go to Home Scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         Debug.Log("Create project click"); 
     }
 
