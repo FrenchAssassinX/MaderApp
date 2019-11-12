@@ -13,5 +13,11 @@ EditorBuildSettings:
     guid: 15ad5243e5ebdb94493e2c53c2b30e7b
   - enabled: 1
     path: Assets/Scenes/NewProjectScene.unity
-    guid: fa08a7452efaea4499c4ec257ca32ecb
+    guid: 9531028e4b6d0ef47b54791471bd8ff2
+  - enabled: 1
+    path: Assets/Scenes/ProjectsListScene.unity
+    guid: 1bf1f19e4ac9e0a408fa3178a89b7500
+  - enabled: 1
+    path: Assets/Scenes/ProjectSheetScene.unity
+    guid: f6c4a914ff9445040be4d07551b8fd94
   m_configObjects: {}

@@ -58,6 +58,50 @@ public class RootObject
     internal string message;
 }
 
+/* Invoice object constructor */
+[System.Serializable]
+public class Invoice
+{
+    public string id;
+}
+
+/* Payement object constructor */
+[System.Serializable]
+public class Payement
+{
+    public string id;
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class Estimation
+{
+    public string id;
+}
+
+[System.Serializable]
+public class User2
+{
+    public string id;
+    public bool incharge;
+    public string matricule;
+}
+
+/* Project object constructor */
+[System.Serializable]
+public class Project
+{
+    public User2 user;
+    public List<Invoice> invoice;
+    public List<Payement> payement;
+    public List<Estimation> estimation;
+    public string _id;
+    public string name;
+    public string date;
+    public string phone;
+    public string email;
+    public string __v;
+}
 
 [System.Serializable]
 public class Estimation
@@ -101,9 +145,16 @@ public class getAllCustomer
     public string zipcode;
     public string city;
     public string roadExtra;
-    public string phone;
-    public string email;
-    public string __v;
+    public string reference;
+    public string customer;
+}
+
+/* Projects request constructor */
+[System.Serializable]
+public class RequestGetAllProject
+{
+    public string message;
+    public List<Project> projects;
 }
 
 [System.Serializable]
