@@ -10,9 +10,11 @@ public class ItemListProject : MonoBehaviour
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
     public string id;                                       // Variable to pass the project on the next scene and find it by ID
+    public string date;
+    public string clientName;
+    public string referentName;
 
     /* All the buttons for make specific actions with the project */                         
-    public GameObject buttonEdit;
     public GameObject buttonView;
     public GameObject buttonDelete;
 
@@ -23,12 +25,10 @@ public class ItemListProject : MonoBehaviour
         isSelected = false;                                 // Initialize the boolean to false
 
         /* Retrieve the buttons in the scene */
-        buttonEdit = GameObject.Find("EditButton");
         buttonView = GameObject.Find("ViewButton");
         buttonDelete = GameObject.Find("DeleteButton");
 
         /* Affect specific onClick behaviours to the buttons */
-        buttonEdit.GetComponent<Button>().onClick.AddListener(EditProject);
         buttonView.GetComponent<Button>().onClick.AddListener(ViewProject);
         buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteProject);
     }
@@ -37,15 +37,6 @@ public class ItemListProject : MonoBehaviour
     public void SelectItem()
     {
         isSelected = true;
-    }
-
-    /* Function to edit the selected project */
-    public void EditProject()
-    {
-        if (isSelected)
-        {
-            Debug.Log("Edit project");
-        }
     }
     
     /* Function to view the selected project */
