@@ -474,7 +474,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: b9e36b7bf99a9ee42b371e192a486484, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ababa54347849a247afdc7e7b2054d2e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1465,6 +1465,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb1f7c77598e09c4ca04ced382b42040, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  url: http://madera-figueiredo.space/
   token: 
+  userID: 
   userName: 
-  userMail: 
