@@ -8,6 +8,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class UpdateProjectSheet : MonoBehaviour
 {
+    public GameObject CONST;                                    // CONST object contains server route, token and user infos
+
+    //backPage button
+    public GameObject backPageButton;
+
+    private string getProjectUrl = "v1/getallproject";          // Specific route to get the project
+
     //project datas
     private string projectId;
     private string projectName;
@@ -47,16 +54,57 @@ public class UpdateProjectSheet : MonoBehaviour
     public GameObject clientPhoneGO;
     public GameObject clientEmailGO;
 
+    //updateButtons
+    public GameObject updateClientButton;
+    public GameObject updateProjectButton;
+
+    //updateClientPanelButtons
+    public GameObject updateClientConfirmButton;
+    public GameObject updateClientCancelButton;
+
+    //updateProjectPanelButtons
+    public GameObject updateProjectConfirmButton;
+    public GameObject updateProjectCancelButton;
+
+    //updateClient inputs
+    public GameObject clientNameInput;
+    public GameObject clientSurnameInput;
+    public GameObject clientRoadInput;
+    public GameObject clientRoadNumInput;
+    public GameObject clientZipCodeInput;
+    public GameObject clientCityInput;
+    public GameObject clientRoadExtraInput;
+    public GameObject clientPhoneInput;
+    public GameObject clientEmailInput;
+
+    //updateProject inputs
+    public GameObject projectNameInput;
+    public GameObject projectSailorIdInput;
+
     public GameObject listItemPrefab;                           // Prefab item to display all elements in project list
-    public GameObject estimationList;
+    public GameObject estimationList;                   //panel wich will contain all the listItemPrefabs 
+
+    //pop-ups panels
+    public GameObject updateClientPanel;
+    public GameObject updateProjectPanel;
 
     // Start is called before the first frame update
     void Start()
     {
-        projectId = "testId";
+        //hide the pop-ups panels
+        updateClientPanel.SetActive(false);
+        updateProjectPanel.SetActive(false);
+
+        CONST = GameObject.Find("CONST");                       // Get const object
+        
+        projectId = CONST.GetComponent<CONST>().selectedProjectID; //Instanciate the projet ID from the CONST object
+        projectSailorId = CONST.GetComponent<CONST>().userID; //Instanciate the sailor ID from the CONST object
+
+
+        Debug.Log("ID : "+projectId);
         projectName = "testName";
         projectDate = "2019-10-16";
-        projectSailorId ="marc du test";
+        
         clientId = "mouton1Id";
         clientName = "mouton1";
         clientSurname = "chèvre";
@@ -87,11 +135,23 @@ public class UpdateProjectSheet : MonoBehaviour
 
         estimationList = GameObject.Find("estimationListPanel");                 // Get grid of the list 
 
-        GetAllEstimations();                       // Start script to find estimations on databse
+        StartCoroutine(GetAllEstimations());                       // Start script to find estimations on databse
     }
 
-    private void GetAllEstimations()
+    private IEnumerator GetAllEstimations()
     {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getProjectUrl);     // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        //string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+        //RequestGetAllProject entities = JsonUtility.FromJson<RequestGetAllProject>(jsonResult);         // Convert JSON file
+
+
+        //====================================================================================================================================================
         string jsonResult = "{\"estimations\": [{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"},{\"id\" : \"1\", \"price\" : \"250 000 €\", \"state\" : \"En cours d\'édition\", \"date\": \"2019-11-11\"}]}";
 
         EstimationList entities = JsonUtility.FromJson<EstimationList>(jsonResult);         // Convert JSON file
@@ -128,6 +188,4 @@ public class UpdateProjectSheet : MonoBehaviour
             dateValue.GetComponent<UnityEngine.UI.Text>().text = entity.date.ToString();
         }
     }
-
-    
 }

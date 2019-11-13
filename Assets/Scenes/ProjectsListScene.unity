@@ -2309,8 +2309,8 @@ MonoBehaviour:
   errorFormatDateText: {fileID: 1368822337}
   confirmPanels: {fileID: 391058344}
   deletePanel: {fileID: 1889498428}
-  deletePanelConfirmButton: {fileID: 0}
-  deletePanelCancelButton: {fileID: 0}
+  deletePanelConfirmButton: {fileID: 1536828521}
+  deletePanelCancelButton: {fileID: 1946820657}
   deletePanelText: {fileID: 1241481046}
   deletePanelTextError: {fileID: 1487587523}
   listProjects: []
