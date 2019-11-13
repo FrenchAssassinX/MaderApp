@@ -44,9 +44,7 @@ public class ItemListProject : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("View project");
-
-            GameObject.Find("Panel").GetComponent<UpdateProjectList>().GoToViewProject(this.gameObject);   // Call function to change scene in UpdateListProject.cs
+           GameObject.Find("Panel").GetComponent<UpdateProjectList>().GoToViewProject(this.gameObject);   // Call function to change scene in UpdateListProject.cs
         }
     }
 
