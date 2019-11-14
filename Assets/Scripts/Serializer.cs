@@ -98,6 +98,16 @@ public class Project
     public string customer;
 }
 
+/* Project request constructor */
+[System.Serializable]
+public class RequestAProject
+{
+    public string message;
+    public Project result;
+    public Customer customer;
+    public List<Estimation> estimation;
+}
+
 /* Estimation object constructor */
 [System.Serializable]
 public class Estimation
@@ -106,12 +116,6 @@ public class Estimation
     public string price;
     public string state;
     public string date; 
-}
-
-[System.Serializable]
-public class EstimationList
-{
-    public List<Estimation> estimations;
 }
 
 /*Customer constructor*/
