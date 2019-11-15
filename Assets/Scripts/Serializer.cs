@@ -87,7 +87,7 @@ public class Project
     public User2 user;
     public List<Invoice> invoice;
     public List<Payement> payement;
-    public List<Estimation> estimation;
+    public List<EstimationId> estimation;
     public string _id;
     public string name;
     public string date;
@@ -105,21 +105,35 @@ public class RequestAProject
     public string message;
     public Project result;
     public Customer customer;
-    public List<Estimation> estimation;
+}
+
+/* Estimation request constructor */
+[System.Serializable]
+public class RequestAnEstimation
+{
+    public string message;
+    public Estimation estimation;
 }
 
 /* Estimation object constructor */
 [System.Serializable]
 public class Estimation
 {
-    public string id;
+    public string _id;
     public string price;
+    public string date;
     public string state;
-    public string date; 
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class EstimationId
+{
+    public string id;
 }
 
 /*Customer constructor*/
- [System.Serializable] 
+[System.Serializable] 
 public class Customer
 {
     public string _id;

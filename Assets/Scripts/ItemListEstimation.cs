@@ -9,6 +9,11 @@ public class ItemListEstimation : MonoBehaviour
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
 
+    public string idValue;                                       // Variable to pass the project on the next scene and find it by ID
+    public string priceValue;
+    public string stateValue;
+    public string dateValue;
+
     /* All the buttons for make specific actions with the project */
     public GameObject buttonAdd;
     public GameObject buttonDelete;
