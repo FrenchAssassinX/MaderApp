@@ -72,13 +72,6 @@ public class Payement
     public string id;
 }
 
-/* Estimation object constructor */
-[System.Serializable]
-public class Estimation
-{
-    public string id;
-}
-
 [System.Serializable]
 public class User2
 {
@@ -101,8 +94,11 @@ public class Project
     public string phone;
     public string email;
     public string __v;
+    public string reference;
+    public string customer;
 }
 
+/* Estimation object constructor */
 [System.Serializable]
 public class Estimation
 {
@@ -135,7 +131,7 @@ public class Customer
 }
 
 [System.Serializable]
-public class getAllCustomer
+public class GetAllCustomer
 {
     public string _id;
     public string name;
@@ -145,8 +141,7 @@ public class getAllCustomer
     public string zipcode;
     public string city;
     public string roadExtra;
-    public string reference;
-    public string customer;
+   
 }
 
 /* Projects request constructor */

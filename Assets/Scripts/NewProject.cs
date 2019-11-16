@@ -17,6 +17,7 @@ public class NewProject : MonoBehaviour
     //project (CanvasLeft)
     public InputField nameProject;
     public InputField referenceProject;
+    public Dropdown idCustomer;
     public Button ButtonCreateCustomer;
     public Button ButtonCreateProject;
 
@@ -44,6 +45,9 @@ public class NewProject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+
+
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
 
         url = CONST.GetComponent<CONST>().url;
@@ -69,6 +73,8 @@ public class NewProject : MonoBehaviour
         //return home page
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
+
+        GenerateReferenceProject();
 
     }
 
@@ -193,9 +199,29 @@ public class NewProject : MonoBehaviour
 
     }
 
-    public void CreateReferenceProject()
+    public void GenerateReferenceProject()
     {
-        //add reference for a new project
+        //Add reference for a new project
+
+        //Select the 5 firsts letters for surname
+        
+        //Select the first letters for name
+
+        //Select the timestanp
+        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        Debug.Log(Timestamp);
+
+        //Generate the ID
+
+        var IdCustomerGenerated = "surname" + "name" + Timestamp;
+
+        //Poster the ID of customer
+
+    }
+
+    public void SelectCustomersForNewProject()
+    {
+        //Poster all customers
     }
 
 }
