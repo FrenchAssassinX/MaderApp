@@ -11,8 +11,9 @@ public class NewProject : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for this scene
-    private string URLCreateProject = "v1/createproject"; // Specific url for this scene
+    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for create customer
+    private string URLCreateProject = "v1/createproject"; // Specific url for create project
+    private string URLGetCustomers = "/v1/getallcustome"; // Specific url for get all customers
 
     //project (CanvasLeft)
     public InputField nameProject;
@@ -46,8 +47,6 @@ public class NewProject : MonoBehaviour
     void Start()
     {
         
-
-
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
 
         url = CONST.GetComponent<CONST>().url;
@@ -74,7 +73,10 @@ public class NewProject : MonoBehaviour
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
 
+        SelectCustomersForNewProject();
+
         GenerateReferenceProject();
+
 
     }
 
@@ -142,7 +144,7 @@ public class NewProject : MonoBehaviour
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
-                    Customer entity = JsonUtility.FromJson<Customer>(jsonResult);
+                    CreateCustomer entity = JsonUtility.FromJson<CreateCustomer>(jsonResult);
                     //message validate new customer
                     createValideCustomer.transform.gameObject.SetActive(true);
 
@@ -199,10 +201,33 @@ public class NewProject : MonoBehaviour
 
     }
 
+    private IEnumerator GetAllCustomers()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+                GetAllCustomer entities = JsonUtility.FromJson<GetAllCustomer>(jsonResult);         // Convert JSON file
+
+            }
+        }
+    }
+
+    //Add reference for a new project
     public void GenerateReferenceProject()
     {
-        //Add reference for a new project
-
         //Select the 5 firsts letters for surname
         
         //Select the first letters for name
@@ -222,6 +247,10 @@ public class NewProject : MonoBehaviour
     public void SelectCustomersForNewProject()
     {
         //Poster all customers
+        GetAllCustomers();
+
+        List<string> dropdowncustomer = new List<string>() { "test", "test", "test", "test" };
+        idCustomer.AddOptions(dropdowncustomer);
     }
 
 }

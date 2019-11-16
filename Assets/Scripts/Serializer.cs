@@ -115,7 +115,7 @@ public class EstimationList
 }
 /*Customer constructor*/
  [System.Serializable] 
-public class Customer
+public class CreateCustomer
 {
     public string _id;
     public string name;
@@ -141,7 +141,9 @@ public class GetAllCustomer
     public string zipcode;
     public string city;
     public string roadExtra;
-   
+    public string phone;
+    public string email;
+
 }
 
 /* Projects request constructor */
