@@ -172,67 +172,77 @@ public class UpdateProjectSheet : MonoBehaviour
                 // foreach to retrieve every estimations
                 foreach(var item in estimationIdList)
                 {
-                    Debug.Log("item = " + item.id);
-
-                    var urlToGetEstimation = CONST.GetComponent<CONST>().url + "v1/getestimationbyid";
-
-                    WWWForm estimationForm = new WWWForm();                       // New form for web request
-                    estimationForm.AddField("estimationID ", item.id);    // Add to the form the value of the ID of the project to get
-
-                    UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new form
-                    requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
-                    requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-                    requestForEstimation.SendWebRequest();
-
-                    if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError)
-                    {
-                        Debug.Log(requestForEstimation.error);
-                    }
-                    else
-                    {
-                        string jsonResultFromEstimation = System.Text.Encoding.UTF8.GetString(requestForEstimation.downloadHandler.data);          // Get JSON file
-
-                        RequestAnEstimation estimationEntity = JsonUtility.FromJson<RequestAnEstimation>(jsonResultFromEstimation);         // Convert JSON file
-
-                        Debug.Log("estimation = " + estimationEntity);
-
-                        Estimation estimation = estimationEntity.estimation;
-
-                        // Create prefab
-                        GameObject listItem = Instantiate(listItemPrefab, estimationList.transform.position, Quaternion.identity);
-
-                        // Set estimationListPanel as parent of prefab in project hierarchy
-                        listItem.transform.SetParent(estimationList.transform);
-
-                        // Find children in listItem to use them
-                        GameObject idValue = GameObject.Find("idText");
-                        GameObject priceValue = GameObject.Find("priceText");
-                        GameObject stateValue = GameObject.Find("stateText");
-                        GameObject dateValue = GameObject.Find("dateText");
-
-                        // Customize props name of the prefab to find it when it will be create
-                        idValue.name = idValue.name + listItem.GetComponent<ItemListEstimation>().name;
-                        priceValue.name = priceValue.name + listItem.GetComponent<ItemListEstimation>().name;
-                        stateValue.name = stateValue.name + listItem.GetComponent<ItemListEstimation>().name;
-                        dateValue.name = dateValue.name + listItem.GetComponent<ItemListEstimation>().name;
-
-                        // Formating date to French timeset
-                        string dateValueText = estimation.date;
-                        dateValueText = dateValueText.Remove(10, 14);
-                        DateTime dateTimeText = Convert.ToDateTime(dateValueText);
-                        dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
-
-                        Debug.Log("Date = " + dateValueText);
-
-                        // Change text value of the list item
-                        idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
-                        priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
-                        stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
-                        dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
-                    }
+                    StartCoroutine(WorkOnEstimation(item));
                 }  
             }
+        }
+    }
+
+    public IEnumerator WorkOnEstimation(EstimationId item)
+    {
+        Debug.Log("item = " + item.id);
+
+        var urlToGetEstimation = CONST.GetComponent<CONST>().url + "v1/getestimationbyid";
+
+        WWWForm estimationForm = new WWWForm();                       // New form for web request
+        estimationForm.AddField("estimationID", item.id);    // Add to the form the value of the ID of the project to get
+
+        UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new form
+        requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+        requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return requestForEstimation.SendWebRequest();
+
+        if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError)
+        {
+            Debug.Log(requestForEstimation.error);
+        }
+        else
+        {
+            string jsonResultFromEstimation = System.Text.Encoding.UTF8.GetString(requestForEstimation.downloadHandler.data);          // Get JSON file
+
+            RequestAnEstimation estimationEntity = JsonUtility.FromJson<RequestAnEstimation>(jsonResultFromEstimation);         // Convert JSON file
+
+            Debug.Log("estimation = " + estimationEntity);
+
+            Estimation estimation = estimationEntity.estimation;
+
+            // Create prefab
+            GameObject listItem = Instantiate(listItemPrefab, estimationList.transform.position, Quaternion.identity);
+
+            // Set estimationListPanel as parent of prefab in project hierarchy
+            listItem.transform.SetParent(estimationList.transform);
+
+            // Find children in listItem to use them
+            GameObject idValue = GameObject.Find("idText");
+            GameObject priceValue = GameObject.Find("priceText");
+            GameObject stateValue = GameObject.Find("stateText");
+            GameObject dateValue = GameObject.Find("dateText");
+
+            // Customize props name of the prefab to find it when it will be create
+            idValue.name = idValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            priceValue.name = priceValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            stateValue.name = stateValue.name + listItem.GetComponent<ItemListEstimation>().name;
+            dateValue.name = dateValue.name + listItem.GetComponent<ItemListEstimation>().name;
+
+            // Formating date to French timeset
+            string dateValueText = estimation.date;
+            dateValueText = dateValueText.Remove(10, 14);
+            DateTime dateTimeText = Convert.ToDateTime(dateValueText);
+            dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+
+            Debug.Log("Date = " + dateValueText);
+
+            // Change text value of the list item
+            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
+            stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
+            dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
+
+            Debug.Log(idValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log(priceValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log(stateValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log(dateValue.GetComponent<UnityEngine.UI.Text>().text);
         }
     }
     
