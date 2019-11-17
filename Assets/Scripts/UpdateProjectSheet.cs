@@ -115,7 +115,7 @@ public class UpdateProjectSheet : MonoBehaviour
         clientEmail = "bêêêêhh@bêmail.Com";
 
 
-        estimationList = GameObject.Find("estimationListPanel");                 // Get grid of the list 
+        estimationList = GameObject.Find("gridWithOurElement");                 // Get grid of the list 
 
         StartCoroutine(GetAllEstimations());                       // Start script to find estimations on databse
     }
@@ -143,8 +143,6 @@ public class UpdateProjectSheet : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-
-                Debug.Log(jsonResult);
 
                 RequestAProject entityProject = JsonUtility.FromJson<RequestAProject>(jsonResult);         // Convert JSON file
                 Project project = entityProject.result; //Instanciate the project object
@@ -180,8 +178,6 @@ public class UpdateProjectSheet : MonoBehaviour
 
     public IEnumerator WorkOnEstimation(EstimationId item)
     {
-        Debug.Log("item = " + item.id);
-
         var urlToGetEstimation = CONST.GetComponent<CONST>().url + "v1/getestimationbyid";
 
         WWWForm estimationForm = new WWWForm();                       // New form for web request
@@ -203,12 +199,10 @@ public class UpdateProjectSheet : MonoBehaviour
 
             RequestAnEstimation estimationEntity = JsonUtility.FromJson<RequestAnEstimation>(jsonResultFromEstimation);         // Convert JSON file
 
-            Debug.Log("estimation = " + estimationEntity);
-
             Estimation estimation = estimationEntity.estimation;
 
             // Create prefab
-            GameObject listItem = Instantiate(listItemPrefab, estimationList.transform.position, Quaternion.identity);
+            GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
 
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(estimationList.transform);
@@ -231,18 +225,16 @@ public class UpdateProjectSheet : MonoBehaviour
             DateTime dateTimeText = Convert.ToDateTime(dateValueText);
             dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
-            Debug.Log("Date = " + dateValueText);
-
             // Change text value of the list item
             idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
 
-            Debug.Log(idValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log(priceValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log(stateValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log(dateValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log("ID : " +idValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log("prix : "+priceValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log("Etat : "+stateValue.GetComponent<UnityEngine.UI.Text>().text);
+            Debug.Log("date : "+dateValue.GetComponent<UnityEngine.UI.Text>().text);
         }
     }
     
@@ -257,6 +249,8 @@ public class UpdateProjectSheet : MonoBehaviour
     //Function called when the user clicks in the update client button
     public void openUpdateClientPanel()
     {
+        //projectNameInput.text = "test";
+        //projectSailorIdInput;
         updateClientPanel.SetActive(true);//set active the update client panel
     }
 
@@ -275,6 +269,7 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the update project pop-up
     public void confirmUpdateProjectPanel()
     {
+        //projectNameGO.projectNameGO.GetComponent<UnityEngine.UI.Text>().text = projectNameInput.GetComponent<UnityEngine.UI.Input.Text>().text;
         updateProjectPanel.SetActive(false); //set non active the update project panel
     }
 
