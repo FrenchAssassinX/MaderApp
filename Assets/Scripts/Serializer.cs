@@ -131,7 +131,16 @@ public class CreateCustomer
 }
 
 [System.Serializable]
-public class GetAllCustomer
+public class RequestGetAllCustomer
+{
+    public string message;
+    public List<Customer> customers;
+
+}
+
+/*Customer constructor*/
+[System.Serializable]
+public class Customer
 {
     public string _id;
     public string name;
@@ -143,7 +152,7 @@ public class GetAllCustomer
     public string roadExtra;
     public string phone;
     public string email;
-
+    public string __v;
 }
 
 /* Projects request constructor */
