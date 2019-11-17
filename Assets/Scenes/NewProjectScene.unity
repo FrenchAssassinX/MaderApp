@@ -2039,6 +2039,8 @@ MonoBehaviour:
   createValideProject: {fileID: 2119956450}
   errorCreateCustomer: {fileID: 1839876573}
   ButtonReturn: {fileID: 661415134}
+  projectSurnameGO: {fileID: 0}
+  projectNameGO: {fileID: 0}
 --- !u!1 &580901650
 GameObject:
   m_ObjectHideFlags: 0

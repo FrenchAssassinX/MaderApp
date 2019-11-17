@@ -39,9 +39,13 @@ public class NewProject : MonoBehaviour
     public GameObject createValideCustomer;
     public GameObject createValideProject;
     public GameObject errorCreateCustomer;
+
     //Top
     public Button ButtonReturn;
 
+    //gameObjects that will containing the project datas
+    public GameObject projectSurnameGO;
+    public GameObject projectNameGO;
 
     // Start is called before the first frame update
     void Start()
@@ -72,6 +76,8 @@ public class NewProject : MonoBehaviour
         //return home page
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
+
+        //projectSurnameGO.GetComponent<UnityEngine.UI.Text>().text = getSurname;
 
         SelectCustomersForNewProject();
 
@@ -192,7 +198,7 @@ public class NewProject : MonoBehaviour
                     CreateProject entity = JsonUtility.FromJson<CreateProject>(jsonResult);
                     //message validate new customer
                     createValideProject.transform.gameObject.SetActive(true);
-
+                    
                 }
                 
             }
@@ -225,25 +231,6 @@ public class NewProject : MonoBehaviour
         }
     }
 
-    //Add reference for a new project
-    public void GenerateReferenceProject()
-    {
-        //Select the 5 firsts letters for surname
-        
-        //Select the first letters for name
-
-        //Select the timestanp
-        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-        Debug.Log(Timestamp);
-
-        //Generate the ID
-
-        var IdCustomerGenerated = "surname" + "name" + Timestamp;
-
-        //Poster the ID of customer
-
-    }
-
     public void SelectCustomersForNewProject()
     {
         //Poster all customers
@@ -251,6 +238,29 @@ public class NewProject : MonoBehaviour
 
         List<string> dropdowncustomer = new List<string>() { "test", "test", "test", "test" };
         idCustomer.AddOptions(dropdowncustomer);
+    }
+
+    //Add reference for a new project
+    public void GenerateReferenceProject()
+    {
+        //Select the 5 firsts letters for surname
+        string getSurname = "users";
+
+
+        //Select the first letters for name
+        string getName = "t";
+
+        //Select the timestanp
+        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        Debug.Log(Timestamp);
+
+        //Generate the ID
+
+        var IdCustomerGenerated = getSurname + getName + Timestamp;
+        Debug.Log(IdCustomerGenerated);
+
+        //Poster the ID of customer
+
     }
 
 }
