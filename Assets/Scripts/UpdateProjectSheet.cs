@@ -17,21 +17,7 @@ public class UpdateProjectSheet : MonoBehaviour
 
     //project datas
     private string projectId;
-    private string projectName;
-    private string projectDate;
     private string projectSailorId;
-
-    //client datas
-    private string clientId;
-    private string clientName;
-    private string clientSurname;
-    private string clientRoad;
-    private string clientRoadNum;
-    private string clientZipCode;
-    private string clientCity;
-    private string clientRoadExtra;
-    private string clientPhone;
-    private string clientEmail;
 
     //gameObject that will containing the title of the window
     public GameObject frameTitle;
@@ -98,22 +84,7 @@ public class UpdateProjectSheet : MonoBehaviour
         CONST = GameObject.Find("CONST");                       // Get const object
 
         projectId = CONST.GetComponent<CONST>().selectedProjectID; //Instanciate the projet ID from the CONST object
-        projectSailorId = CONST.GetComponent<CONST>().userID; //Instanciate the sailor ID from the CONST object
-
-        projectName = "testName";
-        projectDate = "2019-10-16";
-
-        clientId = "mouton1Id";
-        clientName = "mouton1";
-        clientSurname = "chèvre";
-        clientRoad = "rue de l'étable";
-        clientRoadNum = "69";
-        clientZipCode = "21000";
-        clientCity = "farmville";
-        clientRoadExtra = "";
-        clientPhone = "0659263731";
-        clientEmail = "bêêêêhh@bêmail.Com";
-
+        projectSailorId = CONST.GetComponent<CONST>().userID; //Instanciate the sailor ID from the CONST 
 
         estimationList = GameObject.Find("gridWithOurElement");                 // Get grid of the list 
 
@@ -122,7 +93,7 @@ public class UpdateProjectSheet : MonoBehaviour
 
     private IEnumerator GetAllEstimations()
     {
-
+        //http road to get the project datas
         var urlToGetProject = CONST.GetComponent<CONST>().url + "v1/getprojectbyid";
 
         WWWForm form = new WWWForm();                       // New form for web request
@@ -230,11 +201,6 @@ public class UpdateProjectSheet : MonoBehaviour
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
-
-            Debug.Log("ID : " +idValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log("prix : "+priceValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log("Etat : "+stateValue.GetComponent<UnityEngine.UI.Text>().text);
-            Debug.Log("date : "+dateValue.GetComponent<UnityEngine.UI.Text>().text);
         }
     }
     
@@ -249,8 +215,6 @@ public class UpdateProjectSheet : MonoBehaviour
     //Function called when the user clicks in the update client button
     public void openUpdateClientPanel()
     {
-        //projectNameInput.text = "test";
-        //projectSailorIdInput;
         updateClientPanel.SetActive(true);//set active the update client panel
     }
 
@@ -269,7 +233,9 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the update project pop-up
     public void confirmUpdateProjectPanel()
     {
-        //projectNameGO.projectNameGO.GetComponent<UnityEngine.UI.Text>().text = projectNameInput.GetComponent<UnityEngine.UI.Input.Text>().text;
+        if (projectNameInput.GetComponent<UnityEngine.UI.Text>().text != "") { projectNameGO.GetComponent<UnityEngine.UI.Text>().text = projectNameInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if(projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text != "") { projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text; };
+        
         updateProjectPanel.SetActive(false); //set non active the update project panel
     }
 
@@ -282,6 +248,16 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the update client pop-up
     public void confirmUpdateClientPanel()
     {
+        if(clientNameInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientNameGO.GetComponent<UnityEngine.UI.Text>().text = clientNameInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientRoadInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientRoadGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text != "") {clientRoadNumGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text;};
+        if (clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text = clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientCityInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientCityGO.GetComponent<UnityEngine.UI.Text>().text = clientCityInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text = clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text; };
+        if (clientEmailInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = clientEmailInput.GetComponent<UnityEngine.UI.Text>().text; };
+
         updateClientPanel.SetActive(false); //set non active the update client panel
     }
 }

@@ -36,6 +36,11 @@ public class ItemListEstimation : MonoBehaviour
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
 
+        buttonDelete.SetActive(false);
+        buttonEstimation.SetActive(false);
+        buttonPaymentTerms.SetActive(false);
+        buttonTechnicalFile.SetActive(false);
+
         /* Affect specific onClick behaviours to the buttons */
         buttonAdd.GetComponent<Button>().onClick.AddListener(AddEstimation);
         buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
@@ -47,7 +52,13 @@ public class ItemListEstimation : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
+        buttonDelete.SetActive(true);
+        buttonEstimation.SetActive(true);
+        buttonPaymentTerms.SetActive(true);
+        buttonTechnicalFile.SetActive(true);
+
         isSelected = true;
+        Debug.Log("SELECTED");
     }
 
     /* Function to add an estimation */
