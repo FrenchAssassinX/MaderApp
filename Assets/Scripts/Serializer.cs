@@ -175,3 +175,24 @@ public class CreateProject
     public string city;
     public string customerID;
 }
+
+[System.Serializable]
+public class CreateModules
+{
+    public string name;
+    public string cost;
+    public string angle;
+    public string cctp;
+    public string cut;
+    public string range;
+    public List<Composant> composants;
+
+}
+
+[System.Serializable]
+public class Composant
+{
+    public string id;
+    public string qte;
+
+}
