@@ -87,7 +87,7 @@ public class Project
     public User2 user;
     public List<Invoice> invoice;
     public List<Payement> payement;
-    public List<Estimation> estimation;
+    public List<EstimationId> estimation;
     public string _id;
     public string name;
     public string date;
@@ -98,6 +98,44 @@ public class Project
     public string customer;
 }
 
+/* Project request constructor */
+[System.Serializable]
+public class RequestAProject
+{
+    public string message;
+    public Project result;
+    public Customer customer;
+}
+
+/* Projects request constructor */
+[System.Serializable]
+public class RequestGetAllProject
+{
+    public string message;
+    public List<Project> projects;
+}
+
+[System.Serializable]
+public class CreateProject
+{
+    public string userID;
+    public string date;
+    public string road;
+    public string roadNum;
+    public string roadExtra;
+    public string zipcode;
+    public string city;
+    public string customerID;
+}
+
+/* Estimation request constructor */
+[System.Serializable]
+public class RequestAnEstimation
+{
+    public string message;
+    public Estimation estimation;
+}
+
 /* Estimation object constructor */
 [System.Serializable]
 public class Estimation
@@ -106,6 +144,13 @@ public class Estimation
     public string price;
     public string state;
     public string date; 
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class EstimationId
+{
+    public string id;
 }
 
 [System.Serializable]
@@ -156,27 +201,6 @@ public class Customer
     public string __v;
 }
 
-/* Projects request constructor */
-[System.Serializable]
-public class RequestGetAllProject
-{
-    public string message;
-    public List<Project> projects;
-}
-
-[System.Serializable]
-public class CreateProject
-{
-    public string userID;
-    public string date;
-    public string road;
-    public string roadNum;
-    public string roadExtra;
-    public string zipcode;
-    public string city;
-    public string customerID;
-}
-
 [System.Serializable]
 public class CreateModules
 {
@@ -187,7 +211,6 @@ public class CreateModules
     public string cut;
     public string range;
     public List<Component> composants;
-
 }
 
 [System.Serializable]
@@ -195,5 +218,4 @@ public class Component
 {
     public string id;
     public string qte;
-
 }
