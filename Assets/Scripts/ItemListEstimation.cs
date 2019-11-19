@@ -15,7 +15,6 @@ public class ItemListEstimation : MonoBehaviour
     public string dateValue;
 
     /* All the buttons for make specific actions with the project */
-    public GameObject buttonAdd;
     public GameObject buttonDelete;
     public GameObject buttonEstimation;
     public GameObject buttonPaymentTerms;
@@ -30,7 +29,6 @@ public class ItemListEstimation : MonoBehaviour
         isSelected = false;                                 // Initialize the boolean to false
 
         /* Retrieve the buttons in the scene */
-        buttonAdd = GameObject.Find("addButton");
         buttonDelete = GameObject.Find("deleteButton");
         buttonEstimation = GameObject.Find("estimationButton");
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
@@ -42,7 +40,6 @@ public class ItemListEstimation : MonoBehaviour
         buttonTechnicalFile.SetActive(false);
 
         /* Affect specific onClick behaviours to the buttons */
-        buttonAdd.GetComponent<Button>().onClick.AddListener(AddEstimation);
         buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
         buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
         buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
@@ -66,14 +63,10 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().openDeleteEstimation(this.gameObject);
+            
             Debug.Log("Devis supprimé");
         }
-    }
-
-    /* Function to add an estimation */
-    public void AddEstimation()
-    {
-        Debug.Log("Fenêtre d'ajout de devis appelée");
     }
 
     /* Function that gets estimation pdf*/

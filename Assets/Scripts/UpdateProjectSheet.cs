@@ -6,14 +6,13 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 public class UpdateProjectSheet : MonoBehaviour
 {
     public GameObject CONST;                                    // CONST object contains server route, token and user infos
 
     //backPage button
     public GameObject backPageButton;
-
-    private string getProjectUrl = "/v1/getprojectbyid";          // Specific route to get the project
 
     //project datas
     private string projectId;
@@ -73,6 +72,12 @@ public class UpdateProjectSheet : MonoBehaviour
     //pop-ups panels
     public GameObject updateClientPanel;
     public GameObject updateProjectPanel;
+    public GameObject confirmDeletePanel;
+
+    public Button deletePanelConfirmButton;                     // Confirm button on Delete panel
+    public Button deletePanelCancelButton;                      // Cancel button on Delete panel
+
+    EstimationSelected estimationSelected = new EstimationSelected();
 
     // Start is called before the first frame update
     void Start()
@@ -80,8 +85,12 @@ public class UpdateProjectSheet : MonoBehaviour
         //hide the pop-ups panels
         updateClientPanel.SetActive(false);
         updateProjectPanel.SetActive(false);
+        confirmDeletePanel.SetActive(false);
 
         CONST = GameObject.Find("CONST");                       // Get const object
+
+        deletePanelCancelButton.onClick.AddListener(cancelDeleteEstimation);
+        deletePanelConfirmButton.onClick.AddListener(confirmDeleteEstimation);
 
         projectId = CONST.GetComponent<CONST>().selectedProjectID; //Instanciate the projet ID from the CONST object
         projectSailorId = CONST.GetComponent<CONST>().userID; //Instanciate the sailor ID from the CONST 
@@ -201,15 +210,62 @@ public class UpdateProjectSheet : MonoBehaviour
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
+
+            // ID to keep for view estimation sheet or deleting estimation
+            listItem.GetComponent<ItemListEstimation>().idValue = estimation._id;
+            listItem.GetComponent<ItemListEstimation>().dateValue = dateValueText;
+            listItem.GetComponent<ItemListEstimation>().priceValue = estimation.price;
+            listItem.GetComponent<ItemListEstimation>().stateValue = estimation.state;
         }
     }
-    
+
+    /* Function to delete project in the database */
+    private IEnumerator DeleteEstimation(EstimationSelected pEstimationSelected)
+    {
+        string url = CONST.GetComponent<CONST>().url + "v1/deleteestimation"; //delete estimation url
+
+        WWWForm form = new WWWForm();                       // New form for web request
+        form.AddField("estimationID", pEstimationSelected.id);    // Add to the form the value of the ID of the project to delete
+
+        UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                /* Refresh list of projects */
+                foreach (Transform childList in estimationList.transform)
+                {
+                    GameObject.Destroy(childList.gameObject);
+                }
+                StartCoroutine(GetAllEstimations());           // Recall all projects from databse
+            }
+        }
+    }
 
     //Get back  button function
     public void BackPage()
     {
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1); //Send the previous scene (ProjectList)
+    }
+
+    /* Function to display Delete project panel */
+    public void openDeleteEstimation(GameObject pItemSelected)
+    {
+        /* Make panel visible */
+        confirmDeletePanel.SetActive(true);
+
+        // Keep the ID of the selected project
+        estimationSelected.id = pItemSelected.GetComponent<ItemListEstimation>().idValue;
     }
 
     //Function called when the user clicks in the update client button
@@ -259,5 +315,19 @@ public class UpdateProjectSheet : MonoBehaviour
         if (clientEmailInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = clientEmailInput.GetComponent<UnityEngine.UI.Text>().text; };
 
         updateClientPanel.SetActive(false); //set non active the update client panel
+    }
+
+    //function called when the user clicks in the cancel button of the delete estimation pop-up
+    public void cancelDeleteEstimation()
+    {
+        confirmDeletePanel.SetActive(false); //set non active the  delete estimatio panel
+    }
+
+    //function called when the user clicks in the confirm button of the delete estimatio pop-up
+    public void confirmDeleteEstimation()
+    {
+        Debug.Log("deleted estimation : " + estimationSelected.id);
+        //StartCoroutine(DeleteEstimation(estimationSelected));
+        confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
 }
