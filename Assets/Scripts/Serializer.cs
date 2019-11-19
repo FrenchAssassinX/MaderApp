@@ -105,13 +105,38 @@ public class Estimation
     public string id;
     public string price;
     public string state;
-    public string date;
+    public string date; 
 }
 
 [System.Serializable]
 public class EstimationList
 {
     public List<Estimation> estimations;
+}
+
+/*Customer constructor*/
+ [System.Serializable] 
+public class CreateCustomer
+{
+    public string _id;
+    public string name;
+    public string surename;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string phone;
+    public string email;
+    public string __v;
+}
+
+[System.Serializable]
+public class RequestGetAllCustomer
+{
+    public string message;
+    public List<Customer> customers;
+
 }
 
 /*Customer constructor*/
@@ -129,19 +154,6 @@ public class Customer
     public string phone;
     public string email;
     public string __v;
-}
-
-[System.Serializable]
-public class GetAllCustomer
-{
-    public string _id;
-    public string name;
-    public string surename;
-    public string road;
-    public string roadNum;
-    public string zipcode;
-    public string city;
-    public string roadExtra;
 }
 
 /* Projects request constructor */
@@ -163,4 +175,25 @@ public class CreateProject
     public string zipcode;
     public string city;
     public string customerID;
+}
+
+[System.Serializable]
+public class CreateModules
+{
+    public string name;
+    public string cost;
+    public string angle;
+    public string cctp;
+    public string cut;
+    public string range;
+    public List<Component> composants;
+
+}
+
+[System.Serializable]
+public class Component
+{
+    public string id;
+    public string qte;
+
 }
