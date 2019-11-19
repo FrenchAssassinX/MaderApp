@@ -9,8 +9,12 @@ public class ItemListEstimation : MonoBehaviour
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
 
+    public string idValue;                                       // Variable to pass the project on the next scene and find it by ID
+    public string priceValue;
+    public string stateValue;
+    public string dateValue;
+
     /* All the buttons for make specific actions with the project */
-    public GameObject buttonAdd;
     public GameObject buttonDelete;
     public GameObject buttonEstimation;
     public GameObject buttonPaymentTerms;
@@ -25,14 +29,17 @@ public class ItemListEstimation : MonoBehaviour
         isSelected = false;                                 // Initialize the boolean to false
 
         /* Retrieve the buttons in the scene */
-        buttonAdd = GameObject.Find("addButton");
         buttonDelete = GameObject.Find("deleteButton");
         buttonEstimation = GameObject.Find("estimationButton");
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
 
+        buttonDelete.SetActive(false);
+        buttonEstimation.SetActive(false);
+        buttonPaymentTerms.SetActive(false);
+        buttonTechnicalFile.SetActive(false);
+
         /* Affect specific onClick behaviours to the buttons */
-        buttonAdd.GetComponent<Button>().onClick.AddListener(AddEstimation);
         buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
         buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
         buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
@@ -42,7 +49,13 @@ public class ItemListEstimation : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
+        buttonDelete.SetActive(true);
+        buttonEstimation.SetActive(true);
+        buttonPaymentTerms.SetActive(true);
+        buttonTechnicalFile.SetActive(true);
+
         isSelected = true;
+        Debug.Log("SELECTED");
     }
 
     /* Function to add an estimation */
@@ -50,14 +63,10 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().openDeleteEstimation(this.gameObject);
+            
             Debug.Log("Devis supprimé");
         }
-    }
-
-    /* Function to add an estimation */
-    public void AddEstimation()
-    {
-        Debug.Log("Fenêtre d'ajout de devis appelée");
     }
 
     /* Function that gets estimation pdf*/

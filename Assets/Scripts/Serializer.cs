@@ -87,7 +87,7 @@ public class Project
     public User2 user;
     public List<Invoice> invoice;
     public List<Payement> payement;
-    public List<Estimation> estimation;
+    public List<EstimationId> estimation;
     public string _id;
     public string name;
     public string date;
@@ -98,50 +98,13 @@ public class Project
     public string customer;
 }
 
-/* Estimation object constructor */
+/* Project request constructor */
 [System.Serializable]
-public class Estimation
+public class RequestAProject
 {
-    public string id;
-    public string price;
-    public string state;
-    public string date; 
-}
-
-[System.Serializable]
-public class EstimationList
-{
-    public List<Estimation> estimations;
-}
-
-/*Customer constructor*/
- [System.Serializable] 
-public class Customer
-{
-    public string _id;
-    public string name;
-    public string surename;
-    public string road;
-    public string roadNum;
-    public string zipcode;
-    public string city;
-    public string roadExtra;
-    public string phone;
-    public string email;
-    public string __v;
-}
-
-[System.Serializable]
-public class GetAllCustomer
-{
-    public string _id;
-    public string name;
-    public string surename;
-    public string road;
-    public string roadNum;
-    public string zipcode;
-    public string city;
-    public string roadExtra;
+    public string message;
+    public Project result;
+    public Customer customer;
 }
 
 /* Projects request constructor */
@@ -163,4 +126,96 @@ public class CreateProject
     public string zipcode;
     public string city;
     public string customerID;
+}
+
+/* Estimation request constructor */
+[System.Serializable]
+public class RequestAnEstimation
+{
+    public string message;
+    public Estimation estimation;
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class Estimation
+{
+    public string id;
+    public string price;
+    public string state;
+    public string date; 
+}
+
+/* Estimation object constructor */
+[System.Serializable]
+public class EstimationId
+{
+    public string id;
+}
+
+[System.Serializable]
+public class EstimationList
+{
+    public List<Estimation> estimations;
+}
+
+/*Customer constructor*/
+ [System.Serializable] 
+public class CreateCustomer
+{
+    public string _id;
+    public string name;
+    public string surename;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string phone;
+    public string email;
+    public string __v;
+}
+
+[System.Serializable]
+public class RequestGetAllCustomer
+{
+    public string message;
+    public List<Customer> customers;
+
+}
+
+/*Customer constructor*/
+[System.Serializable]
+public class Customer
+{
+    public string _id;
+    public string name;
+    public string surename;
+    public string road;
+    public string roadNum;
+    public string zipcode;
+    public string city;
+    public string roadExtra;
+    public string phone;
+    public string email;
+    public string __v;
+}
+
+[System.Serializable]
+public class CreateModules
+{
+    public string name;
+    public string cost;
+    public string angle;
+    public string cctp;
+    public string cut;
+    public string range;
+    public List<Component> composants;
+}
+
+[System.Serializable]
+public class Component
+{
+    public string id;
+    public string qte;
 }

@@ -65,7 +65,7 @@ public class UpdateProjectList : MonoBehaviour
 
     /* Function useful when a project was selected on the list: Go to Project Sheet */
     public void GoToViewProject(GameObject pItemSelected)
-    {     
+    {
         CONST.GetComponent<CONST>().selectedProjectID = pItemSelected.GetComponent<ItemListProject>().id;   // Assign the ID for the next scene
 
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
