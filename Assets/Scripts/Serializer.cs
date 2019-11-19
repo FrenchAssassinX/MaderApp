@@ -185,12 +185,12 @@ public class CreateModules
     public string cctp;
     public string cut;
     public string range;
-    public List<Composant> composants;
+    public List<Component> composants;
 
 }
 
 [System.Serializable]
-public class Composant
+public class Component
 {
     public string id;
     public string qte;
