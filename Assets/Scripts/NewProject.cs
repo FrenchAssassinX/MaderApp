@@ -11,12 +11,14 @@ public class NewProject : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for this scene
-    private string URLCreateProject = "v1/createproject"; // Specific url for this scene
+    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for create customer
+    private string URLCreateProject = "v1/createproject"; // Specific url for create project
+    private string URLGetCustomers = "v1/getallcustomer"; // Specific url for get all customers
 
     //project (CanvasLeft)
     public InputField nameProject;
     public InputField referenceProject;
+    public Dropdown idCustomer;
     public Button ButtonCreateCustomer;
     public Button ButtonCreateProject;
 
@@ -37,13 +39,14 @@ public class NewProject : MonoBehaviour
     public GameObject createValideCustomer;
     public GameObject createValideProject;
     public GameObject errorCreateCustomer;
+
     //Top
     public Button ButtonReturn;
-
-
+    
     // Start is called before the first frame update
     void Start()
     {
+        
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
 
         url = CONST.GetComponent<CONST>().url;
@@ -70,7 +73,16 @@ public class NewProject : MonoBehaviour
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
 
+        //projectSurnameGO.GetComponent<UnityEngine.UI.Text>().text = getSurname;
+
+
+        GenerateReferenceProject();
+
+        StartCoroutine(GetAllCustomers());
+
+
     }
+
 
     //active CreateNewCient
     void DisplayCreateNewCustomer()
@@ -136,7 +148,7 @@ public class NewProject : MonoBehaviour
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
-                    Customer entity = JsonUtility.FromJson<Customer>(jsonResult);
+                    CreateCustomer entity = JsonUtility.FromJson<CreateCustomer>(jsonResult);
                     //message validate new customer
                     createValideCustomer.transform.gameObject.SetActive(true);
 
@@ -184,7 +196,7 @@ public class NewProject : MonoBehaviour
                     CreateProject entity = JsonUtility.FromJson<CreateProject>(jsonResult);
                     //message validate new customer
                     createValideProject.transform.gameObject.SetActive(true);
-
+                    
                 }
                 
             }
@@ -193,9 +205,72 @@ public class NewProject : MonoBehaviour
 
     }
 
-    public void CreateReferenceProject()
+    public IEnumerator GetAllCustomers()
     {
-        //add reference for a new project
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+                Debug.Log(jsonResult);
+
+                RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);         // Convert JSON file
+
+                Debug.Log("entities : " + entities.customers);
+
+                foreach (var item in entities.customers)
+                {
+                    Customer customer = item;
+                    string getId = customer._id;
+                    string getSurname = customer.surename;
+                    string getName = customer.name;
+                    Debug.Log("surname :" + getSurname);
+                    Debug.Log("name :" + getName);
+
+                    //Poster all customers
+                    List<string> dropdowncustomer = new List<string>() { customer.name + " " + customer.surename };
+                    idCustomer.AddOptions(dropdowncustomer);
+
+                    //Select the 5 firsts letters for surname
+                    string newGetSurname = getSurname.Substring(0, 5);
+
+
+                    //Select the first letters for name
+                    string newGetName = getName.Substring(0, 1);
+
+                    //Select the timestanp
+                    var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    Debug.Log(Timestamp);
+
+                    //Generate the ID
+                    string IdCustomerGenerated = newGetSurname + newGetName + Timestamp;
+                    Debug.Log(IdCustomerGenerated);
+
+                    referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
+                }
+                
+            }
+        }
+    }
+
+    //Add reference for a new project
+    public void GenerateReferenceProject()
+    {
+        
+
+        //Poster the ID of customer
+
     }
 
 }
