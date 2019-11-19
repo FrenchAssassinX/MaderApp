@@ -6,4 +6,6 @@ public class CONST : MonoBehaviour
     public string token;
     public string userID;
     public string userName;
+
+    public string selectedProjectID;
 }
