@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 9133359336289100753}
   - component: {fileID: 9133359336289100758}
   - component: {fileID: 382946566221213404}
+  - component: {fileID: 3146865933225569266}
   m_Layer: 5
   m_Name: FloorButtonPrefab
   m_TagString: Untagged
@@ -179,7 +180,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_SelectedColor: {r: 0.19215687, g: 0.60784316, b: 0.8117647, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -216,3 +217,16 @@ MonoBehaviour:
   m_EffectColor: {r: 0.3372549, g: 0.3372549, b: 0.3372549, a: 1}
   m_EffectDistance: {x: 2, y: 2}
   m_UseGraphicAlpha: 1
+--- !u!114 &3146865933225569266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9133359336289100756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fcb32221ee2cb24b89e8844c6730a2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSelected: 0
