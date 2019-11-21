@@ -19,6 +19,7 @@ public class ItemListEstimation : MonoBehaviour
     public GameObject buttonEstimation;
     public GameObject buttonPaymentTerms;
     public GameObject buttonTechnicalFile;
+    public GameObject buttonShowEstimation;
 
 
     // Start is called before the first frame update
@@ -33,17 +34,20 @@ public class ItemListEstimation : MonoBehaviour
         buttonEstimation = GameObject.Find("estimationButton");
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
+        buttonShowEstimation = GameObject.Find("showEstimationButton");
 
         buttonDelete.SetActive(false);
         buttonEstimation.SetActive(false);
         buttonPaymentTerms.SetActive(false);
         buttonTechnicalFile.SetActive(false);
+        buttonShowEstimation.SetActive(false);
 
         /* Affect specific onClick behaviours to the buttons */
         buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
         buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
         buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
         buttonTechnicalFile.GetComponent<Button>().onClick.AddListener(GetTechnicalFile);
+        buttonShowEstimation.GetComponent<Button>().onClick.AddListener(ShowEstimation);
     }
 
     /* Function for select item detection */
@@ -53,9 +57,19 @@ public class ItemListEstimation : MonoBehaviour
         buttonEstimation.SetActive(true);
         buttonPaymentTerms.SetActive(true);
         buttonTechnicalFile.SetActive(true);
+        buttonShowEstimation.SetActive(true);
 
         isSelected = true;
         Debug.Log("SELECTED");
+    }
+
+    /* Function to show an estimation */
+    public void ShowEstimation()
+    {
+        if (isSelected)
+        {
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowEstimation(this.gameObject);
+        }
     }
 
     /* Function to add an estimation */

@@ -7,4 +7,8 @@ public class CONST : MonoBehaviour
     public string userID;
     public string userName;
     public string selectedProjectID;
+    public string selectedEstimationID;
+    public string customerName;
+    public string projectName;
+    public string estimationPrice;
 }

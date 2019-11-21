@@ -206,13 +206,13 @@ public class UpdateProjectSheet : MonoBehaviour
             dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
             // Change text value of the list item
-            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
+            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation.id;
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
 
             // ID to keep for view estimation sheet or deleting estimation
-            listItem.GetComponent<ItemListEstimation>().idValue = estimation._id;
+            listItem.GetComponent<ItemListEstimation>().idValue = estimation.id;
             listItem.GetComponent<ItemListEstimation>().dateValue = dateValueText;
             listItem.GetComponent<ItemListEstimation>().priceValue = estimation.price;
             listItem.GetComponent<ItemListEstimation>().stateValue = estimation.state;
@@ -249,6 +249,18 @@ public class UpdateProjectSheet : MonoBehaviour
                 StartCoroutine(GetAllEstimations());           // Recall all projects from databse
             }
         }
+    }
+
+    /* Function to show an estimation */
+    public void ShowEstimation(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+        CONST.GetComponent<CONST>().customerName = clientNameGO.GetComponent<UnityEngine.UI.Text>().text + " " + clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().estimationPrice = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); //load the next scene
     }
 
     //Get back  button function
