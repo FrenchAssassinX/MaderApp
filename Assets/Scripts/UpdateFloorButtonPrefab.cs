@@ -10,20 +10,24 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
     private Button floorButton;                                         // Button on the list
     private GameObject panelFloor;                                      // Panel for the concerned floor
+    public GameObject floorCount;                                       // Counter to set name of the floor
+
+    private GameObject deleteButton;                                    // Button to delete prefab
 
     public bool isSelected;                                             // Boolean for onClick function
 
     void Start()
     {
-        gridList = GameObject.Find("GridList");                         // Retrieve gridList on the scene
+        gridList = GameObject.Find("GridList");                                     // Retrieve gridList on the scene
 
-        floorButton = GetComponent<Button>();                           // Retrieve button element on the scene
-        floorButton.onClick.AddListener(SelectItem);                    // Lauch item selected function
-        isSelected = false;                                             // Set to false on start
+        floorButton = GetComponent<Button>();                                       // Retrieve button element on the scene
+        floorButton.onClick.AddListener(SelectItem);                                // Lauch item selected function
+        isSelected = false;                                                         // Set to false on start
 
-        middleCanvas = GameObject.Find("MiddleCanvas");                 // Retrieve the parent canvas on the scene
-        panelFloor = GameObject.Find("panel" + floorButton.name);       // Retrieve panel element on the scene
+        middleCanvas = GameObject.Find("MiddleCanvas");                             // Retrieve the parent canvas on the scene
+        panelFloor = GameObject.Find("panel" + floorButton.name);                   // Retrieve panel element on the scene
 
+        deleteButton = GameObject.Find("ButtonDeleteFloor");                        // Retrieve button on the scene
     }
 
     void Update()
@@ -31,10 +35,14 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         /* Launch function to display the concerned floor panel */
         if (isSelected)
         {
+            /* Calling functions to reset displaying settings */
             UnselectAllButtons();
             DisplayAllFloorPanels();
             DisplaySelectedFloorPanel();
+
+            deleteButton.GetComponent<Button>().onClick.AddListener(DeleteFloor);       // Event to delete floor
         }
+
     }
 
     /* Function for select item detection */
@@ -73,6 +81,22 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             {
                 panel.gameObject.SetActive(false);
             }
+        }
+    }
+
+    /* Function to delete floor */ 
+    private void DeleteFloor()
+    {
+        // Cannot delete Floor0 and Rooftop
+        if (this.gameObject.name != "Floor0" && this.gameObject.name != "Rooftop")
+        {
+            Destroy(this.gameObject);
+            Destroy(panelFloor);
+
+            floorCount.GetComponent<FloorCount>().floorCounter--;                        // Decrease counter of floors
+
+            /* Rename all the floor buttons */
+            // TO DO
         }
     }
 }

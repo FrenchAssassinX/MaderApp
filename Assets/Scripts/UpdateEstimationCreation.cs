@@ -11,7 +11,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public GameObject buttonFloorPrefab;                           // Prefab item to display all elements in project list
     public GameObject gridList;                                     // Grid to insert project prefab items
-    private int floorCount = 0;                                     // Counter to set name of the floor
+    public GameObject floorCount;                                     // Counter to set name of the floor
 
     public GameObject panelFloorPrefab;
     public GameObject panelsCanvas;
@@ -47,7 +47,8 @@ public class UpdateEstimationCreation : MonoBehaviour
         panelRooftop.name = "panelRooftop";                                                                   // Change prefab name
         panelRooftop.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
 
-        floorCount++;                                                                                           // Increase counter of floors
+        floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
+        floorCount.GetComponent<FloorCount>().floorCounter++;                                                            // Increase counter of floors
 
     }
 
@@ -71,7 +72,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         panelNewFloor.name = "panelFloor" + floorCount;                                                                   // Change prefab name
         panelNewFloor.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
 
-        floorCount++;                                                                                           // Increase counter of floors
+        floorCount.GetComponent<FloorCount>().floorCounter++;                                                                                           // Increase counter of floors
 
     }
 }
