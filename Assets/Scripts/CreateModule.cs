@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CreateModule : MonoBehaviour
@@ -20,6 +21,9 @@ public class CreateModule : MonoBehaviour
     //Modification Module (CanvasRight)
     public Canvas canvasModificationModule;
 
+    // Banner (CanvasTop)
+    public Button ButtonReturn;
+
 
     // Start is called before the first frame update
     void Start()
@@ -35,13 +39,23 @@ public class CreateModule : MonoBehaviour
 
         Button btnCM = ButtonCreateModule.GetComponent<Button>();
         btnMM.onClick.AddListener(SendCreateModule);
-        
+
+        Button btnHP = ButtonReturn.GetComponent<Button>();
+        btnHP.onClick.AddListener(ReturnCreateProjectPage);
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    //return to home page
+    void ReturnCreateProjectPage()
+    {
+        //Send the previous scene (create project)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 3);
     }
 
     IEnumerable PostCreateModule()
@@ -72,17 +86,23 @@ public class CreateModule : MonoBehaviour
             {
                 if (request.isDone)
                 {
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    // Create a root object thanks to the JSON file
+                    CreateModules entity = JsonUtility.FromJson<CreateModules>(jsonResult);
 
+                    //foreach (var item in entities.customers)
+                    //{
+
+                    //}
                 }
                 else
                 {
                     Debug.Log("la requete n'est pas bonne");
                 }
+                }
             }
         }
-  
-    }
-
     //active CreateNewCient
     void DisplayModificationModule()
     {
@@ -96,3 +116,5 @@ public class CreateModule : MonoBehaviour
         PostCreateModule();
     }
 }
+
+

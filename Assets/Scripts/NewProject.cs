@@ -99,7 +99,7 @@ void DisplayCreateNewCustomer()
     void SendCreateProject()
     {
         StartCoroutine(PostFormNewProject());
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +3);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +3);
 
     }
 
@@ -170,18 +170,6 @@ void DisplayCreateNewCustomer()
     IEnumerator PostFormNewProject()
     {
         
-        //WWWForm form = new WWWForm();
-        //form.AddField("userID", "5dc2ced306238d15149aa06e");
-        //form.AddField("date", "2019-11-22");
-        //form.AddField("road", road.text);
-        //form.AddField("roadNum", roadNum.text);
-        //form.AddField("roadExtra", roadExtra.text);
-        //form.AddField("zipcode", zipcode.text);
-        //form.AddField("city", city.text);
-        //form.AddField("customerID", "5dbefd7e68ef8658edcde0c4");
-        //form.AddField("reference", referenceProject.text);
-        //form.AddField("projectName", nameProject.text);
-
         WWWForm form = new WWWForm();
         form.AddField("userID", "5dbee1c6e9b5241f704fdca9");
         form.AddField("date", "2019-11-22");
