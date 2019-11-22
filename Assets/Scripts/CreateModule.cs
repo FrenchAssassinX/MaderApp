@@ -32,14 +32,18 @@ public class CreateModule : MonoBehaviour
 
         url = CONST.GetComponent<CONST>().url;
 
+        //it's not visible for now
         canvasModificationModule.transform.gameObject.SetActive(false);
 
+        //Modification module
         Button btnMM = ButtonModificationModule.GetComponent<Button>();
         btnMM.onClick.AddListener(DisplayModificationModule);
 
+        //Create module
         Button btnCM = ButtonCreateModule.GetComponent<Button>();
         btnMM.onClick.AddListener(SendCreateModule);
 
+        //return in create project page
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnCreateProjectPage);
 
