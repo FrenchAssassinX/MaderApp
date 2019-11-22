@@ -18,10 +18,12 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     void Start()
     {
+        floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
+
         /* Instantiate automatic floors */
         /* Ground floor */
         GameObject floor0 = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);   // Creation of the prefab
-        floor0.name = "Floor" + floorCount;
+        floor0.name = "Floor0";
         GameObject text = GameObject.Find("FloorButtonText");                                                   // Find text in the prefab
         text.name = floor0.name + "Text";                                                                       // Change name of the texte
         text.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";                                      // Change text in the prefab
@@ -39,16 +41,13 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* Adding panels for default floors */
         /* Floor 0 */
         GameObject panelFloor0 = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
-        panelFloor0.name = "panelFloor" + floorCount;                                                                   // Change prefab name
+        panelFloor0.name = "panelFloor0";                                                                 // Change prefab name
         panelFloor0.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
 
         /* Rooftop */
         GameObject panelRooftop = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
         panelRooftop.name = "panelRooftop";                                                                   // Change prefab name
         panelRooftop.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
-
-        floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
-        floorCount.GetComponent<FloorCount>().floorCounter++;                                                            // Increase counter of floors
 
     }
 
@@ -61,18 +60,20 @@ public class UpdateEstimationCreation : MonoBehaviour
     {
         /* Adding button in the list on down panel */
         GameObject newFloor = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
-        newFloor.name = "Floor" + floorCount;                                                                    // Change prefab name
+        newFloor.name = "Floor" + floorCount.GetComponent<FloorCount>().floorCounter;                                                                    // Change prefab name
         GameObject textNewFloor = GameObject.Find("FloorButtonText");                                            // Find text in the prefab
         textNewFloor.name = newFloor.name + "Text";                                                               // Change name of the texte
-        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount;                          // Change text in the prefab
+        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount.GetComponent<FloorCount>().floorCounter;                          // Change text in the prefab
         newFloor.transform.SetParent(gridList.transform);
+        floorCount.GetComponent<FloorCount>().listFloorButtons.Add(newFloor);
 
         /* Adding specific panel for the floor */
         GameObject panelNewFloor = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
-        panelNewFloor.name = "panelFloor" + floorCount;                                                                   // Change prefab name
+        panelNewFloor.name = "panelFloor" + floorCount.GetComponent<FloorCount>().floorCounter;                                                                   // Change prefab name
         panelNewFloor.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);
 
         floorCount.GetComponent<FloorCount>().floorCounter++;                                                                                           // Increase counter of floors
-
+     
     }
 }
