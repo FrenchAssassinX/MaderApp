@@ -1576,7 +1576,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 247975012}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 927185316}
+        m_MethodName: AddComponentOnScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &247975012
@@ -4624,9 +4635,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe1d15658b6628a4989e0564b3166096, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  componentPrefab: {fileID: 6245091043562773188, guid: c6c240dd3cc28f0479750ade7b0c5b69,
+    type: 3}
+  middleCanvas: {fileID: 74216437}
   buttonFloorPrefab: {fileID: 9133359336289100756, guid: 368a8b3f5c487a74690827614e182e92,
     type: 3}
   gridList: {fileID: 1567654806}
+  floorCount: {fileID: 0}
   panelFloorPrefab: {fileID: 2636299475594687672, guid: 8bd3e85799485064089f54d89a3dbde3,
     type: 3}
   panelsCanvas: {fileID: 74216437}
@@ -5381,6 +5396,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorCounter: 0
+  listFloorButtons: []
+  listFloorPanels: []
 --- !u!4 &1024067216
 Transform:
   m_ObjectHideFlags: 0

@@ -9,6 +9,9 @@ public class UpdateEstimationCreation : MonoBehaviour
     //private string getProjectUrl = "v1/getallproject";          // Specific route to get all projects
     //private string deleteProjectUrl = "v1/deleteproject";       // Specific route to delete one project
 
+    public GameObject componentPrefab;                            // Prefab of component for 2D scene
+    public GameObject middleCanvas;                               // Useful to set component prefab position 
+
     public GameObject buttonFloorPrefab;                           // Prefab item to display all elements in project list
     public GameObject gridList;                                     // Grid to insert project prefab items
     public GameObject floorCount;                                     // Counter to set name of the floor
@@ -54,6 +57,20 @@ public class UpdateEstimationCreation : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void AddComponentOnScene()
+    {
+        // TO DO: rechercher dans la liste des boutons si un bouton est sélectionné
+        // ATTENTION: problème potentiel, le toit et le rez-de-chaussée ne font pas partie de la liste des boutons
+
+        /*foreach (GameObject button in collection)
+        {
+
+        }*/
+
+        GameObject newComponent = Instantiate(componentPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
+        newComponent.transform.SetParent(middleCanvas.transform);               // Change parent on scene hierarchy                   
     }
 
     public void AddFloor()
