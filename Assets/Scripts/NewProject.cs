@@ -42,11 +42,14 @@ public class NewProject : MonoBehaviour
 
     //Top
     public Button ButtonReturn;
-    
+
+    public string idClientForForm;
+    string IdCustomerGenerated;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
 
         url = CONST.GetComponent<CONST>().url;
@@ -73,19 +76,20 @@ public class NewProject : MonoBehaviour
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnHomePage);
 
-        //projectSurnameGO.GetComponent<UnityEngine.UI.Text>().text = getSurname;
-
-
-        GenerateReferenceProject();
-
         StartCoroutine(GetAllCustomers());
 
 
     }
 
+    void Update()
+    {
 
-    //active CreateNewCient
-    void DisplayCreateNewCustomer()
+    }         
+
+
+
+//active CreateNewCient
+void DisplayCreateNewCustomer()
     {
         canvasNewClient.transform.gameObject.SetActive(true);
 
@@ -95,6 +99,8 @@ public class NewProject : MonoBehaviour
     void SendCreateProject()
     {
         StartCoroutine(PostFormNewProject());
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex +3);
+
     }
 
     //add new customer
@@ -163,18 +169,31 @@ public class NewProject : MonoBehaviour
 
     IEnumerator PostFormNewProject()
     {
+        
+        //WWWForm form = new WWWForm();
+        //form.AddField("userID", "5dc2ced306238d15149aa06e");
+        //form.AddField("date", "2019-11-22");
+        //form.AddField("road", road.text);
+        //form.AddField("roadNum", roadNum.text);
+        //form.AddField("roadExtra", roadExtra.text);
+        //form.AddField("zipcode", zipcode.text);
+        //form.AddField("city", city.text);
+        //form.AddField("customerID", "5dbefd7e68ef8658edcde0c4");
+        //form.AddField("reference", referenceProject.text);
+        //form.AddField("projectName", nameProject.text);
+
         WWWForm form = new WWWForm();
         form.AddField("userID", "5dbee1c6e9b5241f704fdca9");
-        form.AddField("date", "2019-01-21");
-        form.AddField("road", "rue des trucs");
-        form.AddField("roadNum", "25");
-        form.AddField("roadExtra", "rien");
-        form.AddField("zipcode", "71000");
-        form.AddField("city", "sance");
-        form.AddField("customerID", "5dbefd7e68ef8658edcde0c4");
-        form.AddField("reference", "testTruc");
-        form.AddField("projectName", "projectAlpha2");
-        
+        form.AddField("date", "2019-11-22");
+        form.AddField("road", road.text);
+        form.AddField("roadNum", roadNum.text);
+        form.AddField("roadExtra", roadExtra.text);
+        form.AddField("zipcode", zipcode.text);
+        form.AddField("city", city.text);
+        form.AddField("customerID", idClientForForm); //not .text in the end because is a string
+        form.AddField("reference", referenceProject.text);
+        form.AddField("projectName", nameProject.text);
+
 
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateProject, form))
         {
@@ -185,11 +204,16 @@ public class NewProject : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 // error
+                Debug.Log("network erreor :" + request.isNetworkError);
+                Debug.Log("http erreor :" + request.isHttpError);
+                Debug.Log(form);
+
             }
             else
             {
                 if (request.isDone)
                 {
+                    Debug.Log("envoi du projet");
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
@@ -221,26 +245,33 @@ public class NewProject : MonoBehaviour
         {
             if (request.isDone)
             {
+                Debug.Log("ok");
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
 
                 RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);         // Convert JSON file
 
-                Debug.Log("entities : " + entities.customers);
+                //Debug.Log("entities : " + entities.customers);
 
                 foreach (var item in entities.customers)
                 {
+                    //string IdCustomerGenerated = "CHOISIR UN CLIENT";
                     Customer customer = item;
                     string getId = customer._id;
                     string getSurname = customer.surename;
                     string getName = customer.name;
-                    Debug.Log("surname :" + getSurname);
-                    Debug.Log("name :" + getName);
+                    
+                    Debug.Log("surname : " + getSurname);
+                    Debug.Log("name : " + getName);
+                    Debug.Log("id : " + getId);
 
                     //Poster all customers
-                    List<string> dropdowncustomer = new List<string>() { customer.name + " " + customer.surename };
+                    List<string> dropdowncustomer = new List<string>() { customer.name + " " + customer.surename};
                     idCustomer.AddOptions(dropdowncustomer);
+
+                    //Select id customer
+                    //string newGetID = 
 
                     //Select the 5 firsts letters for surname
                     string newGetSurname = getSurname.Substring(0, 5);
@@ -253,13 +284,20 @@ public class NewProject : MonoBehaviour
                     var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
                     Debug.Log(Timestamp);
 
-                    //Generate the ID
-                    string IdCustomerGenerated = newGetSurname + newGetName + Timestamp;
-                    Debug.Log(IdCustomerGenerated);
 
+                    //---------------------------Generate the ID Project-----------------------------------
+
+                    IdCustomerGenerated = newGetSurname + newGetName + Timestamp;
+                    idClientForForm = getId;
+                    Debug.Log(IdCustomerGenerated);
+                    //post ref project
                     referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
+                    
+                    
+                    
+                    //-------------------------------------------------------------------------------------
                 }
-                
+
             }
         }
     }
