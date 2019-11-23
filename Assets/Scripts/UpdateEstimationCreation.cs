@@ -61,16 +61,23 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public void AddComponentOnScene()
     {
-        // TO DO: rechercher dans la liste des boutons si un bouton est sélectionné
-        // ATTENTION: problème potentiel, le toit et le rez-de-chaussée ne font pas partie de la liste des boutons
+        GameObject destinationPanel = null;                                         // GameObject to set the destination scene of the new component
 
-        /*foreach (GameObject button in collection)
+        /* Search wich button is selected */
+        foreach (Transform child in middleCanvas.transform)
         {
+            GameObject panel = child.gameObject;
 
-        }*/
+            Debug.Log("Foreach");
+            if (panel.activeSelf)
+            {
+                Debug.Log("IF");
+                destinationPanel = panel;
+            }
+        }
 
         GameObject newComponent = Instantiate(componentPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
-        newComponent.transform.SetParent(middleCanvas.transform);               // Change parent on scene hierarchy                   
+        newComponent.transform.SetParent(destinationPanel.transform);               // Change parent on scene hierarchy                   
     }
 
     public void AddFloor()

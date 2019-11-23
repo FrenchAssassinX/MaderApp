@@ -42,6 +42,8 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             DisplayAllFloorPanels();
             DisplaySelectedFloorPanel();
 
+            //Debug.Log("Selected button:" + this.gameObject.name);
+
             deleteButton.GetComponent<Button>().onClick.AddListener(DeleteFloor);       // Event to delete floor
         }
 
@@ -58,7 +60,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
     {
         foreach (Transform button in gridList.transform)
         {
-            button.gameObject.GetComponent<UpdateFloorButtonPrefab>().isSelected = false;
+            button.gameObject.GetComponent<UpdateFloorButtonPrefab>().isSelected = false;       // Unselect all buttons except the current selected button
         }
     }
 
