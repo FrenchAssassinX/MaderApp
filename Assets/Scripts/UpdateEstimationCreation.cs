@@ -68,10 +68,8 @@ public class UpdateEstimationCreation : MonoBehaviour
         {
             GameObject panel = child.gameObject;
 
-            Debug.Log("Foreach");
             if (panel.activeSelf)
             {
-                Debug.Log("IF");
                 destinationPanel = panel;
             }
         }

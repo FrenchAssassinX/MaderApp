@@ -1051,7 +1051,7 @@ GameObject:
   - component: {fileID: 140527353}
   - component: {fileID: 140527352}
   m_Layer: 5
-  m_Name: Placeholder
+  m_Name: PlaceholderSection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2263,7 +2263,7 @@ GameObject:
   - component: {fileID: 362647646}
   - component: {fileID: 362647645}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TextSection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2310,10 +2310,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -2413,13 +2413,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 366036918}
   m_TextComponent: {fileID: 362647645}
   m_Placeholder: {fileID: 140527352}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -3625,7 +3625,7 @@ GameObject:
   - component: {fileID: 682382481}
   - component: {fileID: 682382480}
   m_Layer: 5
-  m_Name: Placeholder
+  m_Name: PlaceholderLength
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4484,13 +4484,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 922779269}
   m_TextComponent: {fileID: 1557834777}
   m_Placeholder: {fileID: 682382480}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -5178,13 +5178,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 989894455}
   m_TextComponent: {fileID: 1402905677}
   m_Placeholder: {fileID: 2098556230}
-  m_ContentType: 0
+  m_ContentType: 3
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 2
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 2
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
@@ -7256,7 +7256,7 @@ GameObject:
   - component: {fileID: 1402905678}
   - component: {fileID: 1402905677}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TextAngle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7303,10 +7303,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -7941,7 +7941,7 @@ GameObject:
   - component: {fileID: 1557834778}
   - component: {fileID: 1557834777}
   m_Layer: 5
-  m_Name: Text
+  m_Name: TextLength
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7988,10 +7988,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -11252,7 +11252,7 @@ GameObject:
   - component: {fileID: 2098556231}
   - component: {fileID: 2098556230}
   m_Layer: 5
-  m_Name: Placeholder
+  m_Name: PlaceholderAngle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
