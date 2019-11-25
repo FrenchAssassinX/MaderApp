@@ -1,16 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class UpdateEstimationCreation : MonoBehaviour
 {
-    //public GameObject CONST;                                    // CONST object contains server route, token and user infos
+    public GameObject CONST;                                    // CONST object contains server route, token and user infos
 
-    //private string getProjectUrl = "v1/getallproject";          // Specific route to get all projects
-    //private string deleteProjectUrl = "v1/deleteproject";       // Specific route to delete one project
+    private string createModuleEstimationUrl = "v1/createmodulewithestimation";          // Specific route to get all projects
+    private string deleteModuleUrl = "v1/deletemoduleonestimation";       // Specific route to delete one project
 
-    public GameObject componentPrefab;                            // Prefab of component for 2D scene
+    public GameObject modulePrefab;                            // Prefab of component for 2D scene
     public GameObject middleCanvas;                               // Useful to set component prefab position 
+
+    public GameObject deletePanel;                                // Panel to delete a component
+    public GameObject deletePanelErrorMessage;
+    public GameObject deletePanelMessage;
 
     public GameObject buttonFloorPrefab;                           // Prefab item to display all elements in project list
     public GameObject gridList;                                     // Grid to insert project prefab items
@@ -18,10 +24,18 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public GameObject panelFloorPrefab;
     public GameObject panelsCanvas;
+    public GameObject destinationPanel = null;                         // GameObject to set the destination scene of the new component
+    public Button addModuleButton;
 
     void Start()
     {
+        CONST = GameObject.Find("CONST");
         floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
+        addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();
+
+        addModuleButton.onClick.AddListener(AddModuleOnScene);
+
+        deletePanel.SetActive(false);
 
         /* Instantiate automatic floors */
         /* Ground floor */
@@ -59,10 +73,9 @@ public class UpdateEstimationCreation : MonoBehaviour
         
     }
 
-    public void AddComponentOnScene()
-    {
-        GameObject destinationPanel = null;                                         // GameObject to set the destination scene of the new component
 
+    public void AddModuleOnScene()
+    {
         /* Search wich button is selected */
         foreach (Transform child in middleCanvas.transform)
         {
@@ -74,8 +87,11 @@ public class UpdateEstimationCreation : MonoBehaviour
             }
         }
 
-        GameObject newComponent = Instantiate(componentPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
-        newComponent.transform.SetParent(destinationPanel.transform);               // Change parent on scene hierarchy                   
+        if (destinationPanel != null)
+        {
+            GameObject newModule = Instantiate(modulePrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
+            newModule.transform.SetParent(destinationPanel.transform);                                                   // Change parent on scene hierarchy   
+        }
     }
 
     public void AddFloor()
@@ -98,4 +114,116 @@ public class UpdateEstimationCreation : MonoBehaviour
         floorCount.GetComponent<FloorCount>().floorCounter++;                                                                                           // Increase counter of floors
      
     }
+
+
+    public void DisplayDeletePanel()
+    {
+        if (destinationPanel != null)
+        {
+            foreach (Transform child in destinationPanel.transform)
+            {
+                GameObject module = child.gameObject;
+
+                if (module.GetComponent<UpdateModule2D>().isSelected)
+                {
+                    deletePanel.SetActive(true);
+                    deletePanelErrorMessage.SetActive(false);
+                }
+            }
+        }
+    }
+
+    public void HideDeletePanel()
+    {
+        deletePanel.SetActive(false);
+    }
+    
+    public void DeleteModule()
+    {
+        if (destinationPanel != null)
+        {
+            foreach (Transform child in destinationPanel.transform)
+            {
+                GameObject module = child.gameObject;
+
+                if (module.GetComponent<UpdateModule2D>().isSelected)
+                {
+                    HideDeletePanel();          // Hide delete panel
+                    Destroy(module);         // Destroy module from scene
+                }
+            }
+        }
+    }
+
+    public IEnumerator AddModulesToEstimation()
+    {
+        foreach (Transform child in destinationPanel.transform)
+        {
+            GameObject module = child.gameObject;
+
+            WWWForm form = new WWWForm();                       // New form for web request
+            form.AddField("name", module.name);    // Add to the form the value of the ID of the project to delete
+            //form.AddField("cost", module.name);    // Add to the form the value of the ID of the project to delete
+            //form.AddField("angle", module.name);    // Add to the form the value of the ID of the project to delete
+            //form.AddField("cut", module.name);    // Add to the form the value of the ID of the project to delete
+            //form.AddField("range", module.name);    // Add to the form the value of the ID of the project to delete
+            //form.AddField("estimationID", module.name);    // Add to the form the value of the ID of the project to delete
+
+            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);     // Create new form
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return request.SendWebRequest();                      // Send request                                                              
+
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("*** ERROR: " + request.error + " ***");
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                }
+            }
+        }
+    }
+
+    /*public IEnumerator DeleteComponent()
+    {
+        if (destinationPanel != null)
+        {
+            foreach (Transform child in destinationPanel.transform)
+            {
+                GameObject component = child.gameObject;
+
+                if (component.GetComponent<UpdateComponent2D>().isSelected)
+                {
+                    WWWForm form = new WWWForm();                       // New form for web request
+                    form.AddField("estimationID", "5dc98c411685521e3a11a237");    // Add to the form the value of the ID of the project to delete
+                    form.AddField("moduleID", component.GetComponent<UpdateComponent2D>().id);    // Add to the form the value of the ID of the project to delete
+
+                    UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);       // New request, passing url and form
+                    request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+                    request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                    yield return request.SendWebRequest();
+
+                    if (request.isNetworkError || request.isHttpError)
+                    {
+                        // Display error message 
+                        deletePanelMessage.SetActive(false);
+                        deletePanelErrorMessage.SetActive(true);
+                    }
+                    else
+                    {
+                        if (request.isDone)
+                        {
+                            HideDeletePanel();          // Hide delete panel
+                            Destroy(component);         // Destroy component from scene
+                        }
+                    }
+                }
+            }
+        }
+    }*/
 }

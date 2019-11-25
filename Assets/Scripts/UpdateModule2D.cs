@@ -5,13 +5,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UpdateComponent2D : MonoBehaviour, IDragHandler, IEndDragHandler
+public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     public bool isSelected;                 // Boolean to detect when component is selected
 
-    public InputField sectionInput;         // Input to change height of the component
-    public InputField widthInput;           // Input to change width of the component
-    public InputField angleInput;           // Input to change angle of the component
+    public string id;
+
+    private InputField sectionInput;        // Input to change height of the component
+    private InputField widthInput;          // Input to change width of the component
+    private InputField angleInput;          // Input to change angle of the component
+    public GameObject panelScene;          // Scene 2D to move component
 
     private Button button;                  // Button variable to get component on start
 
@@ -23,6 +26,9 @@ public class UpdateComponent2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
         button = this.GetComponent<Button>();                                               // Retrieve button on scene
         button.onClick.AddListener(SelectComponent);                                        // Add event to select component on scene
+
+        panelScene = button.transform.parent.gameObject;                                    // Retrieve the parent panel of the component on scene
+        Debug.Log("Parent name: " + panelScene.name);
 
         isSelected = false;                                                                 // On start, component is not selected
     }
@@ -49,8 +55,16 @@ public class UpdateComponent2D : MonoBehaviour, IDragHandler, IEndDragHandler
                 button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);        // width, height
                 button.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, angle);    // angle
             }
-
         }
+
+        /* Keep component on panel */
+        /*if (button.GetComponent<RectTransform>().sizeDelta.x < panelScene.GetComponent<RectTransform>().sizeDelta.x)
+        {
+            button.GetComponent<RectTransform>().sizeDelta = new Vector2(
+                                                                    panelScene.GetComponent<RectTransform>().sizeDelta.x,
+                                                                    button.GetComponent<RectTransform>().sizeDelta.y
+            );
+        }*/
     }
 
     /* Function to select component on scene */
