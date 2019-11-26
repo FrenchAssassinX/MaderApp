@@ -81,10 +81,13 @@ public class NewProject : MonoBehaviour
 
     }
 
-    void Update()
-    {
-
-    }         
+    //void Update()
+    //{
+    //    if (!idCustomer.GetComponent<Dropdown>().options.Equals("Client"))
+    //    {
+    //        referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
+    //    }
+    //}         
 
 
 
@@ -236,53 +239,54 @@ void DisplayCreateNewCustomer()
                 Debug.Log("ok");
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                //Debug.Log(jsonResult);
+                Debug.Log(jsonResult);
 
                 RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);         // Convert JSON file
 
-                //Debug.Log("entities : " + entities.customers);
+                Debug.Log("entities : " + entities.customers);
 
                 foreach (var item in entities.customers)
                 {
+                    Debug.Log("item : " + item.city + item.surename + item._id);
                     //string IdCustomerGenerated = "CHOISIR UN CLIENT";
-                    Customer customer = item;
-                    string getId = customer._id;
-                    string getSurname = customer.surename;
-                    string getName = customer.name;
+                    string getId = item._id;
+                    string getSurname = item.surename;
+                    string getName = item.name;
                     
                     Debug.Log("surname : " + getSurname);
                     Debug.Log("name : " + getName);
                     Debug.Log("id : " + getId);
 
                     //Poster all customers
-                    List<string> dropdowncustomer = new List<string>() { customer.name + " " + customer.surename};
+                    List<string> dropdowncustomer = new List<string>() { getName + " " + getSurname };
                     idCustomer.AddOptions(dropdowncustomer);
-
-                    //Select id customer
-                    //string newGetID = 
+                    //Debug.Log("Dropdown customer :" + idCustomer);
 
                     //Select the 5 firsts letters for surname
-                    string newGetSurname = getSurname.Substring(0, 5);
+                    string test = "dfdfgdfg";
 
+                    string newtest = test.Substring(0, 4);
+                    Debug.Log(newtest);
+
+                    string newGetSurname = getSurname.Substring(0, 3);
+                    Debug.Log("modif get surname : " + newGetSurname);
 
                     //Select the first letters for name
                     string newGetName = getName.Substring(0, 1);
+                    Debug.Log("modif get name : " + newGetName);
 
                     //Select the timestanp
                     var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-                    Debug.Log(Timestamp);
-
+                    //Debug.Log(Timestamp);
 
                     //---------------------------Generate the ID Project-----------------------------------
 
                     IdCustomerGenerated = newGetSurname + newGetName + Timestamp;
                     idClientForForm = getId;
-                    Debug.Log(IdCustomerGenerated);
+                    Debug.Log("id generated" + IdCustomerGenerated);
                     //post ref project
                     referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
-                    
-                    
-                    
+                              
                     //-------------------------------------------------------------------------------------
                 }
 

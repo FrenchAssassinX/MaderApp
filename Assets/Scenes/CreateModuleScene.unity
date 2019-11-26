@@ -2446,12 +2446,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CONST: {fileID: 0}
-  gamme: {fileID: 217029545}
-  modele: {fileID: 556159257}
-  coupe: {fileID: 1955841329}
+  ddrange: {fileID: 217029545}
+  ddmodel: {fileID: 556159257}
+  ddcut: {fileID: 1955841329}
   ButtonModificationModule: {fileID: 1761288413}
   ButtonCreateModule: {fileID: 1824538503}
   canvasModificationModule: {fileID: 880125552}
+  woodenUpright: {fileID: 1067732391}
+  insulationPanels: {fileID: 96175985}
+  rainBarrier: {fileID: 857942585}
+  intermediatePanels: {fileID: 705034288}
+  hatchPanels: {fileID: 1450604752}
+  floor: {fileID: 1685997868}
   ButtonReturn: {fileID: 802229238}
 --- !u!114 &363101899
 MonoBehaviour:

@@ -10,16 +10,25 @@ public class CreateModule : MonoBehaviour
     public GameObject CONST;
     private string url;
     private string URLCreateModule = "v1/createmodule";  // Specific url for create module
+    private string URLEstimationModule = "v1/createmodulewithestimation"; // Specific url for estimation module
+    private string URLRange = "v1/getallrange"; // Specific url for range
 
     //Type (CanvasLeft)
-    public Dropdown gamme;
-    public Dropdown modele;
-    public Dropdown coupe;
+    public Dropdown ddrange; //gamme
+    public Dropdown ddmodel; //modele
+    public Dropdown ddcut; //coupe
+    public Input name; //name of module
     public Button ButtonModificationModule;
     public Button ButtonCreateModule;
 
     //Modification Module (CanvasRight)
     public Canvas canvasModificationModule;
+    public Dropdown woodenUpright; //montantBois;
+    public Dropdown insulationPanels; //panneauxIsolation;
+    public Dropdown rainBarrier; //parePluie;
+    public Dropdown intermediatePanels; //panneauxIntermediaires;
+    public Dropdown hatchPanels; //panneauxCouverture;
+    public Dropdown floor; //plancher;
 
     // Banner (CanvasTop)
     public Button ButtonReturn;
@@ -40,12 +49,14 @@ public class CreateModule : MonoBehaviour
         btnMM.onClick.AddListener(DisplayModificationModule);
 
         //Create module
-        Button btnCM = ButtonCreateModule.GetComponent<Button>();
-        btnMM.onClick.AddListener(SendCreateModule);
+        //Button btnCM = ButtonCreateModule.GetComponent<Button>();
+        //btnMM.onClick.AddListener();
 
         //return in create project page
         Button btnHP = ButtonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnCreateProjectPage);
+
+        StartCoroutine(GetAllRange());
 
     }
 
@@ -62,20 +73,11 @@ public class CreateModule : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 3);
     }
 
-    IEnumerable PostCreateModule()
+    public IEnumerator GetAllRange()
     {
 
-        WWWForm form = new WWWForm();
-        form.AddField("name", "name");
-        form.AddField("cost", "cost");
-        form.AddField("angle", "angle");
-        form.AddField("cctp", "cctp");
-        form.AddField("cut", "cut");
-        form.AddField("range", "range");
-
-        /* New webrequest with: CONST url, local URLCreateCustomer and the form */
-        using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateModule, form))
-        {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLRange);
+        
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -90,23 +92,38 @@ public class CreateModule : MonoBehaviour
             {
                 if (request.isDone)
                 {
+                Debug.Log("it's ok");
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
-                    CreateModules entity = JsonUtility.FromJson<CreateModules>(jsonResult);
+                    RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);
+                    Debug.Log("entities : " + entities.ranges);
 
-                    //foreach (var item in entities.customers)
-                    //{
+                    Debug.Log("result jsdon : " + jsonResult);
 
-                    //}
+                    foreach (var item in entities.ranges)
+                    {
+                    
+                        Debug.Log("dans la boucle");
+                        Debug.Log("item : " + item);
+                        string getId = item._id;
+                        string getLibelle = item.libelle;
+
+                        Debug.Log("libelle : " + getLibelle);
+                        Debug.Log("id : " + getId);
+
+                        //Poster all ranges
+                        List<string> dropdownranges = new List<string>() { getLibelle };
+                        ddrange.AddOptions(dropdownranges);
+                    }
                 }
                 else
                 {
                     Debug.Log("la requete n'est pas bonne");
                 }
-                }
             }
-        }
+        
+    }
     //active CreateNewCient
     void DisplayModificationModule()
     {
@@ -114,11 +131,6 @@ public class CreateModule : MonoBehaviour
 
     }
 
-    //add new project
-    void SendCreateModule()
-    {
-        PostCreateModule();
-    }
 }
 
 

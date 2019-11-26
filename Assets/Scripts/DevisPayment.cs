@@ -17,6 +17,9 @@ public class DevisPayment : MonoBehaviour
     public Button ButtonSave;
     public Button ButtonReturn;
     // Start is called before the first frame update
+
+    RectTransform rt;
+
     void Start()
     {
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
@@ -47,10 +50,11 @@ public class DevisPayment : MonoBehaviour
         stateAdvancement.AddOptions(dropdownStateAdvancement);
     }
 
-    
+
+    //progressBar for Advancement Payment
     void ProgressBar()
     {
-
+        
     }
 
     //update devis
