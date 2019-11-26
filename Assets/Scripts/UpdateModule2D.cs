@@ -14,7 +14,8 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     private InputField sectionInput;        // Input to change height of the component
     private InputField widthInput;          // Input to change width of the component
     private InputField angleInput;          // Input to change angle of the component
-    public GameObject panelScene;          // Scene 2D to move component
+
+    public GameObject panelScene;           // Scene 2D to move component
 
     private Button button;                  // Button variable to get component on start
 
@@ -35,42 +36,73 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
     void Update()
     {
-        /* If component is selected */
-        if (isSelected)
-        {
-            /* Displaying values of the component on UI interface */
-            sectionInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().sizeDelta.y.ToString();
-            widthInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().sizeDelta.x.ToString();
-            angleInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().eulerAngles.z.ToString();
-
-            /* If value of the component or not empty... */
-            if (widthInput.text != "" && sectionInput.text != "" && angleInput.text != "")
-            {
-                /* Convert values of the input fields to float */
-                float width = float.Parse(widthInput.text);
-                float height = float.Parse(sectionInput.text);
-                float angle = float.Parse(angleInput.text);
-
-                /* Affect new values of input fields to the component */
-                button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);        // width, height
-                button.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, angle);    // angle
-            }
-        }
-
         /* Keep component on panel */
-        /*if (button.GetComponent<RectTransform>().sizeDelta.x < panelScene.GetComponent<RectTransform>().sizeDelta.x)
+        /* Left */
+        /*if (button.GetComponent<RectTransform>().localPosition.x < panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2)
         {
-            button.GetComponent<RectTransform>().sizeDelta = new Vector2(
-                                                                    panelScene.GetComponent<RectTransform>().sizeDelta.x,
-                                                                    button.GetComponent<RectTransform>().sizeDelta.y
+            button.GetComponent<RectTransform>().localPosition = new Vector2(
+                panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2,
+                button.GetComponent<RectTransform>().localPosition.y
             );
         }*/
+        /* Right */
+        if (button.GetComponent<RectTransform>().localPosition.x > 422)
+        {
+            button.GetComponent<RectTransform>().localPosition = new Vector2(
+                                                                    422,
+                                                                    button.GetComponent<RectTransform>().localPosition.y
+            );
+        }
+        /* Down */
+        if (button.GetComponent<RectTransform>().localPosition.y > 380)
+        {
+            button.GetComponent<RectTransform>().localPosition = new Vector2(
+                                                                    button.GetComponent<RectTransform>().localPosition.x,
+                                                                    380
+                                                                    
+            );
+        }
+        /* Top */
+        if (button.GetComponent<RectTransform>().localPosition.y < -380)
+        {
+            button.GetComponent<RectTransform>().localPosition = new Vector2(
+                                                                    button.GetComponent<RectTransform>().localPosition.x,
+                                                                    -380
+
+            );
+        }
     }
 
     /* Function to select component on scene */
     private void SelectComponent()
     {
         isSelected = true;
+    }
+
+    public void ApplyModifications()
+    {
+        /* Displaying values of the component on UI interface */
+        sectionInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().sizeDelta.y.ToString();
+        widthInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().sizeDelta.x.ToString();
+        angleInput.placeholder.GetComponent<UnityEngine.UI.Text>().text = button.GetComponent<RectTransform>().eulerAngles.z.ToString();
+
+        /* If value of the component or not empty... */
+        if (widthInput.text != "" && sectionInput.text != "" && angleInput.text != "")
+        {
+            /* Convert values of the input fields to float */
+            float width = float.Parse(widthInput.text);
+            float height = float.Parse(sectionInput.text);
+            float angle = float.Parse(angleInput.text);
+
+            /* Affect new values of input fields to the component */
+            button.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);        // width, height
+            button.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, angle);    // angle
+
+            /* Unfill input fields */
+            widthInput.text = "";
+            sectionInput.text = "";
+            angleInput.text = "";
+        }
     }
 
     /* Function to drag element on scene */

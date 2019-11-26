@@ -20,20 +20,23 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public GameObject buttonFloorPrefab;                           // Prefab item to display all elements in project list
     public GameObject gridList;                                     // Grid to insert project prefab items
+    public GameObject list;
     public GameObject floorCount;                                     // Counter to set name of the floor
 
     public GameObject panelFloorPrefab;
-    public GameObject panelsCanvas;
     public GameObject destinationPanel = null;                         // GameObject to set the destination scene of the new component
     public Button addModuleButton;
+
+    private int moduleCounter;
 
     void Start()
     {
         CONST = GameObject.Find("CONST");
         floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
         addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();
-
         addModuleButton.onClick.AddListener(AddModuleOnScene);
+
+        moduleCounter = 1;
 
         deletePanel.SetActive(false);
 
@@ -45,6 +48,8 @@ public class UpdateEstimationCreation : MonoBehaviour
         text.name = floor0.name + "Text";                                                                       // Change name of the texte
         text.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";                                      // Change text in the prefab
         floor0.transform.SetParent(gridList.transform);                                                         // Set prefab as child of the gridList
+        floor0.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
+        floor0.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
 
         /* Rooftop */
         GameObject rooftop = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
@@ -53,24 +58,31 @@ public class UpdateEstimationCreation : MonoBehaviour
         textRooftop.name = rooftop.name + "Text";                                                               // Change name of the texte
         textRooftop.GetComponent<UnityEngine.UI.Text>().text = "Toiture";                                       // Change text in the prefab
         rooftop.transform.SetParent(gridList.transform);                                                        // Set prefab as child of the gridList
+        rooftop.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
+        rooftop.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
         /* Not increase floor counter for the rooftop: avoid counter error */
 
         /* Adding panels for default floors */
         /* Floor 0 */
-        GameObject panelFloor0 = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
+        GameObject panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
         panelFloor0.name = "panelFloor0";                                                                 // Change prefab name
-        panelFloor0.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelFloor0.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
+        panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
+        panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);
 
         /* Rooftop */
-        GameObject panelRooftop = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
+        GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
         panelRooftop.name = "panelRooftop";                                                                   // Change prefab name
-        panelRooftop.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelRooftop.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelRooftop.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
+        panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
+        panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);
 
     }
 
     void Update()
     {
-        
     }
 
 
@@ -91,6 +103,8 @@ public class UpdateEstimationCreation : MonoBehaviour
         {
             GameObject newModule = Instantiate(modulePrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
             newModule.transform.SetParent(destinationPanel.transform);                                                   // Change parent on scene hierarchy   
+            newModule.name = "Module" + moduleCounter;
+            moduleCounter++;
         }
     }
 
@@ -103,16 +117,19 @@ public class UpdateEstimationCreation : MonoBehaviour
         textNewFloor.name = newFloor.name + "Text";                                                               // Change name of the texte
         textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount.GetComponent<FloorCount>().floorCounter;                          // Change text in the prefab
         newFloor.transform.SetParent(gridList.transform);
+        newFloor.GetComponent<RectTransform>().sizeDelta = new Vector2(newFloor.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
+        newFloor.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
         floorCount.GetComponent<FloorCount>().listFloorButtons.Add(newFloor);
 
         /* Adding specific panel for the floor */
-        GameObject panelNewFloor = Instantiate(panelFloorPrefab, panelsCanvas.transform.position, Quaternion.identity);   // Create new prefab
+        GameObject panelNewFloor = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
         panelNewFloor.name = "panelFloor" + floorCount.GetComponent<FloorCount>().floorCounter;                                                                   // Change prefab name
-        panelNewFloor.transform.SetParent(panelsCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelNewFloor.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
+        panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
+        panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
         floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);
 
-        floorCount.GetComponent<FloorCount>().floorCounter++;                                                                                           // Increase counter of floors
-     
+        floorCount.GetComponent<FloorCount>().floorCounter++;                                                           // Increase counter of floors
     }
 
 
@@ -133,9 +150,32 @@ public class UpdateEstimationCreation : MonoBehaviour
         }
     }
 
+    public void UnselectModule()
+    {
+        /* Unselet all modules */
+        foreach (Transform child in destinationPanel.transform)
+        {
+            GameObject module = child.gameObject;
+            module.GetComponent<UpdateModule2D>().isSelected = false;
+        }
+    }
+
     public void HideDeletePanel()
     {
         deletePanel.SetActive(false);
+    }
+
+    public void ModifyModule()
+    {
+        foreach (Transform child in destinationPanel.transform)
+        {
+            GameObject module = child.gameObject;
+
+            if (module.GetComponent<UpdateModule2D>().isSelected)
+            {
+                module.GetComponent<UpdateModule2D>().ApplyModifications();
+            }
+        }
     }
     
     public void DeleteModule()
@@ -155,25 +195,30 @@ public class UpdateEstimationCreation : MonoBehaviour
         }
     }
 
+    public void StartAddModulesToEstimation()
+    {
+        StartCoroutine(AddModulesToEstimation());
+    }
+
     public IEnumerator AddModulesToEstimation()
     {
         foreach (Transform child in destinationPanel.transform)
         {
             GameObject module = child.gameObject;
 
-            WWWForm form = new WWWForm();                       // New form for web request
-            form.AddField("name", module.name);    // Add to the form the value of the ID of the project to delete
-            //form.AddField("cost", module.name);    // Add to the form the value of the ID of the project to delete
-            //form.AddField("angle", module.name);    // Add to the form the value of the ID of the project to delete
-            //form.AddField("cut", module.name);    // Add to the form the value of the ID of the project to delete
-            //form.AddField("range", module.name);    // Add to the form the value of the ID of the project to delete
-            //form.AddField("estimationID", module.name);    // Add to the form the value of the ID of the project to delete
+            WWWForm form = new WWWForm();                                   // New form for web request
+            form.AddField("name", module.name);                             // TO MODIFY                          
+            form.AddField("cost", "12");                                    // TO MODIFY                                                             
+            form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      
+            form.AddField("cut", "horizontal");                             // TO MODIFY                                                      
+            form.AddField("range", "Luxe");                                 // TO MODIFY                                                           
+            form.AddField("estimationID", "5ddbf64db8cb5a77a435e2fb");      // TO MODIFY                                            
 
-            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);     // Create new form
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);      // Create new form
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                          // Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-            yield return request.SendWebRequest();                      // Send request                                                              
+            yield return request.SendWebRequest();          // Send request                                                              
 
             if (request.isNetworkError || request.isHttpError)
             {
@@ -183,6 +228,8 @@ public class UpdateEstimationCreation : MonoBehaviour
             {
                 if (request.isDone)
                 {
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                    Debug.Log(jsonResult);
                 }
             }
         }
