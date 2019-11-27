@@ -21,6 +21,8 @@ EditorBuildSettings:
     path: Assets/Scenes/ProjectSheetScene.unity
     guid: 52c1f2ab1cf40a341b7f123497c64228
   - enabled: 1
+    path: Assets/Scenes/CreateModuleScene.unity
+    guid: 30cba7ef7ea85964f9fffdc481f7c4de
     path: Assets/Scenes/CreateEstimationScene.unity
     guid: f762f465632e8724292a1127f51521ab
   m_configObjects: {}

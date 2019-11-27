@@ -211,6 +211,7 @@ public class CreateModules
     public string cctp;
     public string cut;
     public string range;
+    public string createModule;
     public List<Component> composants;
 }
 
@@ -220,3 +221,20 @@ public class Component
     public string id;
     public string qte;
 }
+
+[System.Serializable]
+public class RequestGetAllRange
+{
+    public string message;
+    public List<Range> range;
+
+}
+
+[System.Serializable]
+public class Range
+{
+    public string _id;
+    public string libelle;
+    public string __v;
+}
+
