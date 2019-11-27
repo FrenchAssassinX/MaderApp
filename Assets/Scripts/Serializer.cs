@@ -211,11 +211,10 @@ public class CreateModules
     public string name;
     public string cost;
     public string angle;
-    public string cctp;
     public string cut;
     public string range;
     public string createModule;
-    public List<Component> composants;
+    public List<Component> components;
 }
 
 [System.Serializable]
@@ -241,3 +240,24 @@ public class Range
     public string __v;
 }
 
+[System.Serializable]
+public class RequestGetAllModule
+{
+    public string message;
+    public List<Module> modules;
+
+}
+
+[System.Serializable]
+public class Module
+{
+    public List<Component> components;
+    public string _id;
+    public string name;
+    public string cost;
+    public string angle;
+    public string cctp;
+    public string cut;
+    public string range;
+    public string __v;
+}

@@ -12,6 +12,8 @@ public class CreateModule : MonoBehaviour
     private string URLCreateModule = "v1/createmodule";  // Specific url for create module
     private string URLEstimationModule = "v1/createmodulewithestimation"; // Specific url for estimation module
     private string URLRange = "v1/getallrange"; // Specific url for range
+    private string URLgetAllModule = "v1/getAllModule"; // Specific url for get module
+
 
     //Type (CanvasLeft)
     public Dropdown ddrange; //gamme
@@ -62,6 +64,7 @@ public class CreateModule : MonoBehaviour
         btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
         StartCoroutine(GetAllRange());
+        StartCoroutine(GetAllModule());
 
     }
 
@@ -105,32 +108,21 @@ public class CreateModule : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 // error
-                Debug.Log("erreur de la requete : " + request);
             }
             else
             {
                 if (request.isDone)
                 {
-                Debug.Log("it's ok");
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
                     RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);
-                    
-                    Debug.Log("entities : " + entities.range);
-
-                    Debug.Log("result jsdon : " + jsonResult);
 
                     foreach (var item in entities.range)
                     {
                     
-                        Debug.Log("dans la boucle");
-                        Debug.Log("item : " + item);
                         string getId = item._id;
                         string getLibelle = item.libelle;
-
-                        Debug.Log("libelle : " + getLibelle);
-                        Debug.Log("id : " + getId);
 
                         //Poster all ranges
                         List<string> dropdownranges = new List<string>() { getLibelle };
@@ -139,11 +131,68 @@ public class CreateModule : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("la requete n'est pas bonne");
+                //erreur request
                 }
             }
         
     }
+
+    public IEnumerator GetAllModule()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLgetAllModule);
+
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            // error
+            Debug.Log("erreur de la requete : " + request);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                // The database return a JSON file of all user infos
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                // Create a root object thanks to the JSON file
+                RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);
+                Debug.Log(jsonResult);
+                foreach (var item in entities.modules)
+                {
+                    Module module = item;
+                    string getIdModule = module._id;
+                    string getName = module.name;
+                    string getCost = module.cost;
+                    string getAngle = module.angle;
+                    string getCut = module.cut;
+                    string getRange = module.range;
+                    Debug.Log("modules : " + getIdModule + getName + getCost + getAngle + getCut + getRange);
+
+                    //Poster all model
+                    List<string> dropdownModel = new List<string>() { getName };
+                    ddmodel.AddOptions(dropdownModel);
+
+                    //Poster all model
+                    List<string> dropdownCut = new List<string>() { getCut };
+                    ddcut.AddOptions(dropdownCut);
+
+                    foreach (var item2 in module.components)
+                    {
+                        string getIdComponents = item2.id;
+                        string getQte = item2.qte;
+                        Debug.Log("components : " + getIdComponents + getQte);
+                    }
+                }
+
+                
+            }
+        }
+
+    }
+
     //active CreateNewCient
     void DisplayModificationModule()
     {
