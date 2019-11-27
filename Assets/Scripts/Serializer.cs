@@ -91,10 +91,12 @@ public class Project
     public string _id;
     public string name;
     public string date;
-    public string phone;
-    public string email;
-    public string __v;
+    public string road;
+    public string roadNum;
+    public string roadExtra;
     public string reference;
+    public string zipcode;
+    public string city;
     public string customer;
 }
 
@@ -140,10 +142,11 @@ public class RequestAnEstimation
 [System.Serializable]
 public class Estimation
 {
-    public string id;
+    public string _id;
     public string price;
     public string state;
-    public string date; 
+    public string date;
+    public string discount;
 }
 
 /* Estimation object constructor */

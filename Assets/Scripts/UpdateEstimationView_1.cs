@@ -27,13 +27,63 @@ public class UpdateEstimationView_1 : MonoBehaviour
     {
         CONST = GameObject.Find("CONST");
 
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().estimationPrice;
-        discount.GetComponent<UnityEngine.UI.Text>().text = "0";
-        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text;
+        string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice;
+        string discountSt = CONST.GetComponent<CONST>().estimationDiscount;
+        int discountInt = Int32.Parse(discountSt);
+        int totalBeforeDiscountInt = Int32.Parse(totalBeforeDiscountSt);
+
+        int totalAfterDiscountInt = totalBeforeDiscountInt;
+        if (discountInt != 0)
+        {
+            totalAfterDiscountInt = totalBeforeDiscountInt / discountInt;
+        }
+
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt;
+        discount.GetComponent<UnityEngine.UI.Text>().text = discountSt;
+        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString();
 
         customer.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().customerName;
         projectName.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().projectName;
 
+    }
+
+    public IEnumerator GetModules()
+    {
+        //http road to get the project datas
+        var urlToGetModules = CONST.GetComponent<CONST>().url + "v1/getprojectbyid";
+
+        WWWForm form = new WWWForm();                       // New form for web request
+        form.AddField("projectID", projectId);    // Add to the form the value of the ID of the project to get
+
+        UnityWebRequest request = UnityWebRequest.Post(urlToGetProject, form);     // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+                RequestAProject entityProject = JsonUtility.FromJson<RequestAProject>(jsonResult);         // Convert JSON file
+                project = entityProject.result; //Instanciate the project object
+                customer = entityProject.customer; //Instanciate the customer object
+
+                List<EstimationId> estimationIdList = project.estimation;
+
+                // foreach to retrieve every estimations
+                foreach (var item in estimationIdList)
+                {
+                    StartCoroutine(WorkOnEstimation(item));
+                }
+            }
+        }
     }
 
     //Get back  button function

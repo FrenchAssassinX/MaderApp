@@ -11,4 +11,5 @@ public class CONST : MonoBehaviour
     public string customerName;
     public string projectName;
     public string estimationPrice;
+    public string estimationDiscount;
 }
