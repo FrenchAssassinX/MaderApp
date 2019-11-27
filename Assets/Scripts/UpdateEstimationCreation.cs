@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UpdateEstimationCreation : MonoBehaviour
@@ -230,9 +231,25 @@ public class UpdateEstimationCreation : MonoBehaviour
                 {
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                     Debug.Log(jsonResult);
+
+                    GoToEstimationView();
                 }
             }
         }
+    }
+
+    // Function to Go to EstimationView scene
+    public void GoToEstimationView()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       // Load Estimation View scene
+    }
+
+    // Function to return to CreateModule scene
+    public void ReturnToCreateModule()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);       // Load CreateModule scene
     }
 
     /*public IEnumerator DeleteComponent()

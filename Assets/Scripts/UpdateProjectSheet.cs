@@ -208,13 +208,13 @@ public class UpdateProjectSheet : MonoBehaviour
             dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
             // Change text value of the list item
-            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation.id;
+            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
 
             // ID to keep for view estimation sheet or deleting estimation
-            listItem.GetComponent<ItemListEstimation>().idValue = estimation.id;
+            listItem.GetComponent<ItemListEstimation>().idValue = estimation._id;
             listItem.GetComponent<ItemListEstimation>().dateValue = dateValueText;
             listItem.GetComponent<ItemListEstimation>().priceValue = estimation.price;
             listItem.GetComponent<ItemListEstimation>().stateValue = estimation.state;

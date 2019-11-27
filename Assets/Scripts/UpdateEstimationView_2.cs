@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
-public class UpdateEstimationView_1 : MonoBehaviour
+public class UpdateEstimationView_2 : MonoBehaviour
 {
     public GameObject CONST;
 
@@ -27,23 +27,6 @@ public class UpdateEstimationView_1 : MonoBehaviour
     {
         CONST = GameObject.Find("CONST");
 
-        string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice;
-        string discountSt = CONST.GetComponent<CONST>().estimationDiscount;
-        int discountInt = Int32.Parse(discountSt);
-        int totalBeforeDiscountInt = Int32.Parse(totalBeforeDiscountSt);
-
-        int totalAfterDiscountInt = totalBeforeDiscountInt;
-        if (discountInt != 0)
-        {
-            totalAfterDiscountInt = totalBeforeDiscountInt / discountInt;
-        }
-
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt;
-        discount.GetComponent<UnityEngine.UI.Text>().text = discountSt;
-        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString();
-
-        customer.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().customerName;
-        projectName.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().projectName;
 
     }
 
