@@ -83,4 +83,10 @@ public class UpdateHome : MonoBehaviour
             myDoc.createPDF(attachName);
         }
     }
+
+    public void GoToEstimationScene()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 4);
+    }
 }
