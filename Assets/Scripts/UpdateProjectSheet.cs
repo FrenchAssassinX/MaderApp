@@ -266,7 +266,7 @@ public class UpdateProjectSheet : MonoBehaviour
 
 
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); //load the next scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
     }
 
     //Get back  button function

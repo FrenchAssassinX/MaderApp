@@ -108,7 +108,6 @@ public class ItemListEstimation : MonoBehaviour
             buttonShowEstimation.SetActive(true);
         }
         isSelected = true;
-        Debug.Log("SELECTED");
     }
 
     /* Function to show an estimation */

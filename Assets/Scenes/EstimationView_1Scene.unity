@@ -3821,6 +3821,9 @@ MonoBehaviour:
   totalAfterDiscount: {fileID: 478775113}
   totalBeforeDiscount: {fileID: 1124535270}
   discount: {fileID: 2086438965}
+  listItemPrefab: {fileID: 269991929180985667, guid: 28c875c70bf9d0d4cacbd01746b68560,
+    type: 3}
+  componentList: {fileID: 92001394}
   actualiser: {fileID: 1100340993}
 --- !u!1 &2045286962
 GameObject:

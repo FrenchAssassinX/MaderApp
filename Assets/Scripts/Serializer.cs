@@ -147,6 +147,7 @@ public class Estimation
     public string state;
     public string date;
     public string discount;
+    public List<ModuleId> module;
 }
 
 /* Estimation object constructor */
@@ -241,3 +242,63 @@ public class Range
     public string __v;
 }
 
+[System.Serializable]
+public class ModuleId
+{
+    public string id;
+}
+
+[System.Serializable]
+public class RequestAModule
+{
+    public string message;
+    public Module module;
+}
+
+[System.Serializable]
+public class Module
+{
+    public List<ComponentId> components;
+    public string _id;
+    public string name;
+    public string cost;
+    public string angle;
+    public string cut;
+    public string range;
+    public string __v; 
+}
+
+[System.Serializable]
+public class ComponentId
+{
+    public string id;
+    public string qte;
+}
+
+[System.Serializable]
+public class RequestAComponent
+{
+    public string message;
+    public ComponentToShow component;
+}
+
+[System.Serializable]
+public class ComponentToShow
+{
+    public string _id;
+    public string code;
+    public string unit;
+    public string description;
+    public string name;
+    public string type;
+    public string price;
+    public Provide provide;
+    public string __v;
+}
+
+[System.Serializable]
+public class Provide 
+{
+    public string refProvider;
+    public string stock;
+}
