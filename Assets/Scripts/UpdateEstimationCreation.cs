@@ -252,42 +252,25 @@ public class UpdateEstimationCreation : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);       // Load CreateModule scene
     }
 
-    /*public IEnumerator DeleteComponent()
+    /* Fucntion to get all ranges from database */
+    public IEnumerator GetAllRanges()
     {
-        if (destinationPanel != null)
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + deleteModuleUrl);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
         {
-            foreach (Transform child in destinationPanel.transform)
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
             {
-                GameObject component = child.gameObject;
 
-                if (component.GetComponent<UpdateComponent2D>().isSelected)
-                {
-                    WWWForm form = new WWWForm();                       // New form for web request
-                    form.AddField("estimationID", "5dc98c411685521e3a11a237");    // Add to the form the value of the ID of the project to delete
-                    form.AddField("moduleID", component.GetComponent<UpdateComponent2D>().id);    // Add to the form the value of the ID of the project to delete
-
-                    UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);       // New request, passing url and form
-                    request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
-                    request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-                    yield return request.SendWebRequest();
-
-                    if (request.isNetworkError || request.isHttpError)
-                    {
-                        // Display error message 
-                        deletePanelMessage.SetActive(false);
-                        deletePanelErrorMessage.SetActive(true);
-                    }
-                    else
-                    {
-                        if (request.isDone)
-                        {
-                            HideDeletePanel();          // Hide delete panel
-                            Destroy(component);         // Destroy component from scene
-                        }
-                    }
-                }
             }
         }
-    }*/
+    }
 }
