@@ -10,6 +10,7 @@ public class TechnicalFolder : MonoBehaviour
     void Start()
     {
         CONST = GameObject.Find("CONST");
+        Debug.Log("Const:" + CONST);
     }
 
     void Update()
