@@ -204,6 +204,7 @@ public class Customer
 [System.Serializable]
 public class CreateModules
 {
+    public string _id;
     public string name;
     public string cost;
     public string angle;
