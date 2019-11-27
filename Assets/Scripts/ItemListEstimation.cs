@@ -13,12 +13,14 @@ public class ItemListEstimation : MonoBehaviour
     public string priceValue;
     public string stateValue;
     public string dateValue;
+    public string discountValue;
 
     /* All the buttons for make specific actions with the project */
-    public GameObject buttonDelete;
-    public GameObject buttonEstimation;
-    public GameObject buttonPaymentTerms;
-    public GameObject buttonTechnicalFile;
+    private GameObject buttonDelete;
+    private GameObject buttonEstimation;
+    private GameObject buttonPaymentTerms;
+    private GameObject buttonTechnicalFile;
+    private GameObject buttonShowEstimation;
 
 
     // Start is called before the first frame update
@@ -33,29 +35,89 @@ public class ItemListEstimation : MonoBehaviour
         buttonEstimation = GameObject.Find("estimationButton");
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
+        buttonShowEstimation = GameObject.Find("showEstimationButton");
 
-        buttonDelete.SetActive(false);
-        buttonEstimation.SetActive(false);
-        buttonPaymentTerms.SetActive(false);
-        buttonTechnicalFile.SetActive(false);
+        //Hide the previous buttons
+        if (buttonDelete != null)
+        {
+            buttonDelete.SetActive(false);
+        }
+        if (buttonEstimation != null)
+        {
+            buttonEstimation.SetActive(false);
+        }
+        if (buttonPaymentTerms != null)
+        {
+            buttonPaymentTerms.SetActive(false);
+        }
+        if (buttonTechnicalFile != null)
+        {
+            buttonTechnicalFile.SetActive(false);
+        }
+        if (buttonShowEstimation != null)
+        {
+            buttonShowEstimation.SetActive(false);
+        }
 
         /* Affect specific onClick behaviours to the buttons */
-        buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
-        buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
-        buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
-        buttonTechnicalFile.GetComponent<Button>().onClick.AddListener(GetTechnicalFile);
+        if (buttonDelete != null)
+        {
+            buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
+        }
+        if (buttonEstimation != null)
+        {
+            buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
+        }
+        if (buttonPaymentTerms != null)
+        {
+            buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
+        }
+        if (buttonTechnicalFile != null)
+        {
+            buttonTechnicalFile.GetComponent<Button>().onClick.AddListener(GetTechnicalFile);
+        }
+        if (buttonShowEstimation != null)
+        {
+            buttonShowEstimation.GetComponent<Button>().onClick.AddListener(ShowEstimation);
+        }
     }
 
     /* Function for select item detection */
     public void SelectItem()
     {
-        buttonDelete.SetActive(true);
-        buttonEstimation.SetActive(true);
-        buttonPaymentTerms.SetActive(true);
-        buttonTechnicalFile.SetActive(true);
+        Debug.Log("selected : " + this.gameObject.GetComponent<ItemListEstimation>().idValue);
 
+        if (buttonDelete != null)
+        {
+            buttonDelete.SetActive(true);
+        }
+        if (buttonEstimation != null)
+        {
+            buttonEstimation.SetActive(true);
+        }
+        if (buttonPaymentTerms != null)
+        {
+            buttonPaymentTerms.SetActive(true);
+        }
+        if (buttonTechnicalFile != null)
+        {
+            buttonTechnicalFile.SetActive(true);
+        }
+        if (buttonShowEstimation != null)
+        {
+            buttonShowEstimation.SetActive(true);
+        }
         isSelected = true;
         Debug.Log("SELECTED");
+    }
+
+    /* Function to show an estimation */
+    public void ShowEstimation()
+    {
+        if (isSelected)
+        {
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowEstimation(this.gameObject);
+        }
     }
 
     /* Function to add an estimation */

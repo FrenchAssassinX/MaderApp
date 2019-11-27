@@ -14,10 +14,6 @@ public class UpdateProjectSheet : MonoBehaviour
     //backPage button
     public GameObject backPageButton;
 
-    //project datas
-    private string projectId;
-    private string projectSailorId;
-
     //gameObject that will containing the title of the window
     public GameObject frameTitle;
 
@@ -77,6 +73,12 @@ public class UpdateProjectSheet : MonoBehaviour
     public Button deletePanelConfirmButton;                     // Confirm button on Delete panel
     public Button deletePanelCancelButton;                      // Cancel button on Delete panel
 
+    //parameters that will containing the project datas
+    private string projectId;
+    private string projectSailorId;
+    private Project project;
+    private Customer customer;
+
     EstimationSelected estimationSelected = new EstimationSelected();
 
     // Start is called before the first frame update
@@ -125,8 +127,8 @@ public class UpdateProjectSheet : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
                 RequestAProject entityProject = JsonUtility.FromJson<RequestAProject>(jsonResult);         // Convert JSON file
-                Project project = entityProject.result; //Instanciate the project object
-                Customer customer = entityProject.customer; //Instanciate the customer object
+                project = entityProject.result; //Instanciate the project object
+                customer = entityProject.customer; //Instanciate the customer object
 
                 List <EstimationId> estimationIdList = project.estimation;
 
@@ -163,7 +165,7 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm estimationForm = new WWWForm();                       // New form for web request
         estimationForm.AddField("estimationID", item.id);    // Add to the form the value of the ID of the project to get
 
-        UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new form
+        UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -216,6 +218,7 @@ public class UpdateProjectSheet : MonoBehaviour
             listItem.GetComponent<ItemListEstimation>().dateValue = dateValueText;
             listItem.GetComponent<ItemListEstimation>().priceValue = estimation.price;
             listItem.GetComponent<ItemListEstimation>().stateValue = estimation.state;
+            listItem.GetComponent<ItemListEstimation>().discountValue = estimation.discount;
         }
     }
 
@@ -226,6 +229,7 @@ public class UpdateProjectSheet : MonoBehaviour
 
         WWWForm form = new WWWForm();                       // New form for web request
         form.AddField("estimationID", pEstimationSelected.id);    // Add to the form the value of the ID of the project to delete
+        form.AddField("projectID", projectId);
 
         UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
@@ -249,6 +253,20 @@ public class UpdateProjectSheet : MonoBehaviour
                 StartCoroutine(GetAllEstimations());           // Recall all projects from databse
             }
         }
+    }
+
+    /* Function to show an estimation */
+    public void ShowEstimation(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+        CONST.GetComponent<CONST>().customerName = clientNameGO.GetComponent<UnityEngine.UI.Text>().text + " " + clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().estimationPrice = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
+        CONST.GetComponent<CONST>().estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
+
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); //load the next scene
     }
 
     //Get back  button function
@@ -289,10 +307,65 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the update project pop-up
     public void confirmUpdateProjectPanel()
     {
-        if (projectNameInput.GetComponent<UnityEngine.UI.Text>().text != "") { projectNameGO.GetComponent<UnityEngine.UI.Text>().text = projectNameInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if(projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text != "") { projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text; };
-        
+        StartCoroutine(UpdateProject());
+    }
+
+    public IEnumerator UpdateProject()
+    {
+        string projectName; //project name value to send into the update
+        string sailorID; //project sailor id value to send into the update
+
+        if (projectNameInput.GetComponent<UnityEngine.UI.Text>().text != "") //If we wrote something into the project name input, we wrote its value into the projectName parameter
+        {
+            projectName = projectNameInput.GetComponent<UnityEngine.UI.Text>().text;
+            projectNameGO.GetComponent<UnityEngine.UI.Text>().text = projectName;
+        }
+        else //else, set the old projectName value into the parameter
+        {
+            projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text != "") //same treatment but for the sailorID parameter
+        {
+            sailorID = projectSailorIdInput.GetComponent<UnityEngine.UI.Text>().text;
+            projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = sailorID;
+        }
+        else
+        {
+            sailorID = projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
         updateProjectPanel.SetActive(false); //set non active the update project panel
+
+        string url = CONST.GetComponent<CONST>().url + "v1/updateproject"; //update project url
+
+        WWWForm form = new WWWForm();                       // New form for web request
+
+        form.AddField("projectID", projectId);    // Add to the form the values of the project to update
+        form.AddField("userID", projectSailorId);
+        form.AddField("road", project.road);
+        form.AddField("roadNum", project.roadNum);
+        form.AddField("roadExtra", project.roadExtra);
+        form.AddField("zipcode", project.zipcode);
+        form.AddField("city", project.city);
+        form.AddField("customerID", project.customer);
+        form.AddField("projectName", projectName);
+        form.AddField("reference", project.reference);
+
+        UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            Debug.Log("project updated");
+        }
     }
 
     //function called when the user clicks in the cancel button of the update client pop-up
@@ -304,17 +377,142 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the update client pop-up
     public void confirmUpdateClientPanel()
     {
-        if(clientNameInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientNameGO.GetComponent<UnityEngine.UI.Text>().text = clientNameInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientRoadInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientRoadGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text != "") {clientRoadNumGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text;};
-        if (clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text = clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientCityInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientCityGO.GetComponent<UnityEngine.UI.Text>().text = clientCityInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text = clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text = clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text; };
-        if (clientEmailInput.GetComponent<UnityEngine.UI.Text>().text != "") { clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = clientEmailInput.GetComponent<UnityEngine.UI.Text>().text; };
+        StartCoroutine(UpdateCustomer());
+    }
+
+    public IEnumerator UpdateCustomer()
+    {
+        string clientName;
+        string clientSurname;
+        string road;
+        string roadNum;
+        string roadExtra;
+        string zipcode;
+        string city;
+        string phone;
+        string email;
+
+        if (clientNameInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            clientName = clientNameInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientNameGO.GetComponent<UnityEngine.UI.Text>().text = clientName;
+        }
+        else
+        {
+            clientName = clientNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            clientSurname = clientSurnameInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = clientSurname;
+        }
+        else
+        {
+            clientSurname = clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientRoadInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            road = clientRoadInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientRoadGO.GetComponent<UnityEngine.UI.Text>().text = road;
+        }
+        else
+        {
+            road = clientRoadGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            roadNum = clientRoadNumInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientRoadNumGO.GetComponent<UnityEngine.UI.Text>().text = roadNum;
+        }
+        else
+        {
+            roadNum = clientRoadNumGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            zipcode = clientZipCodeInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text = zipcode;
+        }
+        else
+        {
+            zipcode = clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientCityInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            city = clientCityInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientCityGO.GetComponent<UnityEngine.UI.Text>().text = city;
+        }
+        else
+        {
+            city = clientCityGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            roadExtra = clientRoadExtraInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text = roadExtra;
+        }
+        else
+        {
+            roadExtra = clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+
+        if (clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            phone = clientPhoneInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text = phone;
+        }
+        else
+        {
+            phone = clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
+        if (clientEmailInput.GetComponent<UnityEngine.UI.Text>().text != "")
+        {
+            email = clientEmailInput.GetComponent<UnityEngine.UI.Text>().text;
+            clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = email;
+        }
+        else
+        {
+            email = clientEmailGO.GetComponent<UnityEngine.UI.Text>().text;
+        }
 
         updateClientPanel.SetActive(false); //set non active the update client panel
+
+        string url = CONST.GetComponent<CONST>().url + "v1/updatecustomer"; //update project url
+
+        WWWForm form = new WWWForm();                       // New form for web request
+
+        form.AddField("name", clientName);    // Add to the form the values of the project to update
+        form.AddField("surename", clientSurname);
+        form.AddField("road", road);
+        form.AddField("roadNum", roadNum);
+        form.AddField("roadExtra", roadExtra);
+        form.AddField("zipcode", zipcode);
+        form.AddField("city", city);
+        form.AddField("phone", phone);
+        form.AddField("email", email);
+        form.AddField("id", customer._id);
+
+
+        UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            Debug.Log("customer updated");
+        }
     }
 
     //function called when the user clicks in the cancel button of the delete estimation pop-up
@@ -327,7 +525,7 @@ public class UpdateProjectSheet : MonoBehaviour
     public void confirmDeleteEstimation()
     {
         Debug.Log("deleted estimation : " + estimationSelected.id);
-        //StartCoroutine(DeleteEstimation(estimationSelected));
+        StartCoroutine(DeleteEstimation(estimationSelected));
         confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
 }
