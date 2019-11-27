@@ -225,7 +225,7 @@ public class Component
 public class RequestGetAllRange
 {
     public string message;
-    public List<Range> ranges;
+    public List<Range> range;
 
 }
 

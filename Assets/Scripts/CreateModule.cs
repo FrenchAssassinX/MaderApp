@@ -97,11 +97,12 @@ public class CreateModule : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
                     RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);
-                    Debug.Log("entities : " + entities.ranges);
+                    
+                    Debug.Log("entities : " + entities.range);
 
                     Debug.Log("result jsdon : " + jsonResult);
 
-                    foreach (var item in entities.ranges)
+                    foreach (var item in entities.range)
                     {
                     
                         Debug.Log("dans la boucle");
