@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DevisPayment : MonoBehaviour
@@ -110,8 +111,17 @@ public class DevisPayment : MonoBehaviour
         }
     }
 
+    // Function to return to Home scene
+    public void ReturnToHomeScene()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 9);       // Load Home scene
+    }
 
-
-
-
+    // Function to return to TechnicalFolder scene
+    public void ReturnToTechnicalFolder()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);       // Load TechnicalFolder scene
+    }
 }

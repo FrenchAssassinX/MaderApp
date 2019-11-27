@@ -161,6 +161,8 @@ void DisplayCreateNewCustomer()
                     //message validate new customer
                     createValideCustomer.transform.gameObject.SetActive(true);
 
+                    DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);   // Load Create Module scene
                 }
                 
             }

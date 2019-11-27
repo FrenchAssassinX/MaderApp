@@ -31,7 +31,8 @@ public class CreateModule : MonoBehaviour
     public Dropdown floor; //plancher;
 
     // Banner (CanvasTop)
-    public Button ButtonReturn;
+    public Button buttonReturn;
+    public Button buttonNext;
 
 
     // Start is called before the first frame update
@@ -53,8 +54,12 @@ public class CreateModule : MonoBehaviour
         //btnMM.onClick.AddListener();
 
         //return in create project page
-        Button btnHP = ButtonReturn.GetComponent<Button>();
+        Button btnHP = buttonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnCreateProjectPage);
+
+        // Go to Create Estimation Scene
+        Button btnNext = buttonNext.GetComponent<Button>();
+        btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
         StartCoroutine(GetAllRange());
 
@@ -66,11 +71,25 @@ public class CreateModule : MonoBehaviour
 
     }
 
-    //return to home page
-    void ReturnCreateProjectPage()
+    // Function to go to Create Estimation scene
+    public void GoToCreateEstimationScene()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       // Load the next scene
+    }
+
+    //return to Project scene
+    public void ReturnCreateProjectPage()
     {
         //Send the previous scene (create project)
+        DontDestroyOnLoad(CONST);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 3);
+    }
+
+    public void GoToHomePage()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 4);
     }
 
     public IEnumerator GetAllRange()
