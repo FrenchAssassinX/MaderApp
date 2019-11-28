@@ -4,15 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ItemListComponent : MonoBehaviour
+public class ItemListModulesForTech : MonoBehaviour
 {
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
 
     public string nameValue;                                       // Variable to pass the project on the next scene and find it by ID
-    public string quantityValue;
-    public string unitValue;
-    public string priceValue;
+    public string idValue;
 
     // Start is called before the first frame update
     void Start()
@@ -22,9 +20,11 @@ public class ItemListComponent : MonoBehaviour
         isSelected = false;
     }
 
-    /* Function for select item detection */
-    public void SelectItem()
+    // Update is called once per frame
+    void SelectItem()
     {
         isSelected = true;
+
+        GameObject.Find("Canvas").GetComponent<TechnicalFolder>().UpdateComponents(this.gameObject);
     }
 }

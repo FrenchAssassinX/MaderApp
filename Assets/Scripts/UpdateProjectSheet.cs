@@ -269,6 +269,15 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
     }
 
+    /* Function to show the technical folder */
+    public void ShowTechnicalFolder(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+        
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
+    }
+
     //Get back  button function
     public void BackPage()
     {
@@ -380,6 +389,7 @@ public class UpdateProjectSheet : MonoBehaviour
         StartCoroutine(UpdateCustomer());
     }
 
+    //function that update the customer datas
     public IEnumerator UpdateCustomer()
     {
         string clientName;

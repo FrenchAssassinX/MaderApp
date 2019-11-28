@@ -125,8 +125,6 @@ public class ItemListEstimation : MonoBehaviour
         if (isSelected)
         {
             GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().openDeleteEstimation(this.gameObject);
-            
-            Debug.Log("Devis supprimé");
         }
     }
 
@@ -153,7 +151,7 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("Dossier technique ouvert");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowTechnicalFolder(this.gameObject);
         }
     }
 }

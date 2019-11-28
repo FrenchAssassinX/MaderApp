@@ -4,16 +4,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ItemListComponent : MonoBehaviour
-{
+public class ItemListModules : MonoBehaviour
+{ 
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
 
-    public string nameValue;                                       // Variable to pass the project on the next scene and find it by ID
-    public string quantityValue;
-    public string unitValue;
-    public string priceValue;
-
+    public string nameValue;                                       // Variable that represents the name into the prefab
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +21,6 @@ public class ItemListComponent : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
-        isSelected = true;
+        isSelected = true;  //prefab selected
     }
 }

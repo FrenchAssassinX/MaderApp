@@ -1650,14 +1650,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CONST: {fileID: 0}
-  customer: {fileID: 0}
-  projectName: {fileID: 0}
-  totalAfterDiscount: {fileID: 0}
-  totalBeforeDiscount: {fileID: 0}
-  discount: {fileID: 0}
-  actualiser: {fileID: 0}
-  nextButton: {fileID: 647337256}
-  backButton: {fileID: 1165622566}
+  listItemPrefab: {fileID: 1289631692215068745, guid: c698551b90bcb654c92d45de75291217,
+    type: 3}
+  componentList: {fileID: 153226193}
 --- !u!114 &2112587854
 MonoBehaviour:
   m_ObjectHideFlags: 0
