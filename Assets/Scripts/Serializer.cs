@@ -237,6 +237,12 @@ public class RequestGetAllRange
 public class Range
 {
     public string _id;
+    public List<string> framequality;
+    public List<string> insulating;
+    public List<string> covering;
+    public List<string> windowsframequality;
+    public List<string> finishingint;
+    public List<string> finishingext;
     public string libelle;
     public string __v;
 }

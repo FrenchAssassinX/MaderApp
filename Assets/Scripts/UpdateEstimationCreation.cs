@@ -7,61 +7,81 @@ using UnityEngine.UI;
 
 public class UpdateEstimationCreation : MonoBehaviour
 {
-    public GameObject CONST;                                    // CONST object contains server route, token and user infos
+    /* ------------------------------------     DECLARE DATAS PART     ------------------------------------ */
+    public GameObject CONST;                            // CONST object contains server route, token and user infos
 
-    private string createModuleEstimationUrl = "v1/createmodulewithestimation";          // Specific route to get all projects
-    private string deleteModuleUrl = "v1/deletemoduleonestimation";       // Specific route to delete one project
+    private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to get all projects
+    private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
+    private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
 
-    public GameObject modulePrefab;                            // Prefab of component for 2D scene
-    public GameObject middleCanvas;                               // Useful to set component prefab position 
+    public GameObject modulePrefab;                     // Prefab of component for 2D scene
+    public GameObject middleCanvas;                     // Useful to set component prefab position 
 
-    public GameObject deletePanel;                                // Panel to delete a component
-    public GameObject deletePanelErrorMessage;
-    public GameObject deletePanelMessage;
+    public GameObject deletePanel;                      // Panel to delete a component
+    public GameObject deletePanelErrorMessage;          // Text message to display when an error appeared
+    public GameObject deletePanelMessage;               // Text message to display confirm message before delete
 
-    public GameObject buttonFloorPrefab;                           // Prefab item to display all elements in project list
-    public GameObject gridList;                                     // Grid to insert project prefab items
-    public GameObject list;
-    public GameObject floorCount;                                     // Counter to set name of the floor
+    public GameObject list;                             // List containing gridList
+    public GameObject gridList;                         // Grid to insert project prefab items
+    public GameObject floorCount;                       // Counter to set name of the floor
+    public GameObject buttonFloorPrefab;                // Prefab item to display all elements in project list
 
-    public GameObject panelFloorPrefab;
-    public GameObject destinationPanel = null;                         // GameObject to set the destination scene of the new component
-    public Button addModuleButton;
+    public GameObject panelFloorPrefab;                 // Prefab item to add floor on scene 
+    public GameObject destinationPanel = null;          // GameObject to set the destination scene of the new component
 
-    private int moduleCounter;
+    public Button addModuleButton;                      // Button to add new module on scene                      
+
+    public Dropdown dropdownRanges;                     // Dropdown for ranges
+    public Dropdown dropdownModeles;                    // Dropdown for modeles
+    public Dropdown dropdownInsulatings;                // Dropdown for insulatings
+    public Dropdown dropdownFrames;                     // Dropdown for frames quality
+    public Dropdown dropdownFinishingExt;               // Dropdown for exterior finishings
+    public Dropdown dropdownFinishingInt;               // Dropdown for interior finishings
+    public Dropdown dropdownCuts;                       // Dropdown for cuts
+
+    private List<string> listRanges;                    // String elements for dropdownRanges
+    private List<string> listModeles;                   // String elements for dropdownModeles
+    private List<string> listInsulatings;               // String elements for dropdownInsulatings
+    private List<string> listFrames;                    // String elements for dropdownFrames
+    private List<string> listFinishingExt;              // String elements for dropdownFinishingExt
+    private List<string> listFinishingInt;              // String elements for dropdownFinishingInt
+    private List<string> listCuts;                      // String elements for dropdownCuts
+
+    private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
+    /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     void Start()
     {
-        CONST = GameObject.Find("CONST");
-        floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
-        addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();
-        addModuleButton.onClick.AddListener(AddModuleOnScene);
+        CONST = GameObject.Find("CONST");                                                   // Get CONST object
+        floorCount = GameObject.Find("FloorCount");                                         // Retrieve counter on the scene
+        addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();        // Retrieve button on scene
+        addModuleButton.onClick.AddListener(AddModuleOnScene);                              // Add listener to button to launch AddModuleOnScene function
 
-        moduleCounter = 1;
+        moduleCounter = 1;                  // Starting counter for module name                                                       
 
-        deletePanel.SetActive(false);
+        deletePanel.SetActive(false);       // Disable delete panel by default
 
         /* Instantiate automatic floors */
         /* Ground floor */
         GameObject floor0 = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);   // Creation of the prefab
-        floor0.name = "Floor0";
+        floor0.name = "Floor0";                                                                                 // Change name of floor
         GameObject text = GameObject.Find("FloorButtonText");                                                   // Find text in the prefab
-        text.name = floor0.name + "Text";                                                                       // Change name of the texte
+        text.name = floor0.name + "Text";                                                                       // Change name of text
         text.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";                                      // Change text in the prefab
         floor0.transform.SetParent(gridList.transform);                                                         // Set prefab as child of the gridList
-        floor0.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
-        floor0.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
+        floor0.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
+        floor0.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                    // Set default position as parent position: useful for responsivity
 
         /* Rooftop */
         GameObject rooftop = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
-        rooftop.name = "Rooftop";
+        rooftop.name = "Rooftop";                                                                               // Change name of floor
         GameObject textRooftop = GameObject.Find("FloorButtonText");                                            // Find text in the prefab
-        textRooftop.name = rooftop.name + "Text";                                                               // Change name of the texte
+        textRooftop.name = rooftop.name + "Text";                                                               // Change name of text
         textRooftop.GetComponent<UnityEngine.UI.Text>().text = "Toiture";                                       // Change text in the prefab
         rooftop.transform.SetParent(gridList.transform);                                                        // Set prefab as child of the gridList
-        rooftop.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
-        rooftop.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
-        /* Not increase floor counter for the rooftop: avoid counter error */
+        rooftop.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);    // Set default size as parent size: useful for responsivity
+        rooftop.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                   // Set default position as parent position: useful for responsivity
+        // Not increase floor counter for the rooftop: avoid counter error 
 
         /* Adding panels for default floors */
         /* Floor 0 */
@@ -80,6 +100,21 @@ public class UpdateEstimationCreation : MonoBehaviour
         panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
         panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);
 
+        /* Add listener to dropdowns */
+        dropdownRanges.onValueChanged.AddListener(delegate {
+            DropdownValueChanged(dropdownRanges);
+        });
+
+        /* Instantiate list for string results */
+        listRanges = new List<string>();
+        listModeles = new List<string>();
+        listInsulatings = new List<string>();
+        listFrames = new List<string>();
+        listFinishingExt = new List<string>();
+        listFinishingInt = new List<string>();
+        listCuts = new List<string>();        
+
+        StartGetAllRanges();
     }
 
     void Update()
@@ -201,6 +236,11 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartCoroutine(AddModulesToEstimation());
     }
 
+    public void StartGetAllRanges()
+    {
+        StartCoroutine(GetAllRanges());
+    }
+
     public IEnumerator AddModulesToEstimation()
     {
         foreach (Transform child in destinationPanel.transform)
@@ -255,7 +295,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Fucntion to get all ranges from database */
     public IEnumerator GetAllRanges()
     {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + deleteModuleUrl);       // New request, passing url and form
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllRangesUrl);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -269,8 +309,101 @@ public class UpdateEstimationCreation : MonoBehaviour
         {
             if (request.isDone)
             {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);             // Convert JSON file to serializable object
+                
+                /* Get all ranges */
+                foreach (var item in entities.range)
+                {
+                    Range range = item;                 // Convert item to range object
 
+                    listRanges.Add(range.libelle);
+                }
+
+                dropdownRanges.options.Clear();
+                dropdownRanges.AddOptions(listRanges);
             }
         }
+    }
+
+    /* Fucntion to get values of each ranges from database */
+    public IEnumerator GetAllRangesValues(string pRangeName)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllRangesUrl);       // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);             // Convert JSON file to serializable object
+
+                /* Get all ranges */
+                foreach (var item in entities.range)
+                {
+                    Range range = item;                     // Convert item to range object
+
+                    if (range.libelle == pRangeName)
+                    {
+                        /* Unfill all lists string */
+                        listFrames.Clear();
+                        listInsulatings.Clear();
+                        listFinishingExt.Clear();
+                        listFinishingInt.Clear();
+
+                        /* Get all Frames Quality for range */
+                        foreach (var frameQuality in range.framequality)
+                        {
+                            listFrames.Add(frameQuality);       // Add frameQuality to string list  
+                        }
+
+                        /* Get all Insulatings for range */
+                        foreach (var insulating in range.insulating)
+                        {
+                            listInsulatings.Add(insulating);       // Add insulating to string list  
+                        }
+
+                        /* Get all Exterior Finishings for range */
+                        foreach (var finishingExt in range.finishingext)
+                        {
+                            listFinishingExt.Add(finishingExt);       // Add exterior finishing to string list  
+                        }
+
+                        /* Get all Interior Finishings for range */
+                        foreach (var finishingInt in range.finishingint)
+                        {
+                            listFinishingInt.Add(finishingInt);       // Add interior finishing to string list  
+                        }
+                    }
+
+                    /* Clearing dropdowns */
+                    dropdownFrames.options.Clear();
+                    dropdownInsulatings.options.Clear();
+                    dropdownFinishingExt.options.Clear();
+                    dropdownFinishingInt.options.Clear();
+
+                    /* Pouplating dropdowns with values from request */
+                    dropdownFrames.AddOptions(listFrames);
+                    dropdownInsulatings.AddOptions(listInsulatings);
+                    dropdownFinishingExt.AddOptions(listFinishingExt);
+                    dropdownFinishingInt.AddOptions(listFinishingInt);
+                }
+            }
+        }
+    }
+
+    private void DropdownValueChanged(Dropdown pDropdown)
+    {
+        Debug.Log("Range selected : " + pDropdown.options[pDropdown.value].text);
+
+        StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));
     }
 }
