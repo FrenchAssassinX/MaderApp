@@ -202,7 +202,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* Verify if a panel is selected */
         if (destinationPanel != null)
         {
-            GameObject newModule = Instantiate(modulePrefab, middleCanvas.transform.position, Quaternion.identity);     // Create new module
+            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity); // Create new module
             newModule.transform.SetParent(destinationPanel.transform);                                                  // Change parent on scene hierarchy   
             newModule.name = "Module" + moduleCounter;                                                                  // Change name of module
             moduleCounter++;                                                                                            // Increase counter after rename module

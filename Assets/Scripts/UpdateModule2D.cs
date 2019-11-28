@@ -21,8 +21,12 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public BoxCollider2D boxCollider;         // Collider to detect collision with panel
 
+    public Camera camera;
+
     void Start()
     {
+        camera = Camera.main;
+
         sectionInput = GameObject.Find("SectionInputField").GetComponent<InputField>();     // Retrieve input on scene
         widthInput = GameObject.Find("LengthInputField").GetComponent<InputField>();        // Retrieve input on scene
         angleInput = GameObject.Find("AngleInputField").GetComponent<InputField>();         // Retrieve input on scene
@@ -34,47 +38,67 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
         Debug.Log("Parent name: " + panelScene.name);
 
         isSelected = false;                                                                 // On start, component is not selected
-
-        boxCollider = this.gameObject.GetComponent<BoxCollider2D>();
     }
 
     void Update()
     {
         /* Keep component on panel */
         /* Left */
-        /*if (button.GetComponent<RectTransform>().localPosition.x < panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2)
+        float limitLeft = panelScene.GetComponent<RectTransform>().position.x - panelScene.GetComponent<RectTransform>().sizeDelta.x / 2;
+        float moduleX = button.GetComponent<RectTransform>().position.x - button.GetComponent<RectTransform>().sizeDelta.x / 2;
+        /*Debug.Log("Panel PosX = " + panelScene.GetComponent<RectTransform>().position.x);
+        Debug.Log("Panel SizeX = " + panelScene.GetComponent<RectTransform>().sizeDelta.x);
+
+        Debug.Log("Module PosX = " + button.GetComponent<RectTransform>().position.x);
+        Debug.Log("Module SizeX = " + button.GetComponent<RectTransform>().sizeDelta.x);*/
+
+        //Debug.Log("Left limit = " + limitLeft);
+        //Debug.Log("ModuleX = " + moduleX);
+
+        Vector2 modulePosition = new Vector2(
+            button.GetComponent<RectTransform>().position.x - button.GetComponent<RectTransform>().sizeDelta.x / 2,
+            button.GetComponent<RectTransform>().position.y - button.GetComponent<RectTransform>().sizeDelta.y / 2
+        );
+
+        Vector2 panelPosition = new Vector2(
+            panelScene.GetComponent<RectTransform>().position.x - panelScene.GetComponent<RectTransform>().sizeDelta.x / 2,
+            panelScene.GetComponent<RectTransform>().position.y - panelScene.GetComponent<RectTransform>().sizeDelta.y / 2
+        );
+
+        if (modulePosition.x < panelPosition.x)
         {
-            button.GetComponent<RectTransform>().localPosition = new Vector2(
-                panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2,
-                button.GetComponent<RectTransform>().localPosition.y
+            button.GetComponent<RectTransform>().position = new Vector2(
+                panelPosition.x + button.GetComponent<RectTransform>().sizeDelta.x / 2,
+                button.GetComponent<RectTransform>().position.y
             );
-        }*/
+        }
+
         /* Right */
-        if (button.GetComponent<RectTransform>().localPosition.x > 422)
+        /*if (button.GetComponent<RectTransform>().localPosition.x > 422)
         {
             button.GetComponent<RectTransform>().localPosition = new Vector2(
                                                                     422,
                                                                     button.GetComponent<RectTransform>().localPosition.y
             );
-        }
+        }*/
         /* Down */
-        if (button.GetComponent<RectTransform>().localPosition.y > 380)
+        /*if (button.GetComponent<RectTransform>().localPosition.y > 380)
         {
             button.GetComponent<RectTransform>().localPosition = new Vector2(
                                                                     button.GetComponent<RectTransform>().localPosition.x,
                                                                     380
                                                                     
             );
-        }
+        }*/
         /* Top */
-        if (button.GetComponent<RectTransform>().localPosition.y < -380)
+        /*if (button.GetComponent<RectTransform>().localPosition.y < -380)
         {
             button.GetComponent<RectTransform>().localPosition = new Vector2(
                                                                     button.GetComponent<RectTransform>().localPosition.x,
                                                                     -380
 
             );
-        }
+        }*/
     }
 
     /* Function to select component on scene */
@@ -122,10 +146,5 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     public void OnEndDrag(PointerEventData pEventData)
     {
         button.GetComponent<RectTransform>().position = Input.mousePosition;           // Let the component on the last mouse position before end dragging
-    }
-
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log("Module hit something");
     }
 }
