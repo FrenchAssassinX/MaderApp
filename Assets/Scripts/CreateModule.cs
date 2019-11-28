@@ -13,7 +13,7 @@ public class CreateModule : MonoBehaviour
     private string URLEstimationModule = "v1/createmodulewithestimation"; // Specific url for estimation module
     private string URLRange = "v1/getallrange"; // Specific url for range
     private string URLgetAllModule = "v1/getAllModule"; // Specific url for get module
-
+    private string URLGetRangeById = "/v1/getrangebyid"; // Specific url for Post range id
 
     //Type (CanvasLeft)
     public Dropdown ddrange; //gamme
@@ -36,6 +36,10 @@ public class CreateModule : MonoBehaviour
     public Button buttonReturn;
     public Button buttonNext;
 
+
+    List<string> dropdownranges = new List<string>();
+    List<string> dropdownModel = new List<string>();
+    List<string> dropdownCut = new List<string>();
 
     // Start is called before the first frame update
     void Start()
@@ -124,11 +128,13 @@ public class CreateModule : MonoBehaviour
                         string getId = item._id;
                         string getLibelle = item.libelle;
 
-                        //Poster all ranges
-                        List<string> dropdownranges = new List<string>() { getLibelle };
-                        ddrange.AddOptions(dropdownranges);
+                    //Poster all ranges
+                        dropdownranges.Add(getLibelle);
+                        
                     }
-                }
+                ddrange.options.Clear();
+                ddrange.AddOptions(dropdownranges);
+            }
                 else
                 {
                 //erreur request
@@ -159,7 +165,7 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 // Create a root object thanks to the JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
                 foreach (var item in entities.modules)
                 {
                     Module module = item;
@@ -169,28 +175,54 @@ public class CreateModule : MonoBehaviour
                     string getAngle = module.angle;
                     string getCut = module.cut;
                     string getRange = module.range;
-                    Debug.Log("modules : " + getIdModule + getName + getCost + getAngle + getCut + getRange);
+                    //Debug.Log("modules : " + getIdModule + "name : " + getName + "cost : " + getCost + "Angle : " +getAngle + "cut : " + getCut + "" + getRange);
 
                     //Poster all model
-                    List<string> dropdownModel = new List<string>() { getName };
-                    ddmodel.AddOptions(dropdownModel);
-
+                    dropdownModel.Add(getName);
+                                        
                     //Poster all model
-                    List<string> dropdownCut = new List<string>() { getCut };
-                    ddcut.AddOptions(dropdownCut);
-
+                    dropdownCut.Add(getCut);
+                    
                     foreach (var item2 in module.components)
                     {
                         string getIdComponents = item2.id;
                         string getQte = item2.qte;
+                        Debug.Log("qte : " + getQte);
                         Debug.Log("components : " + getIdComponents + getQte);
                     }
                 }
+                ddmodel.options.Clear();
+                ddmodel.AddOptions(dropdownModel);
 
-                
+                ddcut.options.Clear();
+                ddcut.AddOptions(dropdownCut);
             }
         }
 
+    }
+
+    public IEnumerator PostGetRangeById()
+    {
+
+        WWWForm form = new WWWForm(); // New form for web request
+
+
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetRangeById, form))
+        {
+            yield return request.SendWebRequest();
+
+            // If connection failed
+            if (request.isNetworkError || request.isHttpError)
+            {
+            }
+            // If connection succeeded
+            else
+            {
+                if (request.isDone)
+                {
+                }
+            }
+        }
     }
 
     //active CreateNewCient
@@ -201,5 +233,3 @@ public class CreateModule : MonoBehaviour
     }
 
 }
-
-

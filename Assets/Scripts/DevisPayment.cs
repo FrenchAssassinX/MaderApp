@@ -9,8 +9,8 @@ public class DevisPayment : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLInvoiceProject = "";
-    private string URLPayment = "";
+    private string URLInvoiceProject = "v1/stateestimation";
+    private string URLPayment = "v1/stateadvancement";
 
     public Dropdown stateDevis;
     public Dropdown stateAdvancement;

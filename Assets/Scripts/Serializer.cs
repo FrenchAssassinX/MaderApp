@@ -261,3 +261,17 @@ public class Module
     public string range;
     public string __v;
 }
+
+[System.Serializable]
+public class GetRangeById
+{
+    public List<string> framequality;
+    public List<string> insulating;
+    public List<string> covering;
+    public List<string> windowsframequality;
+    public List<string> finishingint;
+    public List<string> finishingext;
+    public string _id;
+    public string libelle;
+    public string __V;
+}
