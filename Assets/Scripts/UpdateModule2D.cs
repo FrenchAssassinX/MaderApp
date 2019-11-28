@@ -17,8 +17,9 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public GameObject panelScene;           // Scene 2D to move component
 
-    private GameObject transformPosition;   // Empty object to move component on scene
     private Button button;                  // Button variable to get component on start
+
+    public BoxCollider2D boxCollider;         // Collider to detect collision with panel
 
     void Start()
     {
@@ -29,12 +30,12 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
         button = this.GetComponent<Button>();                                               // Retrieve button on scene
         button.onClick.AddListener(SelectComponent);                                        // Add event to select component on scene
 
-        transformPosition = button.transform.parent.gameObject;
-
-        panelScene = transformPosition.transform.parent.gameObject;                                    // Retrieve the parent panel of the component on scene
+        panelScene = button.transform.parent.gameObject;                                    // Retrieve the parent panel of the component on scene
         Debug.Log("Parent name: " + panelScene.name);
 
         isSelected = false;                                                                 // On start, component is not selected
+
+        boxCollider = this.gameObject.GetComponent<BoxCollider2D>();
     }
 
     void Update()
@@ -113,13 +114,18 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         if (isSelected)
         {
-            transformPosition.transform.position = Input.mousePosition;       // If component is selected, then move component to mouse position
+            button.GetComponent<RectTransform>().position = Input.mousePosition;       // If component is selected, then move component to mouse position
         }
     }
 
     /* Function to end dragging element */
     public void OnEndDrag(PointerEventData pEventData)
     {
-        transformPosition.transform.position = Input.mousePosition;           // Let the component on the last mouse position before end dragging
+        button.GetComponent<RectTransform>().position = Input.mousePosition;           // Let the component on the last mouse position before end dragging
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("Module hit something");
     }
 }

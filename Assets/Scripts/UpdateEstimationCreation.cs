@@ -48,8 +48,12 @@ public class UpdateEstimationCreation : MonoBehaviour
     private List<string> listCuts;                      // String elements for dropdownCuts
 
     private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
+
+    GameObject panelFloor0;
+    BoxCollider2D boxCollider;
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
+    
     void Start()
     {
         CONST = GameObject.Find("CONST");                                                   // Get CONST object
@@ -85,20 +89,22 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         /* Adding panels for default floors */
         /* Floor 0 */
-        GameObject panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
-        panelFloor0.name = "panelFloor0";                                                                 // Change prefab name
-        panelFloor0.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
-        panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
-        panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
-        panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);
+        panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);       // Create new prefab
+        panelFloor0.name = "panelFloor0";                                                                                   // Change prefab name
+        panelFloor0.transform.SetParent(middleCanvas.transform);                                                            // Set prefab as child of MiddleCanvas
+        panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;       // Set default position as parent position: useful for responsivity
+        panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;         // Set default size as parent size: useful for responsivity
+        panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);                                             // Add listener to panel to launch UnselectModule function
+
+        boxCollider = panelFloor0.GetComponent<BoxCollider2D>();
 
         /* Rooftop */
-        GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
-        panelRooftop.name = "panelRooftop";                                                                   // Change prefab name
-        panelRooftop.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
-        panelRooftop.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
-        panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
-        panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);
+        GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);      // Create new prefab
+        panelRooftop.name = "panelRooftop";                                                                                 // Change prefab name
+        panelRooftop.transform.SetParent(middleCanvas.transform);                                                           // Set prefab as child of MiddleCanvas
+        panelRooftop.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;        // Set default position as parent position: useful for responsivity
+        panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;      // Set default size as parent size: useful for responsivity
+        panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);                                            // Add listener to panel to launch UnselectModule function
 
         /* Add listener to dropdowns */
         dropdownRanges.onValueChanged.AddListener(delegate {
@@ -114,128 +120,176 @@ public class UpdateEstimationCreation : MonoBehaviour
         listFinishingInt = new List<string>();
         listCuts = new List<string>();        
 
-        StartGetAllRanges();
+        StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
     }
 
     void Update()
     {
+        
     }
 
+    /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
+    /* Function to add floor on scene (button and panel) */
+    public void AddFloor()
+    {
+        /* Adding button in the list on down panel */
+        GameObject newFloor = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);                     // Creation of the prefab
+        newFloor.name = "Floor" + floorCount.GetComponent<FloorCount>().floorCounter;                                               // Change prefab name
+        GameObject textNewFloor = GameObject.Find("FloorButtonText");                                                               // Find text in the prefab
+        textNewFloor.name = newFloor.name + "Text";                                                                                 // Change name of text
+        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount.GetComponent<FloorCount>().floorCounter;      // Change text in the prefab
+        newFloor.transform.SetParent(gridList.transform);                                                                           // Change parent on scene hierarchy 
+        newFloor.GetComponent<RectTransform>().sizeDelta = new Vector2(newFloor.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
+        newFloor.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                      // Set default position as parent position: useful for responsivity
+        floorCount.GetComponent<FloorCount>().listFloorButtons.Add(newFloor);                                                       // Add new button on listButtons
 
+        /* Adding specific panel for the floor */
+        GameObject panelNewFloor = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);     // Create new prefab
+        panelNewFloor.name = "panelFloor" + floorCount.GetComponent<FloorCount>().floorCounter;                             // Change prefab name
+        panelNewFloor.transform.SetParent(middleCanvas.transform);                                                          // Set prefab as child of MiddleCanvas
+        panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;     // Set default position as parent position: useful for responsivity
+        panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;       // Set default size as parent size: useful for responsivity
+        floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);                                           // Add new panel on listPanels
+
+        floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
+    }
+
+    /* Function to display delete panel */
+    public void DisplayDeletePanel()
+    {
+        // If a panel is selected
+        if (destinationPanel != null)
+        {
+            // Check all modules on panel
+            foreach (Transform child in destinationPanel.transform)
+            {
+                GameObject module = child.gameObject;       // Convert child to Module object
+
+                // Check if is the module selected to delete
+                if (module.GetComponent<UpdateModule2D>().isSelected)
+                {
+                    deletePanel.SetActive(true);                    // Display delete panel
+                    deletePanelErrorMessage.SetActive(false);       // Don't display error message on delete panel
+                }
+            }
+        }
+    }
+
+    /* Function to HideDeletePanel */
+    public void HideDeletePanel()
+    {
+        deletePanel.SetActive(false);
+    }
+    /* -----------------------------------    END DISPLAY ELEMENT PART     ---------------------------------- */
+
+
+    /* -----------------------------------    MODULE PART     ---------------------------------- *
+    /* Function to add module on scene */
     public void AddModuleOnScene()
     {
         /* Search wich button is selected */
         foreach (Transform child in middleCanvas.transform)
         {
-            GameObject panel = child.gameObject;
+            GameObject panel = child.gameObject;        // Convert child to Panel object
 
+            /* Detect wich panel is active */
             if (panel.activeSelf)
             {
-                destinationPanel = panel;
+                destinationPanel = panel;               // Affect panel as default panel for module destination
             }
         }
 
+        /* Verify if a panel is selected */
         if (destinationPanel != null)
         {
-            GameObject newModule = Instantiate(modulePrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new component
-            newModule.transform.SetParent(destinationPanel.transform);                                                   // Change parent on scene hierarchy   
-            newModule.name = "Module" + moduleCounter;
-            moduleCounter++;
+            GameObject newModule = Instantiate(modulePrefab, middleCanvas.transform.position, Quaternion.identity);     // Create new module
+            newModule.transform.SetParent(destinationPanel.transform);                                                  // Change parent on scene hierarchy   
+            newModule.name = "Module" + moduleCounter;                                                                  // Change name of module
+            moduleCounter++;                                                                                            // Increase counter after rename module
         }
     }
 
-    public void AddFloor()
-    {
-        /* Adding button in the list on down panel */
-        GameObject newFloor = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
-        newFloor.name = "Floor" + floorCount.GetComponent<FloorCount>().floorCounter;                                                                    // Change prefab name
-        GameObject textNewFloor = GameObject.Find("FloorButtonText");                                            // Find text in the prefab
-        textNewFloor.name = newFloor.name + "Text";                                                               // Change name of the texte
-        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount.GetComponent<FloorCount>().floorCounter;                          // Change text in the prefab
-        newFloor.transform.SetParent(gridList.transform);
-        newFloor.GetComponent<RectTransform>().sizeDelta = new Vector2(newFloor.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);
-        newFloor.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;
-        floorCount.GetComponent<FloorCount>().listFloorButtons.Add(newFloor);
-
-        /* Adding specific panel for the floor */
-        GameObject panelNewFloor = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);   // Create new prefab
-        panelNewFloor.name = "panelFloor" + floorCount.GetComponent<FloorCount>().floorCounter;                                                                   // Change prefab name
-        panelNewFloor.transform.SetParent(middleCanvas.transform);                                                        // Set prefab as child of MiddleCanvas
-        panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;
-        panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;
-        floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);
-
-        floorCount.GetComponent<FloorCount>().floorCounter++;                                                           // Increase counter of floors
-    }
-
-
-    public void DisplayDeletePanel()
-    {
-        if (destinationPanel != null)
-        {
-            foreach (Transform child in destinationPanel.transform)
-            {
-                GameObject module = child.gameObject;
-
-                if (module.GetComponent<UpdateModule2D>().isSelected)
-                {
-                    deletePanel.SetActive(true);
-                    deletePanelErrorMessage.SetActive(false);
-                }
-            }
-        }
-    }
-
+    /* Function to unselect module */
     public void UnselectModule()
     {
-        /* Unselet all modules */
+        /* Check all modules in panel */
         foreach (Transform child in destinationPanel.transform)
         {
-            GameObject module = child.gameObject;
-            module.GetComponent<UpdateModule2D>().isSelected = false;
+            GameObject module = child.gameObject;                           // Convert child to module object
+            module.GetComponent<UpdateModule2D>().isSelected = false;       // Unselect module
         }
     }
 
-    public void HideDeletePanel()
-    {
-        deletePanel.SetActive(false);
-    }
-
+    /* Function to detect wich module is selected to apply modifications on this module */
     public void ModifyModule()
     {
+        /* Check all modules in panel */
         foreach (Transform child in destinationPanel.transform)
         {
-            GameObject module = child.gameObject;
+            GameObject module = child.gameObject;                               // Convert child to module object
 
+            // If this module is selected
             if (module.GetComponent<UpdateModule2D>().isSelected)
             {
-                module.GetComponent<UpdateModule2D>().ApplyModifications();
+                module.GetComponent<UpdateModule2D>().ApplyModifications();     // Apply modifications on module
             }
         }
     }
     
+    /* Function to delete module */
     public void DeleteModule()
     {
+        // Verifiy wich panel is selected
         if (destinationPanel != null)
         {
+            // Check all modules on selected panel
             foreach (Transform child in destinationPanel.transform)
             {
-                GameObject module = child.gameObject;
+                GameObject module = child.gameObject;                       // Convert child on module object
 
+                // If module is selected
                 if (module.GetComponent<UpdateModule2D>().isSelected)
                 {
-                    HideDeletePanel();          // Hide delete panel
-                    Destroy(module);         // Destroy module from scene
+                    HideDeletePanel();                                      // Hide delete panel
+                    Destroy(module);                                        // Destroy module from scene
                 }
             }
         }
     }
 
+    /* Function to detect Dropdown select value event */
+    private void DropdownValueChanged(Dropdown pDropdown)
+    {
+        StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));        // Start function for get all ranges values
+    }
+    /* -----------------------------------    END MODULE PART     ---------------------------------- */
+
+
+    /* ------------------------------------     CHANGE SCENE PART     ------------------------------------ */
+    // Function to Go to EstimationView scene
+    public void GoToEstimationView()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       // Load Estimation View scene
+    }
+
+    // Function to return to CreateModule scene
+    public void ReturnToCreateModule()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);       // Load CreateModule scene
+    }
+    /* -----------------------------------    END CHANGE SCENE PART     ---------------------------------- */
+
+
+    /* ------------------------------------     WEB REQUEST PART     ------------------------------------ */
+    /* Intermediary function to start AddModulesToEstimation function */
     public void StartAddModulesToEstimation()
     {
         StartCoroutine(AddModulesToEstimation());
     }
 
+    /* Intermediary function to start GetAllRanges function */
     public void StartGetAllRanges()
     {
         StartCoroutine(GetAllRanges());
@@ -276,20 +330,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                 }
             }
         }
-    }
-
-    // Function to Go to EstimationView scene
-    public void GoToEstimationView()
-    {
-        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);       // Load Estimation View scene
-    }
-
-    // Function to return to CreateModule scene
-    public void ReturnToCreateModule()
-    {
-        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);       // Load CreateModule scene
     }
 
     /* Fucntion to get all ranges from database */
@@ -399,11 +439,5 @@ public class UpdateEstimationCreation : MonoBehaviour
             }
         }
     }
-
-    private void DropdownValueChanged(Dropdown pDropdown)
-    {
-        Debug.Log("Range selected : " + pDropdown.options[pDropdown.value].text);
-
-        StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));
-    }
+    /* -----------------------------------    END WEB REQUEST PART     ---------------------------------- */
 }
