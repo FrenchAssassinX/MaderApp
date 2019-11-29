@@ -48,9 +48,6 @@ public class UpdateEstimationCreation : MonoBehaviour
     private List<string> listCuts;                      // String elements for dropdownCuts
 
     private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
-
-    GameObject panelFloor0;
-    BoxCollider2D boxCollider;
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -89,14 +86,12 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         /* Adding panels for default floors */
         /* Floor 0 */
-        panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);       // Create new prefab
+        GameObject panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);       // Create new prefab
         panelFloor0.name = "panelFloor0";                                                                                   // Change prefab name
         panelFloor0.transform.SetParent(middleCanvas.transform);                                                            // Set prefab as child of MiddleCanvas
         panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;       // Set default position as parent position: useful for responsivity
         panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;         // Set default size as parent size: useful for responsivity
         panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);                                             // Add listener to panel to launch UnselectModule function
-
-        boxCollider = panelFloor0.GetComponent<BoxCollider2D>();
 
         /* Rooftop */
         GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);      // Create new prefab
@@ -202,10 +197,12 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* Verify if a panel is selected */
         if (destinationPanel != null)
         {
-            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity); // Create new module
-            newModule.transform.SetParent(destinationPanel.transform);                                                  // Change parent on scene hierarchy   
-            newModule.name = "Module" + moduleCounter;                                                                  // Change name of module
-            moduleCounter++;                                                                                            // Increase counter after rename module
+            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);     // Create new module
+            newModule.transform.SetParent(destinationPanel.transform);                                                      // Change parent on scene hierarchy
+            newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;   // Set default size as parent size: useful for responsivity
+            newModule.GetComponent<RectTransform>().anchoredPosition = destinationPanel.GetComponent<RectTransform>().anchoredPosition;
+            newModule.name = "Module" + moduleCounter;                                                                      // Change name of module
+            moduleCounter++;                                                                                                // Increase counter after rename module
         }
     }
 
