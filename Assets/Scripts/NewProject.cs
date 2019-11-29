@@ -276,7 +276,7 @@ public class NewProject : MonoBehaviour
                     idClientForForm = getId;
                 }
                 idCustomer.options.Clear();
-                    idCustomer.AddOptions(dropdowncustomer);
+                idCustomer.AddOptions(dropdowncustomer);
 
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -12,14 +13,19 @@ public class DevisPayment : MonoBehaviour
     private string URLInvoiceProject = "v1/stateestimation";
     private string URLPayment = "v1/stateadvancement";
 
-    public Dropdown stateDevis;
-    public Dropdown stateAdvancement;
-    public Image barStateAdvancement;
-    public Button ButtonSave;
-    public Button ButtonReturn;
-    // Start is called before the first frame update
+    public Dropdown stateEstimation;
+    public Dropdown StatePayment;
+    public Button buttonSave;
+    public Button buttonReturn;
+    public Slider sliderStatePayment;
+    public Text percentageText;
 
-    RectTransform rt;
+    List<Dropdown.OptionData> dropdownStateEstimation = new List<Dropdown.OptionData>();
+    List<Dropdown.OptionData> dropdownStatePayment = new List<Dropdown.OptionData>();
+
+    public Canvas canvasPayment;
+    public string changeEstimation;
+    public string changePayment;
 
     void Start()
     {
@@ -27,28 +33,106 @@ public class DevisPayment : MonoBehaviour
 
         url = CONST.GetComponent<CONST>().url;
 
-        Button btnSV = ButtonSave.GetComponent<Button>();
+        Button btnSV = buttonSave.GetComponent<Button>();
         btnSV.onClick.AddListener(SaveAdvancement);
+
+        //it's not visible for now
+        canvasPayment.transform.gameObject.SetActive(false);
+
+        //for dropdown estimation
+        stateEstimation.onValueChanged.AddListener(delegate
+        {
+            StateEstimationModif(stateEstimation);
+        });
+
+        //for dropdown payment
+        StatePayment.onValueChanged.AddListener(delegate
+        {
+            StateAdvancementModif(StatePayment);
+        });
+
+        percentageText = GetComponent<Text>();
+
+        StartCoroutine(GetInvoiceProject());
+        StartCoroutine(UpdatePayment());
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     //Poster all devis state
-    void StateDevis()
+    void StateEstimationModif(Dropdown pChangeEstimation)
     {
-        List<string> dropdownStateDevis = new List<string>() {"Brouillon", "En attente", "Accepté", "Refusé", "En commande", "Transfert en facturation" /*temporaire*/};
-        stateDevis.AddOptions(dropdownStateDevis);
-    }
+        stateEstimation.AddOptions(dropdownStateEstimation);
+        changeEstimation = pChangeEstimation.options[pChangeEstimation.value].text;
+        Debug.Log("change estimation : " + changeEstimation);
+
+        if(changeEstimation == "Accepté")
+        {
+            canvasPayment.transform.gameObject.SetActive(true);
+
+        }
+        else
+        {
+            canvasPayment.transform.gameObject.SetActive(false);
+
+        }
+    }    
 
     //Poster all devis advancement
-    void StateAdvancement()
+    //The Client select a state of payment and the slider folow.
+    void StateAdvancementModif( Dropdown pChangePayment)
     {
-        List<string> dropdownStateAdvancement = new List<string>() {/*step*/};
-        stateAdvancement.AddOptions(dropdownStateAdvancement);
+        StatePayment.AddOptions(dropdownStatePayment);
+        changePayment = pChangePayment.options[pChangePayment.value].text;
+        Debug.Log("change payment : " + changePayment);
+        sliderStatePayment.maxValue = 1.0f;
+
+        if(changePayment == "A la signature")
+        {
+            sliderStatePayment.value = 0.03f;
+        }
+
+        if (changePayment == "Obtension du permis de construire")
+        {
+            sliderStatePayment.value = 0.1f;
+        }
+
+        if (changePayment == "Ouverture du chantier")
+        {
+            sliderStatePayment.value = 0.15f;
+        }
+
+        if (changePayment == "Achèvement des fondations")
+        {
+            sliderStatePayment.value = 0.25f;
+        }
+
+        if (changePayment == "Achèvement des murs")
+        {
+            sliderStatePayment.value = 0.4f;
+        }
+
+        if (changePayment == "Mise hors d'eau/hors d'aire")
+        {
+            sliderStatePayment.value = 0.75f;
+        }
+
+        if (changePayment == "Achèvement des travaux d'équipement")
+        {
+            sliderStatePayment.value = 0.95f;
+        }
+
+        if(changePayment == "Remise des clés")
+        {
+            sliderStatePayment.value = 1.0f;
+        }
+
+        percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
     }
 
 
@@ -82,13 +166,17 @@ public class DevisPayment : MonoBehaviour
         {
             if (request.isDone)
             {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
+                InvoiceProject entities = JsonUtility.FromJson<InvoiceProject>(jsonResult);         // Convert JSON file
+
+                Debug.Log("jsons result invoice project: " + jsonResult);
             }
         }
     }
 
 
-    IEnumerable UpdatePayment()
+    IEnumerator UpdatePayment()
     {
         WWWForm form = new WWWForm();
 
@@ -106,7 +194,11 @@ public class DevisPayment : MonoBehaviour
         {
             if (request.isDone)
             {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
+                StateUpdatePayment entities = JsonUtility.FromJson<StateUpdatePayment>(jsonResult);         // Convert JSON file
+
+                Debug.Log("jsons result update project: " + jsonResult);
             }
         }
     }

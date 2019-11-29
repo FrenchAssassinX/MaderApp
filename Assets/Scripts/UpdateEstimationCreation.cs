@@ -35,7 +35,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         CONST = GameObject.Find("CONST");
         floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
         addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();
-        addModuleButton.onClick.AddListener(AddModuleOnScene);
+        addModuleButton.onClick.AddListener(GoToEstimationView);
 
         moduleCounter = 1;
 
@@ -232,7 +232,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                     Debug.Log(jsonResult);
 
-                    GoToEstimationView();
+                    //GoToEstimationView();
                 }
             }
         }

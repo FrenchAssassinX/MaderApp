@@ -256,9 +256,10 @@ public class Module
     public string name;
     public string cost;
     public string angle;
-    public string cctp;
+    public string type;
     public string cut;
     public string range;
+    public string rangeName;
     public string __v;
 }
 
@@ -274,4 +275,20 @@ public class GetRangeById
     public string _id;
     public string libelle;
     public string __V;
+}
+
+[System.Serializable]
+public class InvoiceProject
+{
+    public string state;
+    public string _id;
+}
+
+[System.Serializable]
+
+public class StateUpdatePayment
+{
+    public string step;
+    public string pourcentage;
+    public string _id;
 }

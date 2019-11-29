@@ -13,7 +13,9 @@ public class CreateModule : MonoBehaviour
     private string URLEstimationModule = "v1/createmodulewithestimation"; // Specific url for estimation module
     private string URLRange = "v1/getallrange"; // Specific url for range
     private string URLgetAllModule = "v1/getAllModule"; // Specific url for get module
-    private string URLGetRangeById = "/v1/getrangebyid"; // Specific url for Post range id
+    private string URLGetRangeById = "v1/getrangebyid"; // Specific url for Post range id
+    private string URLGetAllComponent = "v1/getallcomponent";
+    private string URLGetAllModuleModel = "v1/getallmodulemodel";
 
     //Type (CanvasLeft)
     public Dropdown ddrange; //gamme
@@ -35,11 +37,10 @@ public class CreateModule : MonoBehaviour
     // Banner (CanvasTop)
     public Button buttonReturn;
     public Button buttonNext;
-
+    string getIdRange;
 
     List<string> dropdownranges = new List<string>();
     List<string> dropdownModel = new List<string>();
-    List<string> dropdownCut = new List<string>();
 
     // Start is called before the first frame update
     void Start()
@@ -68,7 +69,12 @@ public class CreateModule : MonoBehaviour
         btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
         StartCoroutine(GetAllRange());
-        StartCoroutine(GetAllModule());
+        
+
+        ddrange.onValueChanged.AddListener(delegate
+        {
+            DropdownValueChanged(ddrange);
+        });
 
     }
 
@@ -125,7 +131,7 @@ public class CreateModule : MonoBehaviour
                     foreach (var item in entities.range)
                     {
                     
-                        string getId = item._id;
+                        getIdRange = item._id;
                         string getLibelle = item.libelle;
 
                     //Poster all ranges
@@ -143,9 +149,9 @@ public class CreateModule : MonoBehaviour
         
     }
 
-    public IEnumerator GetAllModule()
+    public IEnumerator GetAllModule(string pRange)
     {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLgetAllModule);
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllModuleModel);
 
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -161,47 +167,40 @@ public class CreateModule : MonoBehaviour
         {
             if (request.isDone)
             {
-                // The database return a JSON file of all user infos
+                //The database return a JSON file of all user infos
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                // Create a root object thanks to the JSON file
+                //Create a root object thanks to the JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);
-                //Debug.Log(jsonResult);
+                Debug.Log("json result model : " + jsonResult);
+                dropdownModel.Clear();
                 foreach (var item in entities.modules)
                 {
                     Module module = item;
-                    string getIdModule = module._id;
-                    string getName = module.name;
-                    string getCost = module.cost;
-                    string getAngle = module.angle;
-                    string getCut = module.cut;
-                    string getRange = module.range;
-                    //Debug.Log("modules : " + getIdModule + "name : " + getName + "cost : " + getCost + "Angle : " +getAngle + "cut : " + getCut + "" + getRange);
-
-                    //Poster all model
-                    dropdownModel.Add(getName);
-                                        
-                    //Poster all model
-                    dropdownCut.Add(getCut);
                     
-                    foreach (var item2 in module.components)
+                    if(module.rangeName == pRange)
                     {
-                        string getIdComponents = item2.id;
-                        string getQte = item2.qte;
-                        Debug.Log("qte : " + getQte);
-                        Debug.Log("components : " + getIdComponents + getQte);
+                        //Poster all model
+                        dropdownModel.Add(module.name);
+
                     }
+
                 }
                 ddmodel.options.Clear();
                 ddmodel.AddOptions(dropdownModel);
 
-                ddcut.options.Clear();
-                ddcut.AddOptions(dropdownCut);
-            }
+                }
         }
 
     }
 
-    public IEnumerator PostGetRangeById()
+    void DropdownValueChanged(Dropdown pChange)
+    {
+        Debug.Log("pchange " + pChange.options[pChange.value].text);
+
+        StartCoroutine(GetAllModule(pChange.options[pChange.value].text));
+    }
+
+        public IEnumerator PostGetRangeById()
     {
 
         WWWForm form = new WWWForm(); // New form for web request
