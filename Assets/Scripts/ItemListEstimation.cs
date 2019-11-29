@@ -133,7 +133,7 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("PDF du devis ouvert");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().EditEstimation(this.gameObject);
         }
     }
 

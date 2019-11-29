@@ -302,3 +302,10 @@ public class Provide
     public string refProvider;
     public string stock;
 }
+
+[System.Serializable]
+public class RequestAUser
+{
+    public string message;
+    public User user;
+}
