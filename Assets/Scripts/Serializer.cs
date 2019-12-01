@@ -285,10 +285,37 @@ public class InvoiceProject
 }
 
 [System.Serializable]
-
 public class StateUpdatePayment
 {
     public string step;
     public string pourcentage;
     public string _id;
+}
+
+[System.Serializable] 
+public class RequestAllComponents
+{
+    public string message;
+    public List<Components> components;
+}
+
+[System.Serializable]
+public class Components
+{
+    public string _id;
+    public string code;
+    public string unit;
+    public string description;
+    public string name;
+    public string type;
+    public string cost;
+    public List<Provide> provide;
+}
+
+[System.Serializable]
+public class Provide
+{
+    public string id;
+    public string refProvider;
+    public string stock;
 }

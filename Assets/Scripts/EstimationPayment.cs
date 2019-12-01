@@ -55,7 +55,6 @@ public class DevisPayment : MonoBehaviour
 
         StartCoroutine(GetInvoiceProject());
         StartCoroutine(UpdatePayment());
-
     }
 
     // Update is called once per frame

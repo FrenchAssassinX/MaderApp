@@ -20,25 +20,37 @@ public class CreateModule : MonoBehaviour
     //Type (CanvasLeft)
     public Dropdown ddrange; //gamme
     public Dropdown ddmodel; //modele
-    public Dropdown ddcut; //coupe
     public Input name; //name of module
     public Button ButtonModificationModule;
     public Button ButtonCreateModule;
 
     //Modification Module (CanvasRight)
     public Canvas canvasModificationModule;
-    public Dropdown woodenUpright; //montantBois;
-    public Dropdown insulationPanels; //panneauxIsolation;
-    public Dropdown rainBarrier; //parePluie;
-    public Dropdown intermediatePanels; //panneauxIntermediaires;
-    public Dropdown hatchPanels; //panneauxCouverture;
-    public Dropdown floor; //plancher;
+    public Dropdown ddwoodenUpright; //montantBois;
+    public Dropdown ddinsulationPanels; //panneauxIsolation;
+    public Dropdown ddrainBarrier; //parePluie;
+    public Dropdown ddintermediatePanels; //panneauxIntermediaires;
+    public Dropdown ddhatchPanels; //panneauxCouverture;
+    public Dropdown ddfloor; //plancher;
 
     // Banner (CanvasTop)
     public Button buttonReturn;
     public Button buttonNext;
     string getIdRange;
 
+    //Define Dropdown Right value
+    List<string> dropdownWoodenUpright = new List<string>();//montant en bois
+    List<string> dropdownIsulationPanels = new List<string>();//panneaux d'isolation
+    List<string> dropdownRainBarrier = new List<string>();//pare Pluie
+    List<string> dropdownIntermediatePanels = new List<string>();//panneaux intermediaires 
+    List<string> dropdownHatchPanels = new List<string>();//panneaux couverture
+    List<string> dropdownFloor = new List<string>();//plancher
+    
+    //Define for Serializer value
+    string getName;
+    string getType;
+    
+    //Define Dropdown Left value
     List<string> dropdownranges = new List<string>();
     List<string> dropdownModel = new List<string>();
 
@@ -69,7 +81,6 @@ public class CreateModule : MonoBehaviour
         btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
         StartCoroutine(GetAllRange());
-        
 
         ddrange.onValueChanged.AddListener(delegate
         {
@@ -200,8 +211,86 @@ public class CreateModule : MonoBehaviour
         StartCoroutine(GetAllModule(pChange.options[pChange.value].text));
     }
 
-        public IEnumerator PostGetRangeById()
+    public IEnumerator GetAllComponent()
     {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllComponent);
+
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            // error
+            Debug.Log("erreur de la requete : " + request);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                //The database return a JSON file of all user infos
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                //Create a root object thanks to the JSON file
+                RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
+                //clear dropdown list
+                //dropdownWoodenUpright.Clear();
+                //dropdownIsulationPanels.Clear();
+                //dropdownRainBarrier.Clear();
+                //dropdownIntermediatePanels.Clear();
+                //dropdownHatchPanels.Clear();
+                //dropdownFloor.Clear();
+
+                foreach (var item in entities.components)
+                {
+                    getName = item.name;
+                    getType = item.type;
+                    
+                    if (getType == "Montant en bois")
+                    {
+                        dropdownWoodenUpright.Add(getName);
+                    }
+                    if(getType == "Panneaux d'isolations")
+                    {
+                        dropdownIsulationPanels.Add(getName);
+                    }
+                    if (getType == "Pare-pluie")
+                    {
+                        dropdownRainBarrier.Add(getName);
+                    }
+                    if (getType == "Panneaux intermediaires")
+                    {
+                        dropdownIntermediatePanels.Add(getName);
+                    }
+                    if (getType == "Panneaux de couvertures")
+                    {
+                        dropdownHatchPanels.Add(getName);
+                    }
+                    if (getType == "Planchers")
+                    {
+                        dropdownFloor.Add(getName);
+                    }
+
+
+                }
+                //ddwoodenUpright.options.Clear();
+                ddwoodenUpright.AddOptions(dropdownWoodenUpright);
+                //ddinsulationPanels.options.Clear();
+                ddinsulationPanels.AddOptions(dropdownIsulationPanels);
+                //ddrainBarrier.options.Clear();
+                ddrainBarrier.AddOptions(dropdownRainBarrier);
+                //ddintermediatePanels.options.Clear();
+                ddintermediatePanels.AddOptions(dropdownIntermediatePanels);
+                //ddhatchPanels.options.Clear();
+                ddhatchPanels.AddOptions(dropdownHatchPanels);
+                //ddfloor.options.Clear();
+                ddfloor.AddOptions(dropdownFloor);
+
+            }
+        }
+    }
+
+        public IEnumerator PostGetRangeById()
+        {
 
         WWWForm form = new WWWForm(); // New form for web request
 
@@ -228,6 +317,7 @@ public class CreateModule : MonoBehaviour
     void DisplayModificationModule()
     {
         canvasModificationModule.transform.gameObject.SetActive(true);
+        StartCoroutine(GetAllComponent());
 
     }
 

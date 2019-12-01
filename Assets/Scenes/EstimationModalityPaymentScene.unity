@@ -515,17 +515,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee0c184ce23e034abd3f5750b09fcb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CONST: {fileID: 0}
-  stateEstimation: {fileID: 123000471}
-  StatePayment: {fileID: 552773112}
-  buttonSave: {fileID: 26380136}
-  buttonReturn: {fileID: 109393078}
-  sliderStatePayment: {fileID: 1084435383}
-  percentageText:
-    text: 
-  canvasPayment: {fileID: 1063902691}
-  changeEstimation: 
-  changePayment: 
 --- !u!1 &109393077
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,7 +1074,7 @@ GameObject:
   - component: {fileID: 355922983}
   - component: {fileID: 355922982}
   m_Layer: 5
-  m_Name: Text
+  m_Name: percent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1107,8 +1096,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 835.8, y: -180}
-  m_SizeDelta: {x: 121.6, y: 89.3}
+  m_AnchoredPosition: {x: 804.1, y: -163.6}
+  m_SizeDelta: {x: 185, y: 122.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &355922982
 MonoBehaviour:
@@ -2676,7 +2665,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 2029552471}
   m_FillRect: {fileID: 2112111808}
   m_HandleRect: {fileID: 2029552470}
@@ -3866,7 +3855,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.0627451, g: 0.2627451, b: 0.8470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

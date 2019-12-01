@@ -252,7 +252,7 @@ public class NewProject : MonoBehaviour
                     Debug.Log("jsons result : " + jsonResult);
 
 
-                foreach (var item in entities.customers)
+                    foreach (var item in entities.customers)
                     {
                     //recuperation values in customers
                     string getId = item._id;

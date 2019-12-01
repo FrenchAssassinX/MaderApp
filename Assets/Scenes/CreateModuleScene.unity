@@ -586,7 +586,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &61329722
 GameObject:
@@ -880,7 +880,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &95364699
 GameObject:
@@ -1059,7 +1059,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Panneaux d'isolation
+    - m_Text: Panneaux d'isolations
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1566,7 +1566,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &221229931
 GameObject:
@@ -1627,10 +1627,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -2071,10 +2071,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -2254,7 +2254,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &315332713
 MonoBehaviour:
@@ -2421,7 +2421,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &326508913
 MonoBehaviour:
@@ -2543,16 +2543,15 @@ MonoBehaviour:
   CONST: {fileID: 0}
   ddrange: {fileID: 217029545}
   ddmodel: {fileID: 556159257}
-  ddcut: {fileID: 0}
   ButtonModificationModule: {fileID: 1761288413}
   ButtonCreateModule: {fileID: 1824538503}
   canvasModificationModule: {fileID: 880125552}
-  woodenUpright: {fileID: 1067732391}
-  insulationPanels: {fileID: 96175985}
-  rainBarrier: {fileID: 857942585}
-  intermediatePanels: {fileID: 705034288}
-  hatchPanels: {fileID: 1450604752}
-  floor: {fileID: 1685997868}
+  ddwoodenUpright: {fileID: 1067732391}
+  ddinsulationPanels: {fileID: 96175985}
+  ddrainBarrier: {fileID: 857942585}
+  ddintermediatePanels: {fileID: 705034288}
+  ddhatchPanels: {fileID: 1450604752}
+  ddfloor: {fileID: 1685997868}
   buttonReturn: {fileID: 802229238}
   buttonNext: {fileID: 395072730}
 --- !u!114 &363101899
@@ -3028,10 +3027,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -3400,10 +3399,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -4419,7 +4418,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: "Panneaux Interm\xE9diaires"
+    - m_Text: "Panneaux interm\xE9diaires"
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5063,7 +5062,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &810135610
 GameObject:
@@ -5318,7 +5317,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Panneaux d'isolation
+  m_Text: Panneaux d'isolations
 --- !u!222 &840362084
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5915,7 +5914,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &970582518
 GameObject:
@@ -6063,7 +6062,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &976640029
 MonoBehaviour:
@@ -6455,10 +6454,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -6545,7 +6544,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Panneaux de couverture
+  m_Text: Panneaux de couvertures
 --- !u!222 &1244000070
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7209,7 +7208,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: Panneaux de couverture
+    - m_Text: Panneaux de couvertures
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7641,7 +7640,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 28}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &1498018468
 GameObject:
@@ -8316,10 +8315,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 10
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 3
     m_AlignByGeometry: 0
@@ -8999,7 +8998,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1810402053
 MonoBehaviour:
@@ -9315,7 +9314,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Panneaux Interm\xE9diaires"
+  m_Text: "Panneaux interm\xE9diaires"
 --- !u!222 &1878239223
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9361,7 +9360,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1890417081
 MonoBehaviour:
@@ -10095,7 +10094,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 20}
+  m_SizeDelta: {x: 0, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2102836836
 MonoBehaviour:
