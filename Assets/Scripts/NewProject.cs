@@ -270,8 +270,7 @@ public class NewProject : MonoBehaviour
                     //Select the first letters for name
                     
                     
-
-                    
+                                    
 
                     idClientForForm = getId;
                 }

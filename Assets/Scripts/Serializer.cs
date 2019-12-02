@@ -31,6 +31,7 @@ public class Token
 public class Text
 {
     public string text;
+    internal object transform;
 }
 
 /* User constructor */
