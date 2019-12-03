@@ -9,7 +9,14 @@ public class ItemListModules : MonoBehaviour
     public Button rowListItem;                              // The item in the list to manipulate (this object)
     public bool isSelected;                                 // Boolean to detect when the item is select on the list
 
-    public string nameValue;                                       // Variable that represents the name into the prefab
+    public string nameValue;                                       // Variable that represents the name into the 
+    public string frameQualityValue;
+    public string windowsFrameQualityValue;
+    public string insulatingValue;
+    public string coveringValue;
+    public string intFinishingValue;
+    public string extFinishingValue; 
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +28,9 @@ public class ItemListModules : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
+        Debug.Log("shtonk");
         isSelected = true;  //prefab selected
+
+        GameObject.Find("Canvas").GetComponent<UpdateEstimationView_2>().ShowRange(this.gameObject);
     }
 }

@@ -265,7 +265,19 @@ public class Module
     public string angle;
     public string cut;
     public string range;
-    public string __v; 
+    public string __v;
+    public RangeAttribute rangeAttributes;
+}
+
+[System.Serializable]
+public class RangeAttribute
+{
+    public string frameQuality;
+    public string windowsframequality;
+    public string insulating;
+    public string covering;
+    public string finishingext;
+    public string finishingint;
 }
 
 [System.Serializable]

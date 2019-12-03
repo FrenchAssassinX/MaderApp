@@ -14,12 +14,19 @@ public class UpdateEstimationView_2 : MonoBehaviour
     public GameObject listItemPrefab;                           // Prefab item to display all elements in component list
     public GameObject componentList;                   //panel wich will contain all the listItemPrefabs 
 
+    public GameObject frameQuality;           //range attributes game objects to show when a module is selected
+    public GameObject windowsFrameQuality;
+    public GameObject insulating;
+    public GameObject covering;
+    public GameObject finishingext;
+    public GameObject finishingint;
+    public GameObject rangePanel;
 
     // Start is called before the first frame update
     void Start()
     {
         CONST = GameObject.Find("CONST");
-
+        rangePanel.SetActive(false);
         StartCoroutine(GetEstimation()); //Start the search of the estimation datas
     }
 
@@ -82,6 +89,11 @@ public class UpdateEstimationView_2 : MonoBehaviour
             RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
             Module module = moduleEntity.module;
 
+            RangeAttribute rangeAttribute = module.rangeAttributes; //Instanciate range attribute object
+
+            Debug.Log("range : " + rangeAttribute);
+            Debug.Log("frame quality  : " + rangeAttribute.frameQuality);
+
             // Create prefab
             GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
 
@@ -96,7 +108,28 @@ public class UpdateEstimationView_2 : MonoBehaviour
 
             // Change text value of the list item
             nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
+
+            // ID to keep for view range datas
+            listItem.GetComponent<ItemListModules>().frameQualityValue = rangeAttribute.frameQuality;
+            listItem.GetComponent<ItemListModules>().windowsFrameQualityValue = rangeAttribute.windowsframequality;
+            listItem.GetComponent<ItemListModules>().insulatingValue = rangeAttribute.insulating;
+            listItem.GetComponent<ItemListModules>().coveringValue = rangeAttribute.covering;
+            listItem.GetComponent<ItemListModules>().intFinishingValue = rangeAttribute.finishingext;
+            listItem.GetComponent<ItemListModules>().extFinishingValue = rangeAttribute.finishingint;
         }
+    }
+
+    //show the range content 
+    public void ShowRange(GameObject pItemSelected)
+    {
+        rangePanel.SetActive(true);
+        Debug.Log(pItemSelected.GetComponent<ItemListModules>().frameQualityValue);
+        frameQuality.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().frameQualityValue;
+        windowsFrameQuality.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().windowsFrameQualityValue;
+        insulating.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().insulatingValue;
+        covering.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().coveringValue;
+        finishingext.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().intFinishingValue;
+        finishingint.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().extFinishingValue;
     }
 
     //Get back page button function
