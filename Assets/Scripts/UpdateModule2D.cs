@@ -19,8 +19,14 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private Button button;                  // Button variable to get component on start
 
+    Vector2 moduleInitialPos;               // Keep initial position of module to avoid to place out of panel
+    bool outOfSection;                      // boolean to detect
+
     void Start()
     {
+        moduleInitialPos = this.GetComponent<RectTransform>().position;                     // Get the iniital position of the component
+        outOfSection = false;                                                               // Instantiate the boolean to false
+
         sectionInput = GameObject.Find("SectionInputField").GetComponent<InputField>();     // Retrieve input on scene
         widthInput = GameObject.Find("LengthInputField").GetComponent<InputField>();        // Retrieve input on scene
         angleInput = GameObject.Find("AngleInputField").GetComponent<InputField>();         // Retrieve input on scene
@@ -36,41 +42,7 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
 
     void Update()
     {
-        /* Keep component on panel */
-        /* Left */
-        /*if (button.GetComponent<RectTransform>().localPosition.x < panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2)
-        {
-            button.GetComponent<RectTransform>().localPosition = new Vector2(
-                panelScene.GetComponent<RectTransform>().localPosition.x - panelScene.GetComponent<RectTransform>().localPosition.x / 2,
-                button.GetComponent<RectTransform>().localPosition.y
-            );
-        }*/
-        /* Right */
-        if (button.GetComponent<RectTransform>().localPosition.x > 422)
-        {
-            button.GetComponent<RectTransform>().localPosition = new Vector2(
-                                                                    422,
-                                                                    button.GetComponent<RectTransform>().localPosition.y
-            );
-        }
-        /* Down */
-        if (button.GetComponent<RectTransform>().localPosition.y > 380)
-        {
-            button.GetComponent<RectTransform>().localPosition = new Vector2(
-                                                                    button.GetComponent<RectTransform>().localPosition.x,
-                                                                    380
-                                                                    
-            );
-        }
-        /* Top */
-        if (button.GetComponent<RectTransform>().localPosition.y < -380)
-        {
-            button.GetComponent<RectTransform>().localPosition = new Vector2(
-                                                                    button.GetComponent<RectTransform>().localPosition.x,
-                                                                    -380
 
-            );
-        }
     }
 
     /* Function to select component on scene */
@@ -110,13 +82,30 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         if (isSelected)
         {
-            GetComponent<RectTransform>().position = Input.mousePosition;       // If component is selected, then move component to mouse position
+            button.GetComponent<RectTransform>().position = Input.mousePosition;       // If component is selected, then move component to mouse position
         }
     }
 
     /* Function to end dragging element */
     public void OnEndDrag(PointerEventData pEventData)
     {
-        GetComponent<RectTransform>().position = Input.mousePosition;           // Let the component on the last mouse position before end dragging
+        /* If component is out of area... */
+        if (outOfSection)
+        {
+            this.GetComponent<RectTransform>().position = moduleInitialPos;                 // Return it to its initial position
+            outOfSection = false;                                                           // Reinitialize boolean
+        }
+        else
+        {
+            button.GetComponent<RectTransform>().position = Input.mousePosition;           // Let the component on the last mouse position before end dragging
+        }
+    }
+
+    /* Function to detect where module is out of panel */
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("Collision !");
+
+        outOfSection = true;        // Boolean pass to true
     }
 }

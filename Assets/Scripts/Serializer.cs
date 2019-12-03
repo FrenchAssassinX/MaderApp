@@ -236,6 +236,12 @@ public class RequestGetAllRange
 public class Range
 {
     public string _id;
+    public List<string> framequality;
+    public List<string> insulating;
+    public List<string> covering;
+    public List<string> windowsframequality;
+    public List<string> finishingint;
+    public List<string> finishingext;
     public string libelle;
     public string __v;
 }
@@ -386,4 +392,18 @@ public class RequestAUser
 {
     public string message;
     public User user;
+}
+
+[System.Serializable]
+public class Cuts
+{
+    public string _id;
+    public string name;
+}
+
+[System.Serializable]
+public class RequestGetAllCuts
+{
+    public string message;
+    public List<Cuts> cuts;
 }
