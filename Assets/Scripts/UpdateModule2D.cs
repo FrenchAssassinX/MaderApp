@@ -104,6 +104,8 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     /* Function to detect where module is out of panel */
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("Collision !");
+
         outOfSection = true;        // Boolean pass to true
     }
 }

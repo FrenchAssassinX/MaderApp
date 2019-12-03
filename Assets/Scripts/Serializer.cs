@@ -247,3 +247,17 @@ public class Range
     public string __v;
 }
 
+[System.Serializable]
+public class Cuts
+{
+    public string _id;
+    public string name;
+}
+
+[System.Serializable]
+public class RequestGetAllCuts
+{
+    public string message;
+    public List<Cuts> cuts;
+
+}

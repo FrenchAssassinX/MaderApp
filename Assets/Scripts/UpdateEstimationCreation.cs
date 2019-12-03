@@ -13,6 +13,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to get all projects
     private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
+    private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
 
     public GameObject modulePrefab;                     // Prefab of component for 2D scene
     public GameObject middleCanvas;                     // Useful to set component prefab position 
@@ -116,6 +117,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         listCuts = new List<string>();        
 
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
+        StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
     }
 
     void Update()
@@ -292,6 +294,12 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartCoroutine(GetAllRanges());
     }
 
+    /* Intermediary function to start GetAllCuts function */
+    public void StartGetAllCuts()
+    {
+        StartCoroutine(GetAllCuts());
+    }
+
     public IEnumerator AddModulesToEstimation()
     {
         foreach (Transform child in destinationPanel.transform)
@@ -302,8 +310,8 @@ public class UpdateEstimationCreation : MonoBehaviour
             form.AddField("name", module.name);                             // TO MODIFY                          
             form.AddField("cost", "12");                                    // TO MODIFY                                                             
             form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      
-            form.AddField("cut", "horizontal");                             // TO MODIFY                                                      
-            form.AddField("range", "Luxe");                                 // TO MODIFY                                                           
+            form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                                                                                  
+            form.AddField("range", dropdownRanges.options[dropdownRanges.value].text);                                                         
             form.AddField("estimationID", "5ddbf64db8cb5a77a435e2fb");      // TO MODIFY                                            
 
             UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);      // Create new form
@@ -433,6 +441,42 @@ public class UpdateEstimationCreation : MonoBehaviour
                     dropdownFinishingExt.AddOptions(listFinishingExt);
                     dropdownFinishingInt.AddOptions(listFinishingInt);
                 }
+            }
+        }
+    }
+
+    /* Fucntion to get all cuts from database */
+    public IEnumerator GetAllCuts()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllCutsUrl);         // New request, passing url
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
+
+                Debug.Log(jsonResult);
+                
+                /* Get all cuts */
+                foreach (var item in entities.cuts)
+                {
+                    Cuts cut = item;                     // Convert item to cut object
+
+                    listCuts.Add(cut.name);
+                }
+
+                dropdownCuts.options.Clear();
+                dropdownCuts.AddOptions(listCuts);
             }
         }
     }
