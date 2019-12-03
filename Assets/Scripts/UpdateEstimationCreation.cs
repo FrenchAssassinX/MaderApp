@@ -35,7 +35,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         CONST = GameObject.Find("CONST");
         floorCount = GameObject.Find("FloorCount");                                                                      // Retrieve counter on the scene
         addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();
-        addModuleButton.onClick.AddListener(AddModuleOnScene);
+        addModuleButton.onClick.AddListener(GoToEstimationView);
 
         moduleCounter = 1;
 
