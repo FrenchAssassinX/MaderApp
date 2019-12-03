@@ -232,7 +232,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                     Debug.Log(jsonResult);
 
-                    //GoToEstimationView();
+                    GoToEstimationView();
                 }
             }
         }

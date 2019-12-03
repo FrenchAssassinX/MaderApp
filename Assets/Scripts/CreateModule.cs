@@ -227,7 +227,6 @@ public class CreateModule : MonoBehaviour
                     }
 
                 }
-                ddmodel.options.Clear();
                 ddmodel.AddOptions(dropdownModel);
 
                 }

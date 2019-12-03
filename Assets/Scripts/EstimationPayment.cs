@@ -51,7 +51,7 @@ public class DevisPayment : MonoBehaviour
             StateAdvancementModif(StatePayment);
         });
 
-        percentageText = GetComponent<Text>();
+        //percentageText = GetComponent<Text>();
 
         StartCoroutine(GetInvoiceProject());
         StartCoroutine(UpdatePayment());
@@ -131,7 +131,7 @@ public class DevisPayment : MonoBehaviour
             sliderStatePayment.value = 1.0f;
         }
 
-        percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
+        //percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
     }
 
 
