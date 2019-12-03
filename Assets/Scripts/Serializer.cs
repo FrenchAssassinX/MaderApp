@@ -31,6 +31,7 @@ public class Token
 public class Text
 {
     public string text;
+    internal object transform;
 }
 
 /* User constructor */
@@ -147,7 +148,6 @@ public class Estimation
     public string state;
     public string date;
     public string discount;
-    public List<ModuleId> module;
 }
 
 /* Estimation object constructor */
@@ -212,11 +212,10 @@ public class CreateModules
     public string name;
     public string cost;
     public string angle;
-    public string cctp;
     public string cut;
     public string range;
     public string createModule;
-    public List<Component> composants;
+    public List<Component> components;
 }
 
 [System.Serializable]
@@ -231,7 +230,6 @@ public class RequestGetAllRange
 {
     public string message;
     public List<Range> range;
-
 }
 
 [System.Serializable]
@@ -240,6 +238,66 @@ public class Range
     public string _id;
     public string libelle;
     public string __v;
+}
+
+[System.Serializable]
+public class RequestGetAllModule
+{
+    public string message;
+    public List<Module> modules;
+}
+
+[System.Serializable]
+public class Module
+{
+    public List<Component> components;
+    public List<ComponentId> componentsID;
+    public string _id;
+    public string name;
+    public string cost;
+    public string angle;
+    public string type;
+    public string cut;
+    public string range;
+    public string rangeName;
+    public string __v;
+    public RangeAttribute rangeAttributes;
+}
+
+[System.Serializable]
+public class GetRangeById
+{
+    public List<string> framequality;
+    public List<string> insulating;
+    public List<string> covering;
+    public List<string> windowsframequality;
+    public List<string> finishingint;
+    public List<string> finishingext;
+    public string _id;
+    public string libelle;
+    public string __V;
+}
+
+[System.Serializable]
+public class InvoiceProject
+{
+    public string state;
+    public string _id;
+}
+
+[System.Serializable]
+public class StateUpdatePayment
+{
+    public string step;
+    public string pourcentage;
+    public string _id;
+}
+
+[System.Serializable] 
+public class RequestAllComponents
+{
+    public string message;
+    public List<Components> components;
 }
 
 [System.Serializable]
@@ -256,17 +314,24 @@ public class RequestAModule
 }
 
 [System.Serializable]
-public class Module
+public class Components
 {
-    public List<ComponentId> components;
     public string _id;
+    public string code;
+    public string unit;
+    public string description;
     public string name;
+    public string type;
     public string cost;
-    public string angle;
-    public string cut;
-    public string range;
-    public string __v;
-    public RangeAttribute rangeAttributes;
+    public List<Provide> provide;
+}
+
+[System.Serializable]
+public class Provide
+{
+    public string id;
+    public string refProvider;
+    public string stock;
 }
 
 [System.Serializable]
@@ -309,8 +374,9 @@ public class ComponentToShow
 }
 
 [System.Serializable]
-public class Provide 
+public class Provide
 {
+    public string id;
     public string refProvider;
     public string stock;
 }
