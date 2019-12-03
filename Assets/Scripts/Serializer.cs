@@ -148,6 +148,7 @@ public class Estimation
     public string state;
     public string date;
     public string discount;
+    public List<ModuleId> module;
 }
 
 /* Estimation object constructor */
@@ -377,14 +378,6 @@ public class ComponentToShow
     public string price;
     public Provide provide;
     public string __v;
-}
-
-[System.Serializable]
-public class Provide
-{
-    public string id;
-    public string refProvider;
-    public string stock;
 }
 
 [System.Serializable]
