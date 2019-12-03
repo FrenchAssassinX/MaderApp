@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using sharpPDF;
+using sharpPDF.Enumerators;
 
 public class UpdateProjectSheet : MonoBehaviour
 {
@@ -34,6 +36,33 @@ public class UpdateProjectSheet : MonoBehaviour
     public GameObject clientRoadExtraGO;
     public GameObject clientPhoneGO;
     public GameObject clientEmailGO;
+
+    //Customer informations to show into the pdf
+    private string customerSurename;
+    private string customerFirstname;
+    private string customerRoad;
+    private string customerRoadNum;
+    private string customerRoadExtra;
+    private string customerCity;
+    private string customerZipcode;
+
+    //project informations to show into the pdf
+    private string projectName;
+    private string projectRef;
+    private string projectRoad;
+    private string projectRoadNum;
+    private string projectRoadExtra;
+    private string projectCity;
+    private string projectZipcode;
+    private string projectReferent;
+
+    //estimation informations so show into the pdf
+    private string estimationDate;
+    private string estimationRef;
+    private string estimationPriceWtotTaxes;
+    private string estimationDiscount;
+    private string estimationPriceWtTaxes;
+    private string estimationPriceToPay;
 
     //updateButtons
     public GameObject updateClientButton;
@@ -148,7 +177,7 @@ public class UpdateProjectSheet : MonoBehaviour
                 clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text = customer.roadExtra;
                 clientPhoneGO.GetComponent<UnityEngine.UI.Text>().text = customer.phone;
                 clientEmailGO.GetComponent<UnityEngine.UI.Text>().text = customer.email;
-                
+
                 // foreach to retrieve every estimations
                 foreach(var item in estimationIdList)
                 {
@@ -266,7 +295,16 @@ public class UpdateProjectSheet : MonoBehaviour
 
 
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); //load the next scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
+    }
+
+    /* Function to show the technical folder */
+    public void ShowTechnicalFolder(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+        
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
     }
 
     //Get back  button function
@@ -380,6 +418,7 @@ public class UpdateProjectSheet : MonoBehaviour
         StartCoroutine(UpdateCustomer());
     }
 
+    //function that update the customer datas
     public IEnumerator UpdateCustomer()
     {
         string clientName;
@@ -528,4 +567,262 @@ public class UpdateProjectSheet : MonoBehaviour
         StartCoroutine(DeleteEstimation(estimationSelected));
         confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
+
+    //Funtion that get all the informations to show into the pdf of the estimation, and that creates it
+    public void EditEstimation(GameObject pItemSelected)
+    {
+        StartCoroutine(InstanciateUserDatas(project.user.id));//call the function that Instanciate the referent informations
+
+        //Instanciate parameters to show up into the pdf
+        customerSurename = clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerFirstname = clientNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerRoad = clientRoadGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerRoadNum = clientRoadNumGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerRoadExtra = clientRoadExtraGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerCity = clientCityGO.GetComponent<UnityEngine.UI.Text>().text;
+        customerZipcode = clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text;
+        projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        projectRef = projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text;
+        projectRoad = project.road;
+        projectRoadNum = project.roadNum;
+        projectRoadExtra = project.roadExtra;
+        projectCity = project.city;
+        projectZipcode = project.zipcode;
+        estimationDate = pItemSelected.GetComponent<ItemListEstimation>().dateValue;
+        estimationRef = pItemSelected.GetComponent<ItemListEstimation>().idValue;
+        estimationPriceWtTaxes = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
+        estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
+
+        int priceWtTaxes = Int32.Parse(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+        int discount = Int32.Parse(estimationDiscount);  //int value of the discount used for the calculations
+        double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
+        //calculation of the price discounted
+        int mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
+        int sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+        int priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
+
+        estimationPriceWtTaxes = priceWtTaxes.ToString();//string object that contains the price with the taxes
+        estimationPriceToPay = priceToPay.ToString(); //string object that contains the price discounted
+
+        string pdfEditor = CONST.GetComponent<CONST>().userName; //string object that contains the connected user name
+
+        string osRunning = SystemInfo.operatingSystem; //value that contains the current os
+        string[] osTab = osRunning.Split(' ');
+        string OS = osTab[0];
+
+        //pdf creation with windows os
+        if (OS.Equals("Windows"))
+        {
+            int normalCaracFont = 11; //font tall for the classic content
+            int titleCaracFont = 13; //font tall for the titles
+            int leftPage = 10; //x position for the left page content
+            int rightPage = 330; //x position for the right page content
+            string attachName = "Devis_"+ pItemSelected.GetComponent<ItemListEstimation>().idValue+ ".pdf"; //name of the document
+            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
+            pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
+            pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
+
+            //text adding of all the pdf content. 
+            myFirstPage.addText("Devis de maison modulaire", 200, 772, predefinedFont.csHelveticaBold, 20, color);
+            myFirstPage.addText("Entreprise MADERA", leftPage, 740, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Numéro de voie : 70 ", leftPage, 726, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : avenue Charles De Gaules", leftPage, 713, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : ------ ", leftPage, 699, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : Lille" + "  |  Code postal : 59000" + customerZipcode, leftPage, 685, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("SIRET : ------- ", leftPage, 671, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 659, predefinedFont.csHelvetica, normalCaracFont, color);
+
+
+            myFirstPage.addText("CLIENT", leftPage, 645, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Nom : "+customerSurename+"   |     Prénom : "+customerFirstname, leftPage, 630, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " +customerRoadNum, leftPage, 616, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + customerRoad, leftPage, 602, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : "+customerRoadExtra, leftPage, 588, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : "+customerCity + "  |  Code postal : " + customerZipcode, leftPage, 574, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 560, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("PROJET", leftPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Projet : " + projectName, leftPage, 531, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Référence du projet : " + projectRef, leftPage, 517, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " + projectRoadNum, leftPage, 503, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + projectRoad, leftPage, 489, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Complément d'adresse : " + projectRoadExtra, leftPage, 475, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : " + projectCity +"  |  Code Postal : "+projectZipcode, leftPage, 461, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Commercial référent : "+projectReferent, leftPage, 447, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 443, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Date : "+ estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes+"€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("TVA : 20% " , rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes+"€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du commercial : ", rightPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText(pdfEditor, 340, 375, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            /*Set Header's Style*/
+            myDoc.createPDF(@"C:\Users\Public\" + attachName);
+        }
+        //pdf creation with mac os
+        else if (OS.Equals("Mac"))
+        {
+            int normalCaracFont = 11; //font tall for the classic content
+            int titleCaracFont = 13; //font tall for the titles
+            int leftPage = 10; //x position for the left page content
+            int rightPage = 330; //x position for the right page content
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
+            pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
+            pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
+
+            //text adding of all the pdf content. 
+            myFirstPage.addText("Devis de maison modulaire", 200, 772, predefinedFont.csHelveticaBold, 20, color);
+            myFirstPage.addText("Entreprise MADERA", leftPage, 740, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Numéro de voie : 70 ", leftPage, 726, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : avenue Charles De Gaules", leftPage, 713, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : ------ ", leftPage, 699, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : Lille" + "  |  Code postal : 59000" + customerZipcode, leftPage, 685, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("SIRET : ------- ", leftPage, 671, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 659, predefinedFont.csHelvetica, normalCaracFont, color);
+
+
+            myFirstPage.addText("CLIENT", leftPage, 645, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Nom : " + customerSurename + "   |     Prénom : " + customerFirstname, leftPage, 630, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " + customerRoadNum, leftPage, 616, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + customerRoad, leftPage, 602, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : " + customerRoadExtra, leftPage, 588, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : " + customerCity + "  |  Code postal : " + customerZipcode, leftPage, 574, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 560, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("PROJET", leftPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Projet : " + projectName, leftPage, 531, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Référence du projet : " + projectRef, leftPage, 517, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " + projectRoadNum, leftPage, 503, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + projectRoad, leftPage, 489, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Complément d'adresse : " + projectRoadExtra, leftPage, 475, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : " + projectCity + "  |  Code Postal : " + projectZipcode, leftPage, 461, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Commercial référent : " + projectReferent, leftPage, 447, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 443, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Date : " + estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes + "€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("TVA : 20% ", rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes + "€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du commercial : ", rightPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText(pdfEditor, 340, 375, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            /*Set Header's Style*/
+            myDoc.createPDF(@"C:\Users\Public\" + attachName);
+            /*Set Header's Style*/
+            myDoc.createPDF(@"\Users\Shared\" + attachName);
+        }
+        //pdf creation with Android os
+        else if (OS.Equals("Android"))
+        {
+            int normalCaracFont = 11; //font tall for the classic content
+            int titleCaracFont = 13; //font tall for the titles
+            int leftPage = 10; //x position for the left page content
+            int rightPage = 330; //x position for the right page content
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
+            pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
+            pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
+
+            //text adding of all the pdf content. 
+            myFirstPage.addText("Devis de maison modulaire", 200, 772, predefinedFont.csHelveticaBold, 20, color);
+            myFirstPage.addText("Entreprise MADERA", leftPage, 740, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Numéro de voie : 70 ", leftPage, 726, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : avenue Charles De Gaules", leftPage, 713, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : ------ ", leftPage, 699, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : Lille" + "  |  Code postal : 59000" + customerZipcode, leftPage, 685, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("SIRET : ------- ", leftPage, 671, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 659, predefinedFont.csHelvetica, normalCaracFont, color);
+
+
+            myFirstPage.addText("CLIENT", leftPage, 645, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Nom : " + customerSurename + "   |     Prénom : " + customerFirstname, leftPage, 630, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " + customerRoadNum, leftPage, 616, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + customerRoad, leftPage, 602, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Supplément d'adresse : " + customerRoadExtra, leftPage, 588, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : " + customerCity + "  |  Code postal : " + customerZipcode, leftPage, 574, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 560, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("PROJET", leftPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Projet : " + projectName, leftPage, 531, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Référence du projet : " + projectRef, leftPage, 517, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Numéro de voie : " + projectRoadNum, leftPage, 503, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Adresse : " + projectRoad, leftPage, 489, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Complément d'adresse : " + projectRoadExtra, leftPage, 475, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Ville : " + projectCity + "  |  Code Postal : " + projectZipcode, leftPage, 461, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("Commercial référent : " + projectReferent, leftPage, 447, predefinedFont.csHelvetica, normalCaracFont, color);
+            myFirstPage.addText("___________________________________________________________________________________________", leftPage, 443, predefinedFont.csHelvetica, normalCaracFont, color);
+
+            myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Date : " + estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes + "€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("TVA : 20% ", rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes + "€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText("Signature du commercial : ", rightPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
+            myFirstPage.addText(pdfEditor, 340, 375, predefinedFont.csHelvetica, titleCaracFont, color);
+
+            /*Set Header's Style*/
+            myDoc.createPDF(@"C:\Users\Public\" + attachName);
+            /*Set Header's Style*/
+            myDoc.createPDF(attachName);
+        }
+    }
+
+    //Instanciate the referent informations to show on the estimation pdf
+    public IEnumerator InstanciateUserDatas(string userId)
+    {
+        //http road to get the project datas
+        var urlToGetUser = CONST.GetComponent<CONST>().url + "v1/getuserbyid";
+
+        WWWForm form = new WWWForm();                       // New form for web request
+        form.AddField("userID", userId);    // Add to the form the value of the ID of the project to get
+
+        UnityWebRequest request = UnityWebRequest.Post(urlToGetUser, form);     // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+                RequestAUser entity = JsonUtility.FromJson<RequestAUser>(jsonResult);         // Convert JSON file
+                User user = entity.user; //Instanciate the customer object
+
+                projectReferent = user.nom + " " + user.prenom; //Instanciate the referent informations to show on the estimation pdf
+
+            }
+        }
+    }
 }
+
+    

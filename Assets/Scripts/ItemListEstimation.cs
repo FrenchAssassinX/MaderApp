@@ -108,7 +108,6 @@ public class ItemListEstimation : MonoBehaviour
             buttonShowEstimation.SetActive(true);
         }
         isSelected = true;
-        Debug.Log("SELECTED");
     }
 
     /* Function to show an estimation */
@@ -126,8 +125,6 @@ public class ItemListEstimation : MonoBehaviour
         if (isSelected)
         {
             GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().openDeleteEstimation(this.gameObject);
-            
-            Debug.Log("Devis supprimé");
         }
     }
 
@@ -136,7 +133,7 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("PDF du devis ouvert");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().EditEstimation(this.gameObject);
         }
     }
 
@@ -154,7 +151,7 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("Dossier technique ouvert");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowTechnicalFolder(this.gameObject);
         }
     }
 }

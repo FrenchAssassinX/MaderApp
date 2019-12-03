@@ -31,6 +31,7 @@ public class Token
 public class Text
 {
     public string text;
+    internal object transform;
 }
 
 /* User constructor */
@@ -211,11 +212,10 @@ public class CreateModules
     public string name;
     public string cost;
     public string angle;
-    public string cctp;
     public string cut;
     public string range;
     public string createModule;
-    public List<Component> composants;
+    public List<Component> components;
 }
 
 [System.Serializable]
@@ -230,7 +230,6 @@ public class RequestGetAllRange
 {
     public string message;
     public List<Range> range;
-
 }
 
 [System.Serializable]
@@ -248,6 +247,154 @@ public class Range
 }
 
 [System.Serializable]
+public class RequestGetAllModule
+{
+    public string message;
+    public List<Module> modules;
+}
+
+[System.Serializable]
+public class Module
+{
+    public List<Component> components;
+    public List<ComponentId> componentsID;
+    public string _id;
+    public string name;
+    public string cost;
+    public string angle;
+    public string type;
+    public string cut;
+    public string range;
+    public string rangeName;
+    public string __v;
+    public RangeAttribute rangeAttributes;
+}
+
+[System.Serializable]
+public class GetRangeById
+{
+    public List<string> framequality;
+    public List<string> insulating;
+    public List<string> covering;
+    public List<string> windowsframequality;
+    public List<string> finishingint;
+    public List<string> finishingext;
+    public string _id;
+    public string libelle;
+    public string __V;
+}
+
+[System.Serializable]
+public class InvoiceProject
+{
+    public string state;
+    public string _id;
+}
+
+[System.Serializable]
+public class StateUpdatePayment
+{
+    public string step;
+    public string pourcentage;
+    public string _id;
+}
+
+[System.Serializable] 
+public class RequestAllComponents
+{
+    public string message;
+    public List<Components> components;
+}
+
+[System.Serializable]
+public class ModuleId
+{
+    public string id;
+}
+
+[System.Serializable]
+public class RequestAModule
+{
+    public string message;
+    public Module module;
+}
+
+[System.Serializable]
+public class Components
+{
+    public string _id;
+    public string code;
+    public string unit;
+    public string description;
+    public string name;
+    public string type;
+    public string cost;
+    public List<Provide> provide;
+}
+
+[System.Serializable]
+public class Provide
+{
+    public string id;
+    public string refProvider;
+    public string stock;
+}
+
+[System.Serializable]
+public class RangeAttribute
+{
+    public string frameQuality;
+    public string windowsframequality;
+    public string insulating;
+    public string covering;
+    public string finishingext;
+    public string finishingint;
+}
+
+[System.Serializable]
+public class ComponentId
+{
+    public string id;
+    public string qte;
+}
+
+[System.Serializable]
+public class RequestAComponent
+{
+    public string message;
+    public ComponentToShow component;
+}
+
+[System.Serializable]
+public class ComponentToShow
+{
+    public string _id;
+    public string code;
+    public string unit;
+    public string description;
+    public string name;
+    public string type;
+    public string price;
+    public Provide provide;
+    public string __v;
+}
+
+[System.Serializable]
+public class Provide
+{
+    public string id;
+    public string refProvider;
+    public string stock;
+}
+
+[System.Serializable]
+public class RequestAUser
+{
+    public string message;
+    public User user;
+}
+
+[System.Serializable]
 public class Cuts
 {
     public string _id;
@@ -259,5 +406,4 @@ public class RequestGetAllCuts
 {
     public string message;
     public List<Cuts> cuts;
-
 }

@@ -177,7 +177,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 24.94
+  m_Spacing: 25.6
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -2012,7 +2012,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1100340995}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2014866936}
+        m_MethodName: actualize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1100340995
@@ -3821,7 +3832,9 @@ MonoBehaviour:
   totalAfterDiscount: {fileID: 478775113}
   totalBeforeDiscount: {fileID: 1124535270}
   discount: {fileID: 2086438965}
-  actualiser: {fileID: 1100340993}
+  listItemPrefab: {fileID: 269991929180985667, guid: 28c875c70bf9d0d4cacbd01746b68560,
+    type: 3}
+  componentList: {fileID: 92001394}
 --- !u!1 &2045286962
 GameObject:
   m_ObjectHideFlags: 0
@@ -3959,10 +3972,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 50
+    m_FontSize: 35
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 5
+    m_MinSize: 3
     m_MaxSize: 50
     m_Alignment: 0
     m_AlignByGeometry: 0
