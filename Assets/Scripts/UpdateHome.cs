@@ -1,8 +1,4 @@
-﻿//using PdfSharp.Drawing;
-//using PdfSharp.Pdf;
-using sharpPDF;
-using sharpPDF.Enumerators;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -48,40 +44,6 @@ public class UpdateHome : MonoBehaviour
     public void Parameters()
     {
         Debug.Log("Parameters click");
-        string osRunning = SystemInfo.operatingSystem;
-        string[] osTab = osRunning.Split(' ');
-        string OS = osTab[0];
-
-        if (OS.Equals("Windows"))
-        {
-            string attachName = "hello.pdf";
-            Debug.Log(OS);
-            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false);
-            pdfPage myFirstPage = myDoc.addPage();
-            myFirstPage.addText("hello world", 10, 730, predefinedFont.csHelveticaOblique, 30, new pdfColor(predefinedColor.csBlack));
-            /*Set Header's Style*/
-            myDoc.createPDF(@"C:\Users\Public\"+attachName);
-        }
-        else if (OS.Equals("Mac"))
-        {
-            string attachName = "hello.pdf";
-            Debug.Log(OS);
-            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false);
-            pdfPage myFirstPage = myDoc.addPage();
-            myFirstPage.addText("hello world", 10, 730, predefinedFont.csHelveticaOblique, 30, new pdfColor(predefinedColor.csBlack));
-            /*Set Header's Style*/
-            myDoc.createPDF(@"\Users\Shared\" + attachName);
-        }
-        else if (OS.Equals("Android"))
-        {
-            string attachName = "hello.pdf";
-            Debug.Log(OS);
-            pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false);
-            pdfPage myFirstPage = myDoc.addPage();
-            myFirstPage.addText("hello world", 10, 730, predefinedFont.csHelveticaOblique, 30, new pdfColor(predefinedColor.csBlack));
-            /*Set Header's Style*/
-            myDoc.createPDF(attachName);
-        }
     }
 
     public void GoToEstimationScene()

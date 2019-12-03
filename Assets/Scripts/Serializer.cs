@@ -230,7 +230,6 @@ public class RequestGetAllRange
 {
     public string message;
     public List<Range> range;
-
 }
 
 [System.Serializable]
@@ -246,13 +245,13 @@ public class RequestGetAllModule
 {
     public string message;
     public List<Module> modules;
-
 }
 
 [System.Serializable]
 public class Module
 {
     public List<Component> components;
+    public List<ComponentId> componentsID;
     public string _id;
     public string name;
     public string cost;
@@ -262,6 +261,7 @@ public class Module
     public string range;
     public string rangeName;
     public string __v;
+    public RangeAttribute rangeAttributes;
 }
 
 [System.Serializable]
@@ -301,6 +301,19 @@ public class RequestAllComponents
 }
 
 [System.Serializable]
+public class ModuleId
+{
+    public string id;
+}
+
+[System.Serializable]
+public class RequestAModule
+{
+    public string message;
+    public Module module;
+}
+
+[System.Serializable]
 public class Components
 {
     public string _id;
@@ -319,4 +332,58 @@ public class Provide
     public string id;
     public string refProvider;
     public string stock;
+}
+
+[System.Serializable]
+public class RangeAttribute
+{
+    public string frameQuality;
+    public string windowsframequality;
+    public string insulating;
+    public string covering;
+    public string finishingext;
+    public string finishingint;
+}
+
+[System.Serializable]
+public class ComponentId
+{
+    public string id;
+    public string qte;
+}
+
+[System.Serializable]
+public class RequestAComponent
+{
+    public string message;
+    public ComponentToShow component;
+}
+
+[System.Serializable]
+public class ComponentToShow
+{
+    public string _id;
+    public string code;
+    public string unit;
+    public string description;
+    public string name;
+    public string type;
+    public string price;
+    public Provide provide;
+    public string __v;
+}
+
+[System.Serializable]
+public class Provide
+{
+    public string id;
+    public string refProvider;
+    public string stock;
+}
+
+[System.Serializable]
+public class RequestAUser
+{
+    public string message;
+    public User user;
 }
