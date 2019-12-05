@@ -411,6 +411,7 @@ GameObject:
   - component: {fileID: 108197801}
   - component: {fileID: 108197800}
   - component: {fileID: 108197799}
+  - component: {fileID: 108197798}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -418,6 +419,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &108197798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 108197797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee0c184ce23e034abd3f5750b09fcb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CONST: {fileID: 0}
+  stateEstimation: {fileID: 123000471}
+  StatePayment: {fileID: 552773112}
+  buttonSave: {fileID: 26380136}
+  buttonReturn: {fileID: 109393078}
+  sliderStatePayment: {fileID: 1084435383}
+  percentageText:
+    text: 
+  canvasPayment: {fileID: 1063902691}
+  changeEstimation: 
+  changePayment: 
 --- !u!114 &108197799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1513,7 +1537,7 @@ GameObject:
   - component: {fileID: 552773113}
   - component: {fileID: 552773112}
   m_Layer: 5
-  m_Name: EtatDesLotsRealises
+  m_Name: DropdownStatePayment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3725,7 +3749,7 @@ GameObject:
   - component: {fileID: 1946780774}
   - component: {fileID: 1946780773}
   m_Layer: 5
-  m_Name: EtatDesLotsRealises
+  m_Name: StatePayment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

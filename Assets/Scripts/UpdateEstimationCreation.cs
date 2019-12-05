@@ -118,6 +118,10 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
+
+        //me !!
+        GoToEstimationView();
+        //me !!
     }
 
     void Update()
@@ -331,7 +335,9 @@ public class UpdateEstimationCreation : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                     Debug.Log(jsonResult);
 
-                    GoToEstimationView();
+
+                    //me !!!
+                    //GoToEstimationView();
                 }
             }
         }

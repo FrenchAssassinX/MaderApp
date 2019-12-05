@@ -349,7 +349,7 @@ public class CreateModule : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 badSendModule.transform.gameObject.SetActive(true);
-                Debug.Log("ERROR !!");
+                Debug.Log("ERROR !! " + request);
             }
             // If connection succeeded
             else

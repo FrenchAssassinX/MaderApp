@@ -6,12 +6,12 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class DevisPayment : MonoBehaviour
+public class EstimationPayment : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLInvoiceProject = "v1/stateestimation";
-    private string URLPayment = "v1/stateadvancement";
+    private string URLCreatePayment = "v1/createpayement"; //Post
+    private string URLUpdateEstimation = "v1/updateestimationstate"; //Post
 
     public Dropdown stateEstimation;
     public Dropdown StatePayment;
@@ -33,6 +33,7 @@ public class DevisPayment : MonoBehaviour
 
         url = CONST.GetComponent<CONST>().url;
 
+        //save states
         Button btnSV = buttonSave.GetComponent<Button>();
         btnSV.onClick.AddListener(SaveAdvancement);
 
@@ -53,14 +54,8 @@ public class DevisPayment : MonoBehaviour
 
         //percentageText = GetComponent<Text>();
 
-        StartCoroutine(GetInvoiceProject());
-        StartCoroutine(UpdatePayment());
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        StartCoroutine(CreatePayment());
+        StartCoroutine(UpdateEstimation());
     }
 
     //Poster all devis state
@@ -70,19 +65,20 @@ public class DevisPayment : MonoBehaviour
         changeEstimation = pChangeEstimation.options[pChangeEstimation.value].text;
         Debug.Log("change estimation : " + changeEstimation);
 
-        if(changeEstimation == "Accepté")
+        //if you select "Accepté" in the dropdown canvasPyament will appear
+        if (changeEstimation == "Accepté")
         {
-            canvasPayment.transform.gameObject.SetActive(true);
+            canvasPayment.transform.gameObject.SetActive(true); //poster payment state
 
         }
         else
         {
-            canvasPayment.transform.gameObject.SetActive(false);
+            canvasPayment.transform.gameObject.SetActive(false); //hidden payment state
 
         }
     }    
 
-    //Poster all devis advancement
+    //Poster all estimation advancement
     //The Client select a state of payment and the slider folow.
     void StateAdvancementModif( Dropdown pChangePayment)
     {
@@ -147,11 +143,11 @@ public class DevisPayment : MonoBehaviour
 
     }
 
-    IEnumerator GetInvoiceProject()
+    IEnumerator CreatePayment()
     {
         WWWForm form = new WWWForm();
 
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLInvoiceProject);
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLCreatePayment);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -168,18 +164,18 @@ public class DevisPayment : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
                 InvoiceProject entities = JsonUtility.FromJson<InvoiceProject>(jsonResult);         // Convert JSON file
-
+                
                 Debug.Log("jsons result invoice project: " + jsonResult);
             }
         }
     }
 
 
-    IEnumerator UpdatePayment()
+    IEnumerator UpdateEstimation()
     {
         WWWForm form = new WWWForm();
 
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLPayment);
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLUpdateEstimation);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
