@@ -55,7 +55,7 @@ public class EstimationPayment : MonoBehaviour
         //percentageText = GetComponent<Text>();
 
         StartCoroutine(CreatePayment());
-        StartCoroutine(UpdateEstimation());
+        //StartCoroutine(UpdateEstimation());
     }
 
     //Poster all devis state
@@ -127,7 +127,7 @@ public class EstimationPayment : MonoBehaviour
             sliderStatePayment.value = 1.0f;
         }
 
-        //percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
+        percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
     }
 
 
@@ -146,6 +146,9 @@ public class EstimationPayment : MonoBehaviour
     IEnumerator CreatePayment()
     {
         WWWForm form = new WWWForm();
+        form.AddField("step", changePayment);
+        Debug.Log("step : " + changePayment);
+        form.AddField("percentage", percentageText.text);
 
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLCreatePayment);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");

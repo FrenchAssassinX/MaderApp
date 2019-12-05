@@ -400,3 +400,17 @@ public class RequestGetAllCuts
     public string message;
     public List<Cuts> cuts;
 }
+
+[System.Serializable] 
+public class CreatePayment
+{
+    public string message;
+    public List<payment> createPayment;
+}
+
+[System.Serializable]
+public class payment
+{
+    public string step;
+    public string percent;
+}
