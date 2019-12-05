@@ -9,19 +9,19 @@ public class CreateModule : MonoBehaviour
 {
     public GameObject CONST;
     private string url;
-    private string URLCreateModule = "v1/createmodule";  // Specific url for create module
-    private string URLEstimationModule = "v1/createmodulewithestimation"; // Specific url for estimation module
-    private string URLRange = "v1/getallrange"; // Specific url for range
-    private string URLgetAllModule = "v1/getAllModule"; // Specific url for get module
-    private string URLGetRangeById = "v1/getrangebyid"; // Specific url for Post range id
+    private string URLCreateModule = "v1/createmodule";                         // Specific url for create module
+    private string URLEstimationModule = "v1/createmodulewithestimation";       // Specific url for estimation module
+    private string URLRange = "v1/getallrange";                                 // Specific url for range
+    private string URLgetAllModule = "v1/getAllModule";                         // Specific url for get module
+    private string URLGetRangeById = "v1/getrangebyid";                         // Specific url for Post range id
     private string URLGetAllComponent = "v1/getallcomponent";
     private string URLGetAllModuleModel = "v1/getallmodulemodel";
     private string URLPostGetComponentbyId = "v1/getcomponentbyid";
 
     //Type (CanvasLeft)
-    public Dropdown ddrange; //gamme
-    public Dropdown ddmodel; //modele
-    public Input name; //name of module
+    public Dropdown ddrange;                    //gamme
+    public Dropdown ddmodel;                    //modele
+    public Input name;                          //name of module
     public Button buttonModificationModule;
     public Button buttonCreateModule;
     public GameObject goodSendModule;
@@ -29,12 +29,12 @@ public class CreateModule : MonoBehaviour
     
     //Modification Module (CanvasRight)
     public Canvas canvasModificationModule;
-    public Dropdown ddwoodenUpright; //montantBois;
-    public Dropdown ddinsulationPanels; //panneauxIsolation;
-    public Dropdown ddrainBarrier; //parePluie;
-    public Dropdown ddintermediatePanels; //panneauxIntermediaires;
-    public Dropdown ddhatchPanels; //panneauxCouverture;
-    public Dropdown ddfloor; //plancher;
+    public Dropdown ddwoodenUpright;            //montantBois;
+    public Dropdown ddinsulationPanels;         //panneauxIsolation;
+    public Dropdown ddrainBarrier;              //parePluie;
+    public Dropdown ddintermediatePanels;       //panneauxIntermediaires;
+    public Dropdown ddhatchPanels;              //panneauxCouverture;
+    public Dropdown ddfloor;                    //plancher;
 
     // Banner (CanvasTop)
     public Button buttonReturn;
@@ -42,24 +42,26 @@ public class CreateModule : MonoBehaviour
     string getIdRange;
 
     //Define Dropdown Right value
-    List<string> dropdownWoodenUpright = new List<string>();//montant en bois
-    List<string> dropdownIsulationPanels = new List<string>();//panneaux d'isolation
-    List<string> dropdownRainBarrier = new List<string>();//pare Pluie
-    List<string> dropdownIntermediatePanels = new List<string>();//panneaux intermediaires 
-    List<string> dropdownHatchPanels = new List<string>();//panneaux couverture
-    List<string> dropdownFloor = new List<string>();//plancher
+    List<string> dropdownWoodenUpright = new List<string>();        //montant en bois
+    List<string> dropdownIsulationPanels = new List<string>();      //panneaux d'isolation
+    List<string> dropdownRainBarrier = new List<string>();          //pare Pluie
+    List<string> dropdownIntermediatePanels = new List<string>();   //panneaux intermediaires 
+    List<string> dropdownHatchPanels = new List<string>();          //panneaux couverture
+    List<string> dropdownFloor = new List<string>();                //plancher
     
     //Define for Serializer value
     string getName;
     string getType;
-    string getRangeForForm; //ddrange
-    string getModelForForm; //ddmodel
-    string getWUForForm; //ddwoodenUpright
-    string getIPForForm; //ddinsulationPanels
-    string getRBForForm; //ddrainBarrier
-    string getITPForForm; //ddintermediatePanels
-    string getHPForForm; //ddhatchPanels
-    string getFloorForForm; //ddfloor
+    string getRangeNameForForm;     //ddrange
+    string getRangeForForm;         //ddrange
+    string getModelForForm;         //ddmodel
+
+    string getWUForForm;            //ddwoodenUpright
+    string getIPForForm;            //ddinsulationPanels
+    string getRBForForm;            //ddrainBarrier
+    string getITPForForm;           //ddintermediatePanels
+    string getHPForForm;            //ddhatchPanels
+    string getFloorForForm;         //ddfloor
 
     string code;
     string unit;
@@ -84,7 +86,6 @@ public class CreateModule : MonoBehaviour
 
         //it's not visible for now
         canvasModificationModule.transform.gameObject.SetActive(false);
-
 
         //Modification module
         Button btnMM = buttonModificationModule.GetComponent<Button>();
@@ -146,42 +147,37 @@ public class CreateModule : MonoBehaviour
 
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLRange);
         
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
 
-            yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
+        yield return request.SendWebRequest();
+        if (request.isNetworkError || request.isHttpError)
+        {
+            // error
+        }
+        else
+        {
+            if (request.isDone)
             {
-                // error
-            }
-            else
-            {
-                if (request.isDone)
+                // The database return a JSON file of all user infos
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                // Create a root object thanks to the JSON file
+                RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);
+
+                foreach (var item in entities.range)
                 {
-                    // The database return a JSON file of all user infos
-                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                    // Create a root object thanks to the JSON file
-                    RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);
-
-                    foreach (var item in entities.range)
-                    {
-                    
-                        getIdRange = item._id;
-                        string libelle = item.libelle;
+                    getIdRange = item._id;
+                    string libelle = item.libelle;
 
                     //Poster all ranges
-                        dropdownranges.Add(libelle);
+                    dropdownranges.Add(libelle);
                         
-                    }
+                }
                 ddrange.options.Clear();
                 ddrange.AddOptions(dropdownranges);
             }
-                else
-                {
-                //erreur request
-                }
-            }
+        }
         
     }
 
@@ -197,7 +193,7 @@ public class CreateModule : MonoBehaviour
         if (request.isNetworkError || request.isHttpError)
         {
             // error
-            Debug.Log("erreur de la requete : " + request);
+            Debug.Log("ERROR: " + request);
         }
         else
         {
@@ -208,7 +204,9 @@ public class CreateModule : MonoBehaviour
                 //Create a root object thanks to the JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);
                 Debug.Log("json result model : " + jsonResult);
+
                 dropdownModel.Clear();
+
                 foreach (var item in entities.modules)
                 {
                     Module module = item;
@@ -216,22 +214,19 @@ public class CreateModule : MonoBehaviour
                     if(module.rangeName == pRange)
                     {
                         //Poster all model
+                        getRangeNameForForm = module.rangeName;
                         getModelForForm = module.name;
                         dropdownModel.Add(module.name);
-
                         idModule = module._id;
                         nameModule = module.name;
                         costModule = module.cost;
                         angleModule = module.angle;
                         cutModule = module.cut;
                     }
-
                 }
                 ddmodel.AddOptions(dropdownModel);
-
-                }
+            }
         }
-
     }
 
     void DropdownValueChanged(Dropdown pChange)
@@ -262,13 +257,6 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
-                //clear dropdown list
-                //dropdownWoodenUpright.Clear();
-                //dropdownIsulationPanels.Clear();
-                //dropdownRainBarrier.Clear();
-                //dropdownIntermediatePanels.Clear();
-                //dropdownHatchPanels.Clear();
-                //dropdownFloor.Clear();
 
                 foreach (var item in entities.components)
                 {
@@ -277,7 +265,6 @@ public class CreateModule : MonoBehaviour
                     description = item.description;
                     unit = item.unit;
                     code = item.code;
-                    
                     
                     if (getType == "Montant en bois")
                     {
@@ -309,68 +296,99 @@ public class CreateModule : MonoBehaviour
                         dropdownFloor.Add(getName);
                         getFloorForForm = getName;
                     }
-
-
                 }
-                //ddwoodenUpright.options.Clear();
-                ddwoodenUpright.AddOptions(dropdownWoodenUpright);
-                //ddinsulationPanels.options.Clear();
-                ddinsulationPanels.AddOptions(dropdownIsulationPanels);
-                //ddrainBarrier.options.Clear();
-                ddrainBarrier.AddOptions(dropdownRainBarrier);
-                //ddintermediatePanels.options.Clear();
-                ddintermediatePanels.AddOptions(dropdownIntermediatePanels);
-                //ddhatchPanels.options.Clear();
-                ddhatchPanels.AddOptions(dropdownHatchPanels);
-                //ddfloor.options.Clear();
-                ddfloor.AddOptions(dropdownFloor);
 
+                ddwoodenUpright.AddOptions(dropdownWoodenUpright);
+                ddinsulationPanels.AddOptions(dropdownIsulationPanels);
+                ddrainBarrier.AddOptions(dropdownRainBarrier);
+                ddintermediatePanels.AddOptions(dropdownIntermediatePanels);
+                ddhatchPanels.AddOptions(dropdownHatchPanels);
+                ddfloor.AddOptions(dropdownFloor);
             }
         }
     }
 
     public IEnumerator PostAllModuleModel()
     {
+        List<WWWForm> listComponentsForm = new List<WWWForm>();     // List of forms to keep all selected components
+
+        /* First request to retrieve selected components */
+        UnityWebRequest requestComponents = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllComponent);
+
+        requestComponents.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        requestComponents.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+        yield return requestComponents.SendWebRequest();
+
+        if (requestComponents.isNetworkError || requestComponents.isHttpError)
+        {
+            // error
+            Debug.Log("erreur de la requete : " + requestComponents);
+        }
+        else
+        {
+            if (requestComponents.isDone)
+            {
+                //The database return a JSON file of all user infos
+                string jsonResult = System.Text.Encoding.UTF8.GetString(requestComponents.downloadHandler.data);
+                //Create a root object thanks to the JSON file
+                RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
+
+                /* Retrieve all selected components: if selected component in Dropdwon is equals to current item, then affect ID */
+                foreach (var item in entities.components)
+                {
+                    if (item.name == ddwoodenUpright.options[ddwoodenUpright.value].text ||
+                            item.name == ddinsulationPanels.options[ddinsulationPanels.value].text ||
+                            item.name == ddrainBarrier.options[ddrainBarrier.value].text ||
+                            item.name == ddintermediatePanels.options[ddintermediatePanels.value].text ||
+                            item.name == ddhatchPanels.options[ddhatchPanels.value].text ||
+                            item.name == ddfloor.options[ddfloor.value].text)
+                    {
+                        WWWForm componentsForm = new WWWForm();         // New form for web request of selected components
+                        componentsForm.AddField("id", item._id);        // Add id of component
+                        componentsForm.AddField("qte", "1");            // Add quantity of component: always equal to 1
+                        listComponentsForm.Add(componentsForm);
+                    }
+                }
+            }
+        }
+
 
         WWWForm form = new WWWForm(); // New form for web request
-        form.AddField("_id", idModule);
+
         form.AddField("name", nameModule);
         form.AddField("cost", costModule);
         form.AddField("angle", angleModule);
         form.AddField("cut", cutModule);
         form.AddField("range", getRangeForForm);
-        form.AddField("__v", "0");
+        form.AddField("rangeName", getRangeNameForForm);
+        //form.AddField("components", listComponentsForm);
 
-        using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateModule, form))
+        /* Second request to create new module */
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))
         {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
             yield return request.SendWebRequest();
 
             // If connection failed
             if (request.isNetworkError || request.isHttpError)
             {
                 badSendModule.transform.gameObject.SetActive(true);
-                Debug.Log("ERROR !!");
+                Debug.Log("ERROR: " + request.error);
             }
             // If connection succeeded
             else
             {
                 if (request.isDone)
                 {
-                    Debug.Log("envoyé");
                     // The database return a JSON file of all modules infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     Debug.Log("json result in post : " + jsonResult);
+
                     // Create a root object thanks to the JSON file
                     RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
-                    CONST.GetComponent<CONST>().token = entity.token.ToString();
-                    CONST.GetComponent<CONST>().userID = entity.user._id.ToString();
-                    CONST.GetComponent<CONST>().userName = entity.user.prenom.ToString();
-
-                    // Keep the CONST gameObject between scenes
-                    DontDestroyOnLoad(CONST.transform);
                     goodSendModule.transform.gameObject.SetActive(true);
-
-
                 }
                 else
                 {
@@ -386,7 +404,6 @@ public class CreateModule : MonoBehaviour
     {
         canvasModificationModule.transform.gameObject.SetActive(true);
         StartCoroutine(GetAllComponent());
-
     }
     
     void SendFullModule()
