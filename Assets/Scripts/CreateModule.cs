@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -257,7 +258,10 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
-
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+                //Fais en sort de garder en mémoire ce "entities.components", il sera ton moduleList de ma fonction
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //________________________________________________________________________________________________
                 foreach (var item in entities.components)
                 {
                     getName = item.name;
@@ -409,5 +413,60 @@ public class CreateModule : MonoBehaviour
     void SendFullModule()
     {
         StartCoroutine(PostAllModuleModel());
+    }
+
+    public string CreateJsonToSend(List<Dictionary<string, string>> moduleList, List<string> selectedModuleNameList)
+    {
+        // MODULELIST = ce que tu garde en mémoire a la création des dropdown
+        // SELECTEDMODULELIST = récupère tout les composants selectionné dans les dropdown et fous les dans une List<string>
+        string beginArray = "[";
+        string endArray = "]";
+        string beginObj = "{";
+        string endObj = "}";
+        string virgule = ",";
+        string quote = "\"";
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append(beginArray);// [
+        for(int i = 0; i < selectedModuleNameList.Count; i++)
+        {
+            string name = selectedModuleNameList[i];
+            for(int y = 0; y < moduleList.Count; y++)
+            {
+                string module = moduleList[y]["name"];
+                if (module.Equals(name))
+                {
+                    sb.Append(beginObj);// {
+                    sb.Append(quote);//    "
+                    sb.Append("id");//     id
+                    sb.Append(quote);//    "
+                    sb.Append(":");//      :
+                    sb.Append(quote);//    "
+                    sb.Append(moduleList[y]["_id"]);// valeur de l'id
+                    sb.Append(quote);//    "
+                    sb.Append(virgule);//  ,
+                    sb.Append(quote);//    "
+                    sb.Append("qte");//    qte
+                    sb.Append(quote);//    "
+                    sb.Append(":");//      :
+                    sb.Append(quote);//    "
+                    sb.Append("1");//      1
+                    sb.Append(quote);//    "
+                    sb.Append(endObj);//   }
+                    if(i < (selectedModuleNameList.Count - 1))
+                    {
+                        //ajoute une virgule si et seulement si il y a un suivant dans la liste des modules selectionné
+                        sb.Append(virgule);// ,
+                    }
+                    break;
+                }
+            }
+            if (i == (selectedModuleNameList.Count - 1))
+            {
+                //ajoute le crochet de fin de array si et seulement si c'est le dernier item de la liste
+                sb.Append(endArray);// ]
+            }
+        }
+        return "";
     }
 }
