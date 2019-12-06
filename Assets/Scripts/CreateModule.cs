@@ -78,7 +78,10 @@ public class CreateModule : MonoBehaviour
     List<string> dropdownranges = new List<string>();
     List<string> dropdownModel = new List<string>();
 
-    // Start is called before the first frame update
+    // 
+    public List<Components> listComponents = new List<Components>();
+    public List<string> listSelectedModules = new List<string>();
+
     void Start()
     {
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
@@ -172,8 +175,7 @@ public class CreateModule : MonoBehaviour
                     string libelle = item.libelle;
 
                     //Poster all ranges
-                    dropdownranges.Add(libelle);
-                        
+                    dropdownranges.Add(libelle);     
                 }
                 ddrange.options.Clear();
                 ddrange.AddOptions(dropdownranges);
@@ -258,12 +260,12 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
-                //Fais en sort de garder en mémoire ce "entities.components", il sera ton moduleList de ma fonction
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //________________________________________________________________________________________________
+
                 foreach (var item in entities.components)
                 {
+                    Components component = item;
+                    listComponents.Add(component);
+
                     getName = item.name;
                     getType = item.type;
                     description = item.description;
@@ -314,8 +316,6 @@ public class CreateModule : MonoBehaviour
 
     public IEnumerator PostAllModuleModel()
     {
-        List<WWWForm> listComponentsForm = new List<WWWForm>();     // List of forms to keep all selected components
-
         /* First request to retrieve selected components */
         UnityWebRequest requestComponents = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllComponent);
 
@@ -347,15 +347,14 @@ public class CreateModule : MonoBehaviour
                             item.name == ddhatchPanels.options[ddhatchPanels.value].text ||
                             item.name == ddfloor.options[ddfloor.value].text)
                     {
-                        WWWForm componentsForm = new WWWForm();         // New form for web request of selected components
-                        componentsForm.AddField("id", item._id);        // Add id of component
-                        componentsForm.AddField("qte", "1");            // Add quantity of component: always equal to 1
-                        listComponentsForm.Add(componentsForm);
+                        listSelectedModules.Add(item.name);
                     }
                 }
             }
         }
 
+        /* Convert components selected from dropdowns on the right to string JSON */
+        string componentsSelected = CreateJsonToSend(listComponents, listSelectedModules);
 
         WWWForm form = new WWWForm(); // New form for web request
 
@@ -365,7 +364,7 @@ public class CreateModule : MonoBehaviour
         form.AddField("cut", cutModule);
         form.AddField("range", getRangeForForm);
         form.AddField("rangeName", getRangeNameForForm);
-        //form.AddField("components", listComponentsForm);
+        form.AddField("components", componentsSelected);
 
         /* Second request to create new module */
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))
@@ -394,11 +393,6 @@ public class CreateModule : MonoBehaviour
                     RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
                     goodSendModule.transform.gameObject.SetActive(true);
                 }
-                else
-                {
-                    badSendModule.transform.gameObject.SetActive(true);
-                    Debug.Log("petite erreur");
-                }
             }
         }
     }
@@ -415,10 +409,8 @@ public class CreateModule : MonoBehaviour
         StartCoroutine(PostAllModuleModel());
     }
 
-    public string CreateJsonToSend(List<Dictionary<string, string>> moduleList, List<string> selectedModuleNameList)
+    public string CreateJsonToSend(List<Components> pComponentsList, List<string> pSelectedModuleNameList)
     {
-        // MODULELIST = ce que tu garde en mémoire a la création des dropdown
-        // SELECTEDMODULELIST = récupère tout les composants selectionné dans les dropdown et fous les dans une List<string>
         string beginArray = "[";
         string endArray = "]";
         string beginObj = "{";
@@ -428,45 +420,51 @@ public class CreateModule : MonoBehaviour
 
         StringBuilder sb = new StringBuilder();
         sb.Append(beginArray);// [
-        for(int i = 0; i < selectedModuleNameList.Count; i++)
+        for(int i = 0; i < pSelectedModuleNameList.Count; i++)
         {
-            string name = selectedModuleNameList[i];
-            for(int y = 0; y < moduleList.Count; y++)
+            string name = pSelectedModuleNameList[i];
+
+            for(int y = 0; y < pComponentsList.Count; y++)
             {
-                string module = moduleList[y]["name"];
-                if (module.Equals(name))
+                string module = pComponentsList[y].name;
+
+                if (module != null && module != "")
                 {
-                    sb.Append(beginObj);// {
-                    sb.Append(quote);//    "
-                    sb.Append("id");//     id
-                    sb.Append(quote);//    "
-                    sb.Append(":");//      :
-                    sb.Append(quote);//    "
-                    sb.Append(moduleList[y]["_id"]);// valeur de l'id
-                    sb.Append(quote);//    "
-                    sb.Append(virgule);//  ,
-                    sb.Append(quote);//    "
-                    sb.Append("qte");//    qte
-                    sb.Append(quote);//    "
-                    sb.Append(":");//      :
-                    sb.Append(quote);//    "
-                    sb.Append("1");//      1
-                    sb.Append(quote);//    "
-                    sb.Append(endObj);//   }
-                    if(i < (selectedModuleNameList.Count - 1))
+                    if (module.Equals(name))
                     {
-                        //ajoute une virgule si et seulement si il y a un suivant dans la liste des modules selectionné
-                        sb.Append(virgule);// ,
+                        sb.Append(beginObj);// {
+                        sb.Append(quote);//    "
+                        sb.Append("id");//     id
+                        sb.Append(quote);//    "
+                        sb.Append(":");//      :
+                        sb.Append(quote);//    "
+                        sb.Append(pComponentsList[y]._id);// valeur de l'id
+                        sb.Append(quote);//    "
+                        sb.Append(virgule);//  ,
+                        sb.Append(quote);//    "
+                        sb.Append("qte");//    qte
+                        sb.Append(quote);//    "
+                        sb.Append(":");//      :
+                        sb.Append(quote);//    "
+                        sb.Append("1");//      1
+                        sb.Append(quote);//    "
+                        sb.Append(endObj);//   }
+                        if (i < (pSelectedModuleNameList.Count - 1))
+                        {
+                            //ajoute une virgule si et seulement si il y a un suivant dans la liste des modules selectionné
+                            sb.Append(virgule);// ,
+                        }
+                        break;
                     }
-                    break;
                 }
             }
-            if (i == (selectedModuleNameList.Count - 1))
+            if (i == (pSelectedModuleNameList.Count - 1))
             {
                 //ajoute le crochet de fin de array si et seulement si c'est le dernier item de la liste
                 sb.Append(endArray);// ]
             }
         }
-        return "";
+
+        return sb.ToString();
     }
 }

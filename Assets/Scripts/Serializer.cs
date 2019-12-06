@@ -119,16 +119,10 @@ public class RequestGetAllProject
 }
 
 [System.Serializable]
-public class CreateProject
+public class RequestCreateProject
 {
-    public string userID;
-    public string date;
-    public string road;
-    public string roadNum;
-    public string roadExtra;
-    public string zipcode;
-    public string city;
-    public string customerID;
+    public string message;
+    public Project project;
 }
 
 /* Estimation request constructor */
