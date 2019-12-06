@@ -17,7 +17,7 @@ public class EstimationPayment : MonoBehaviour
     public Dropdown StatePayment;
     public Button buttonSave;
     public Button buttonReturn;
-    public Slider sliderStatePayment;
+    public Slider sliderStatePayment; //progressBar for Advancement Payment
     public Text percentageText;
 
     List<Dropdown.OptionData> dropdownStateEstimation = new List<Dropdown.OptionData>();
@@ -26,6 +26,8 @@ public class EstimationPayment : MonoBehaviour
     public Canvas canvasPayment;
     public string changeEstimation;
     public string changePayment;
+    public string stepPayment;
+    public string percentPayment;
 
     void Start()
     {
@@ -33,20 +35,24 @@ public class EstimationPayment : MonoBehaviour
 
         url = CONST.GetComponent<CONST>().url;
 
-        //save states
+        //Button save states
         Button btnSV = buttonSave.GetComponent<Button>();
         btnSV.onClick.AddListener(SaveAdvancement);
 
-        //it's not visible for now
+        //return home page
+        Button btnRT = buttonReturn.GetComponent<Button>();
+        btnRT.onClick.AddListener(Return);
+
+        //State payment is not visible for now
         canvasPayment.transform.gameObject.SetActive(false);
 
-        //for dropdown estimation
+        //For dropdown estimation
         stateEstimation.onValueChanged.AddListener(delegate
         {
             StateEstimationModif(stateEstimation);
         });
 
-        //for dropdown payment
+        //For dropdown payment
         StatePayment.onValueChanged.AddListener(delegate
         {
             StateAdvancementModif(StatePayment);
@@ -54,13 +60,20 @@ public class EstimationPayment : MonoBehaviour
 
         //percentageText = GetComponent<Text>();
 
-        StartCoroutine(CreatePayment());
+
         //StartCoroutine(UpdateEstimation());
     }
 
-    //Poster all devis state
-    void StateEstimationModif(Dropdown pChangeEstimation)
+    public void Return()
     {
+        //Send the previous scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    //Poster all devis state
+    public void StateEstimationModif(Dropdown pChangeEstimation)
+    {
+        //Add option in dropdown state Estimation
         stateEstimation.AddOptions(dropdownStateEstimation);
         changeEstimation = pChangeEstimation.options[pChangeEstimation.value].text;
         Debug.Log("change estimation : " + changeEstimation);
@@ -69,6 +82,7 @@ public class EstimationPayment : MonoBehaviour
         if (changeEstimation == "Accepté")
         {
             canvasPayment.transform.gameObject.SetActive(true); //poster payment state
+            //start CreatePayment if "Accepté" is selected
 
         }
         else
@@ -80,95 +94,113 @@ public class EstimationPayment : MonoBehaviour
 
     //Poster all estimation advancement
     //The Client select a state of payment and the slider folow.
-    void StateAdvancementModif( Dropdown pChangePayment)
+    public void StateAdvancementModif( Dropdown pChangePayment)
     {
+        //Add option in dropdown state payment
         StatePayment.AddOptions(dropdownStatePayment);
         changePayment = pChangePayment.options[pChangePayment.value].text;
-        Debug.Log("change payment : " + changePayment);
-        sliderStatePayment.maxValue = 1.0f;
 
-        if(changePayment == "A la signature")
+        Debug.Log("change payment : " + changePayment);
+
+        //max slider is 1, it's full position
+        sliderStatePayment.maxValue = 1.0f;
+        if (changePayment == "A la signature")
         {
+            stepPayment = "1";
+            percentPayment = "0.03";
             sliderStatePayment.value = 0.03f;
         }
 
         if (changePayment == "Obtension du permis de construire")
         {
+            stepPayment = "2";
+            percentPayment = "0.1";
             sliderStatePayment.value = 0.1f;
         }
 
         if (changePayment == "Ouverture du chantier")
         {
+            stepPayment = "3";
+            percentPayment = "0.15";
             sliderStatePayment.value = 0.15f;
         }
 
         if (changePayment == "Achèvement des fondations")
         {
+            stepPayment = "4";
+            percentPayment = "0.025";
             sliderStatePayment.value = 0.25f;
         }
 
         if (changePayment == "Achèvement des murs")
         {
+            stepPayment = "5";
+            percentPayment = "0.4";
             sliderStatePayment.value = 0.4f;
         }
 
         if (changePayment == "Mise hors d'eau/hors d'aire")
         {
+            stepPayment = "6";
+            percentPayment = "0.75";
             sliderStatePayment.value = 0.75f;
         }
 
         if (changePayment == "Achèvement des travaux d'équipement")
         {
+            stepPayment = "7";
+            percentPayment = "0.95";
             sliderStatePayment.value = 0.95f;
         }
 
         if(changePayment == "Remise des clés")
         {
+            stepPayment = "8";
+            percentPayment = "1.0";
             sliderStatePayment.value = 1.0f;
         }
 
+
+        //Poster purcentage
         percentageText.text = Mathf.RoundToInt(sliderStatePayment.value * 100) + "%";
-    }
-
-
-    //progressBar for Advancement Payment
-    void ProgressBar()
-    {
-        
     }
 
     //update devis
     void SaveAdvancement()
     {
-
+        StartCoroutine(CreatePayment());
     }
 
     IEnumerator CreatePayment()
     {
         WWWForm form = new WWWForm();
-        form.AddField("step", changePayment);
-        Debug.Log("step : " + changePayment);
-        form.AddField("percentage", percentageText.text);
+        form.AddField("step", stepPayment);
+        form.AddField("percent", percentPayment);
 
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLCreatePayment);
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+        Debug.Log("step : " + stepPayment);
+        Debug.Log("percent : " + percentPayment);
 
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreatePayment, form))
         {
-            Debug.Log("*** ERROR: " + request.error + " ***");
-        }
-        else
-        {
-            if (request.isDone)
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
             {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log("*** ERROR: " + request.error + " ***");
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                InvoiceProject entities = JsonUtility.FromJson<InvoiceProject>(jsonResult);         // Convert JSON file
-                
-                Debug.Log("jsons result invoice project: " + jsonResult);
+                    payement entities = JsonUtility.FromJson<payement>(jsonResult);         // Convert JSON file
+
+                    Debug.Log("jsons result payment: " + jsonResult);
+                }
             }
         }
     }
