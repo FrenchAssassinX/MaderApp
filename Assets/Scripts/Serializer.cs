@@ -405,15 +405,30 @@ public class RequestGetAllCuts
 public class CreatePayment
 {
     public string message;
-    public List<payement> payement;
+    public List<CreatePayement> payement;
 }
 
 [System.Serializable]
-public class payement
+public class CreatePayement
 {
     public string _id;
     public string step;
     public string percentage;
     public string date;
     public string __v;
+}
+
+[System.Serializable] 
+public class UpdateEstimationState
+{
+    public string message;
+    public List<EstimationState> estimationState;
+}
+
+[System.Serializable]
+public class EstimationState
+{
+    public string n;
+    public string nModified;
+    public string ok;
 }

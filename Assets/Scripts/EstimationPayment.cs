@@ -41,7 +41,7 @@ public class EstimationPayment : MonoBehaviour
 
         //return home page
         Button btnRT = buttonReturn.GetComponent<Button>();
-        btnRT.onClick.AddListener(Return);
+        btnRT.onClick.AddListener(ReturnToTechnicalFolder);
 
         //State payment is not visible for now
         canvasPayment.transform.gameObject.SetActive(false);
@@ -60,14 +60,7 @@ public class EstimationPayment : MonoBehaviour
 
         //percentageText = GetComponent<Text>();
 
-
-        //StartCoroutine(UpdateEstimation());
-    }
-
-    public void Return()
-    {
-        //Send the previous scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        StartCoroutine(UpdateEstimation());
     }
 
     //Poster all devis state
@@ -75,6 +68,7 @@ public class EstimationPayment : MonoBehaviour
     {
         //Add option in dropdown state Estimation
         stateEstimation.AddOptions(dropdownStateEstimation);
+        //change state
         changeEstimation = pChangeEstimation.options[pChangeEstimation.value].text;
         Debug.Log("change estimation : " + changeEstimation);
 
@@ -98,66 +92,77 @@ public class EstimationPayment : MonoBehaviour
     {
         //Add option in dropdown state payment
         StatePayment.AddOptions(dropdownStatePayment);
+        //change state
         changePayment = pChangePayment.options[pChangePayment.value].text;
 
         Debug.Log("change payment : " + changePayment);
 
         //max slider is 1, it's full position
         sliderStatePayment.maxValue = 1.0f;
+
+        //the user can choose the state of progress which will advance the pregress bar
         if (changePayment == "A la signature")
         {
-            stepPayment = "1";
-            percentPayment = "0.03";
-            sliderStatePayment.value = 0.03f;
+            //progress bar at 3%
+            stepPayment = "1"; //number for step
+            percentPayment = "3%"; //percent for advancement payment
+            sliderStatePayment.value = 0.03f; //value to advance the progress bar
         }
 
         if (changePayment == "Obtension du permis de construire")
         {
-            stepPayment = "2";
-            percentPayment = "0.1";
-            sliderStatePayment.value = 0.1f;
+            //progress bar at 10%
+            stepPayment = "2"; //number for step
+            percentPayment = "10%"; //percent for advancement payment
+            sliderStatePayment.value = 0.1f; //value to advance the progress bar
         }
 
         if (changePayment == "Ouverture du chantier")
         {
-            stepPayment = "3";
-            percentPayment = "0.15";
-            sliderStatePayment.value = 0.15f;
+            //progress bar at 15%
+            stepPayment = "3"; //number for step
+            percentPayment = "15%"; //percent for advancement payment
+            sliderStatePayment.value = 0.15f; //value to advance the progress bar
         }
 
         if (changePayment == "Achèvement des fondations")
         {
-            stepPayment = "4";
-            percentPayment = "0.025";
-            sliderStatePayment.value = 0.25f;
+            //progress bar at 25%
+            stepPayment = "4"; //number for step
+            percentPayment = "25%"; //percent for advancement payment
+            sliderStatePayment.value = 0.25f; //value to advance the progress bar
         }
 
         if (changePayment == "Achèvement des murs")
         {
-            stepPayment = "5";
-            percentPayment = "0.4";
-            sliderStatePayment.value = 0.4f;
+            //progress bar at 40%
+            stepPayment = "5"; //number for step
+            percentPayment = "40%"; //percent for advancement payment
+            sliderStatePayment.value = 0.4f; //value to advance the progress bar
         }
 
         if (changePayment == "Mise hors d'eau/hors d'aire")
         {
-            stepPayment = "6";
-            percentPayment = "0.75";
-            sliderStatePayment.value = 0.75f;
+            //progress bar at 75%
+            stepPayment = "6"; //number for step
+            percentPayment = "75%"; //percent for advancement payment
+            sliderStatePayment.value = 0.75f; //value to advance the progress bar
         }
 
         if (changePayment == "Achèvement des travaux d'équipement")
         {
-            stepPayment = "7";
-            percentPayment = "0.95";
-            sliderStatePayment.value = 0.95f;
+            //progress bar at 95%
+            stepPayment = "7"; //number for step
+            percentPayment = "95%"; //percent for advancement payment
+            sliderStatePayment.value = 0.95f; //value to advance the progress bar
         }
 
         if(changePayment == "Remise des clés")
         {
-            stepPayment = "8";
-            percentPayment = "1.0";
-            sliderStatePayment.value = 1.0f;
+            //progress bar at 100%
+            stepPayment = "8"; //number for step
+            percentPayment = "100%"; //percent for advancement payment
+            sliderStatePayment.value = 1.0f; //value to advance the progress bar
         }
 
 
@@ -166,12 +171,13 @@ public class EstimationPayment : MonoBehaviour
     }
 
     //update devis
-    void SaveAdvancement()
+    public void SaveAdvancement()
     {
         StartCoroutine(CreatePayment());
     }
 
-    IEnumerator CreatePayment()
+    // Function for create payment, it's send step and percent advancement payment
+    public IEnumerator CreatePayment()
     {
         WWWForm form = new WWWForm();
         form.AddField("step", stepPayment);
@@ -197,7 +203,7 @@ public class EstimationPayment : MonoBehaviour
                 {
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                    payement entities = JsonUtility.FromJson<payement>(jsonResult);         // Convert JSON file
+                    CreatePayement entities = JsonUtility.FromJson<CreatePayement>(jsonResult);         // Convert JSON file
 
                     Debug.Log("jsons result payment: " + jsonResult);
                 }
@@ -206,29 +212,33 @@ public class EstimationPayment : MonoBehaviour
     }
 
 
-    IEnumerator UpdateEstimation()
+    public IEnumerator UpdateEstimation()
     {
         WWWForm form = new WWWForm();
+        form.AddField("state", "");
+        form.AddField("EstimationID", "");
 
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLUpdateEstimation);
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLUpdateEstimation, form))
         {
-            Debug.Log("*** ERROR: " + request.error + " ***");
-        }
-        else
-        {
-            if (request.isDone)
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError)
             {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log("*** ERROR: " + request.error + " ***");
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
 
-                StateUpdatePayment entities = JsonUtility.FromJson<StateUpdatePayment>(jsonResult);         // Convert JSON file
+                    EstimationState entities = JsonUtility.FromJson<EstimationState>(jsonResult);         // Convert JSON file
 
-                Debug.Log("jsons result update project: " + jsonResult);
+                    Debug.Log("jsons result update project: " + jsonResult);
+                }
             }
         }
     }
