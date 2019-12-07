@@ -2092,11 +2092,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CONST: {fileID: 0}
+  buttonReturn: {fileID: 661415134}
   nameProject: {fileID: 320831937}
   referenceProject: {fileID: 442963319}
   idCustomer: {fileID: 1343207614}
-  ButtonCreateCustomer: {fileID: 376514093}
-  ButtonCreateProject: {fileID: 352276159}
+  buttonDisplayRightCanvas: {fileID: 376514093}
+  buttonCreateProject: {fileID: 352276159}
+  canvasNewClient: {fileID: 1038885662}
   name: {fileID: 67374787}
   surname: {fileID: 1559895496}
   roadNum: {fileID: 392019672}
@@ -2106,12 +2108,10 @@ MonoBehaviour:
   roadExtra: {fileID: 1712561597}
   email: {fileID: 841981646}
   phone: {fileID: 1404080530}
-  ButtonCreateNewCustomer: {fileID: 1523016646}
-  canvasNewClient: {fileID: 1038885662}
+  buttonCreateNewCustomer: {fileID: 1523016646}
   createValideCustomer: {fileID: 2140360411}
   createValideProject: {fileID: 2119956450}
   errorCreateCustomer: {fileID: 1839876573}
-  ButtonReturn: {fileID: 661415134}
   idClientForForm: 
 --- !u!1 &580901650
 GameObject:

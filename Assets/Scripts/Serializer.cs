@@ -119,6 +119,13 @@ public class RequestGetAllProject
 }
 
 [System.Serializable]
+public class RequestCreateProject
+{
+    public string message;
+    public Project project;
+}
+
+[System.Serializable]
 public class CreateProject
 {
     public string userID;
@@ -402,9 +409,10 @@ public class RequestGetAllCuts
 }
 
 [System.Serializable] 
-public class CreatePayment
+public class RequestCreatePayment
 {
     public string message;
+    public Project project;
     public List<CreatePayement> payement;
 }
 
@@ -418,17 +426,18 @@ public class CreatePayement
     public string __v;
 }
 
-[System.Serializable] 
-public class UpdateEstimationState
+[System.Serializable]
+public class GetPaymentById
 {
     public string message;
-    public List<EstimationState> estimationState;
+    public List<GetPayment> getPayment;
 }
 
 [System.Serializable]
-public class EstimationState
+public class GetPayment
 {
-    public string n;
-    public string nModified;
-    public string ok;
+    public string _id;
+    public string step;
+    public string percentage;
+    public string date;
 }
