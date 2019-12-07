@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class CONST : MonoBehaviour
 {
@@ -12,4 +13,5 @@ public class CONST : MonoBehaviour
     public string projectName;
     public string estimationPrice;
     public string estimationDiscount;
+    public List<string> listModulesCreated = new List<string>();
 }

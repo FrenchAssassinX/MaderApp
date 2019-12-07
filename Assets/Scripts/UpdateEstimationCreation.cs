@@ -14,6 +14,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
     private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
+    private string getAllModulesUrl = "v1/getallmodule";                                // Specific route to get all modules
 
     public GameObject modulePrefab;                     // Prefab of component for 2D scene
     public GameObject middleCanvas;                     // Useful to set component prefab position 
@@ -259,6 +260,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to detect Dropdown select value event */
     private void DropdownValueChanged(Dropdown pDropdown)
     {
+        StartCoroutine(GetAllModulesModel(pDropdown.options[pDropdown.value].text));        // Start function to get all modules equals to the range
         StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));        // Start function for get all ranges values
     }
     /* -----------------------------------    END MODULE PART     ---------------------------------- */
@@ -341,7 +343,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public IEnumerator GetAllRanges()
     {
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllRangesUrl);       // New request, passing url and form
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
         yield return request.SendWebRequest();
@@ -477,6 +479,51 @@ public class UpdateEstimationCreation : MonoBehaviour
 
                 dropdownCuts.options.Clear();
                 dropdownCuts.AddOptions(listCuts);
+            }
+        }
+    }
+
+    /* Fucntion to get all modules models from database */
+    public IEnumerator GetAllModulesModel(string pRangeName)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllModulesUrl);     // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
+
+                /* Get all modules */
+                foreach (var item in entities.modules)
+                {
+                    Module module = item;                 // Convert root object item to module object
+
+                    /* If module from database have the same range as the dropdown */
+                    if (module.rangeName == pRangeName)
+                    {
+                        /* Verify all modules linked to estimation */
+                        foreach (string idModulesInEstimation in CONST.GetComponent<CONST>().listModulesCreated)
+                        {
+                            // If id of module from database is equal to a module linked to estimation..
+                            if (idModulesInEstimation == module._id)
+                            {
+                                listModeles.Add(module.name);           // Add name of the module in list
+                            }
+                        }
+                    }
+                }
+                dropdownModeles.options.Clear();                    // Clear dropdown
+                dropdownModeles.AddOptions(listModeles);            // Fill dropdown with module list
             }
         }
     }

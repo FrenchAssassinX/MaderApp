@@ -366,6 +366,14 @@ public class CreateModule : MonoBehaviour
         form.AddField("rangeName", getRangeNameForForm);
         form.AddField("components", componentsSelected);
 
+        Debug.Log("Name: " + nameModule);
+        Debug.Log("Cost: " + costModule);
+        Debug.Log("Angle: " + angleModule);
+        Debug.Log("Cut: " + cutModule);
+        Debug.Log("Range: " + getRangeForForm);
+        Debug.Log("Range name: " + getRangeNameForForm);
+        Debug.Log("Selected components: " + componentsSelected);
+
         /* Second request to create new module */
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))
         {
@@ -390,7 +398,12 @@ public class CreateModule : MonoBehaviour
                     Debug.Log("json result in post : " + jsonResult);
 
                     // Create a root object thanks to the JSON file
-                    RootObject entity = JsonUtility.FromJson<RootObject>(jsonResult);
+                    RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResult);
+
+                    Module module = entity.module;                                      // Convert root object to module object
+                    CONST.GetComponent<CONST>().listModulesCreated.Add(module._id);     // Add created module id to listModulesCreated: useful to Create Estimation Scene
+
+                    // Display good message
                     goodSendModule.transform.gameObject.SetActive(true);
                 }
             }
