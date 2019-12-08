@@ -30,6 +30,9 @@ public class EstimationPayment : MonoBehaviour
     public string stepPayment; //Define string for step in payment
     public string percentPayment; //Define string for percent in payment
 
+    public string getStep; //take step in database
+    public string getPercent; //take percent in database
+
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     void Start()
@@ -61,9 +64,9 @@ public class EstimationPayment : MonoBehaviour
             StateAdvancementModif(statePayment);
         });
 
+        //StartCoroutine(UpdateEstimation());
 
 
-        StartCoroutine(UpdateEstimation());
     }
 
     //Poster all estimation state
@@ -113,7 +116,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Obtension du permis de construire")
+        else if (changePayment == "Obtension du permis de construire")
         {
             //Progress bar at 10%
             stepPayment = "2"; //Number for step
@@ -122,7 +125,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Ouverture du chantier")
+        else if (changePayment == "Ouverture du chantier")
         {
             //Progress bar at 15%
             stepPayment = "3"; //Number for step
@@ -131,7 +134,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Achèvement des fondations")
+        else if (changePayment == "Achèvement des fondations")
         {
             //Progress bar at 25%
             stepPayment = "4"; //Number for step
@@ -140,7 +143,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Achèvement des murs")
+        else if (changePayment == "Achèvement des murs")
         {
             //Progress bar at 40%
             stepPayment = "5"; //Number for step
@@ -149,7 +152,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Mise hors d'eau/hors d'aire")
+        else if (changePayment == "Mise hors d'eau/hors d'aire")
         {
             //Progress bar at 75%
             stepPayment = "6"; //Number for step
@@ -158,7 +161,7 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Achèvement des travaux d'équipement")
+        else if (changePayment == "Achèvement des travaux d'équipement")
         {
             //Progress bar at 95%
             stepPayment = "7"; //Number for step
@@ -167,13 +170,19 @@ public class EstimationPayment : MonoBehaviour
 
         }
 
-        if (changePayment == "Remise des clés")
+        else if (changePayment == "Remise des clés")
         {
             //Progress bar at 100%
             stepPayment = "8"; //Number for step
             percentPayment = "100%"; //Percent for advancement payment
             sliderStatePayment.value = 1.0f; //Value to advance the progress bar
 
+        }
+
+        else
+        {
+            stepPayment = "0"; //Number for step
+            percentPayment = "0%"; //Percent for advancement payment
         }
 
 
@@ -205,13 +214,13 @@ public class EstimationPayment : MonoBehaviour
         WWWForm form = new WWWForm(); //New form for web request
         form.AddField("step", stepPayment); //Add to the form the value of the UI Element 'stepPyament'
         form.AddField("percent", percentPayment); //Add to the form the value of the UI Element 'percentPyament'
-        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);
+        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID); //Add to the form the value of the selectedProjectID in CONST
 
         Debug.Log("step : " + stepPayment);
         Debug.Log("percent : " + percentPayment);
         Debug.Log("const create payment: " + CONST.GetComponent<CONST>().selectedProjectID);
 
-        /* New webrequest with: CONST url, local url and the form */
+        // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreatePayment, form)) //Create new form
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
@@ -234,9 +243,15 @@ public class EstimationPayment : MonoBehaviour
                     //Create a create payment thanks to the JSON file
                     RequestCreatePayment entities = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);         //Convert JSON file
                     Debug.Log("jsons result payment: " + jsonResult);
-                    //Create ID for paymentID
-                    Project project = entities.project;
-                    CONST.GetComponent<CONST>().paymentID = project._id;
+                    //Take id payment for convert in payment Id for update payment
+                    foreach (var item in entities.payement)
+                    {
+                        Debug.Log("dedans");
+                        //Create ID for paymentID
+                        CONST.GetComponent<CONST>().paymentID = item._id;
+                        Debug.Log("paymentID créée: " + CONST.GetComponent<CONST>().paymentID);
+                        
+                    }
                 }
             }
         }
@@ -245,30 +260,44 @@ public class EstimationPayment : MonoBehaviour
     //Function for update payment, it recovers step and percent advancement payment
     public IEnumerator UpdateEstimation()
     {
-        WWWForm form = new WWWForm();
-        form.AddField("payementID", CONST.GetComponent<CONST>().paymentID);
+        Debug.Log("start update");
+        WWWForm form = new WWWForm(); //New form for web request
+        form.AddField("payementID", CONST.GetComponent<CONST>().paymentID); //Add to the form the value of the paymentID in CONST
         Debug.Log("const update estimation : " + CONST.GetComponent<CONST>().paymentID);
 
+        // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLUpdateEstimation, form))
         {
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            yield return request.SendWebRequest();
+            yield return request.SendWebRequest(); //Send request
 
+            //If connection failed
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.Log("*** ERROR: " + request.error + " ***");
-            }
+            }   
+            
+            //If connection succeeded
             else
             {
                 if (request.isDone)
                 {
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
 
-                    GetPayment entities = JsonUtility.FromJson<GetPayment>(jsonResult); //Convert JSON file
+                    GetPaymentById entities = JsonUtility.FromJson<GetPaymentById>(jsonResult); //Convert JSON file
 
                     Debug.Log("jsons result update project: " + jsonResult);
+
+                    //Take step and percent in this customer for payment
+                    foreach(var item in entities.getPayment)
+                    {
+                        getStep = item.step; //Get the step
+                        getPercent = item.percentage; //Get the percent
+
+                        Debug.Log("step & percent : " + getStep + " " + getPercent);
+                    }
                 }
             }
         }

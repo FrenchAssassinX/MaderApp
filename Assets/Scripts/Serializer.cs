@@ -412,7 +412,6 @@ public class RequestGetAllCuts
 public class RequestCreatePayment
 {
     public string message;
-    public Project project;
     public List<CreatePayement> payement;
 }
 
