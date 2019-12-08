@@ -15,7 +15,7 @@ public class CreateModule : MonoBehaviour
     private string URLRange = "v1/getallrange";                                 // Specific url for range
     private string URLgetAllModule = "v1/getAllModule";                         // Specific url for get module
     private string URLGetRangeById = "v1/getrangebyid";                         // Specific url for Post range id
-    private string URLGetAllComponent = "v1/getallcomponent";
+    private string getAllComponentsUrl = "v1/getallcomponent";                  // Specific route to get all components
     private string URLGetAllModuleModel = "v1/getallmodulemodel";
     private string URLPostGetComponentbyId = "v1/getcomponentbyid";
 
@@ -54,7 +54,7 @@ public class CreateModule : MonoBehaviour
     string getName;
     string getType;
     string getRangeNameForForm;     //ddrange
-    string getRangeForForm;         //ddrange
+    string rangeIDForForm;          //  Range ID to send datas to database
     string getModelForForm;         //ddmodel
 
     string getWUForForm;            //ddwoodenUpright
@@ -68,11 +68,12 @@ public class CreateModule : MonoBehaviour
     string unit;
     string description;
 
-    string idModule;
-    string nameModule;
-    string costModule;
-    string angleModule;
-    string cutModule;
+    string idModule = "";
+    string nameModule = "";
+    string costModule = "";
+    string angleModule = "";
+    string cutModule = "";
+    string componentsSelected = "[]";
 
     //Define Dropdown Left value
     List<string> dropdownranges = new List<string>();
@@ -81,6 +82,7 @@ public class CreateModule : MonoBehaviour
     // 
     public List<Components> listComponents = new List<Components>();
     public List<string> listSelectedModules = new List<string>();
+    public Dictionary<string, string> dictRangesIDNames = new Dictionary<string, string>();
 
     void Start()
     {
@@ -175,7 +177,10 @@ public class CreateModule : MonoBehaviour
                     string libelle = item.libelle;
 
                     //Poster all ranges
-                    dropdownranges.Add(libelle);     
+                    dropdownranges.Add(libelle);
+
+                    // Adding new range to a dictionnary to keep name and id
+                    dictRangesIDNames.Add(item._id, item.libelle);
                 }
                 ddrange.options.Clear();
                 ddrange.AddOptions(dropdownranges);
@@ -213,7 +218,7 @@ public class CreateModule : MonoBehaviour
                 foreach (var item in entities.modules)
                 {
                     Module module = item;
-                    getRangeForForm = pRange;                    
+                    rangeIDForForm = pRange;                    
                     if(module.rangeName == pRange)
                     {
                         //Poster all model
@@ -227,12 +232,44 @@ public class CreateModule : MonoBehaviour
                         cutModule = module.cut;
                     }
                 }
+
+                ddmodel.options.Clear();
                 ddmodel.AddOptions(dropdownModel);
             }
         }
     }
 
-    void DropdownValueChanged(Dropdown pChange)
+    /* Function to get all components from Database */
+    public IEnumerator GetAllComponents()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllComponentsUrl);   // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);         // Convert JSON file to serializable object
+
+                foreach (var item in entities.components)
+                {
+                    Components component = item;
+
+
+                }
+            }
+        }
+    }
+
+    private void DropdownValueChanged(Dropdown pChange)
     {
         Debug.Log("pchange " + pChange.options[pChange.value].text);
 
@@ -241,7 +278,7 @@ public class CreateModule : MonoBehaviour
 
     public IEnumerator GetAllComponent()
     {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllComponent);
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllComponentsUrl);
 
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -317,7 +354,7 @@ public class CreateModule : MonoBehaviour
     public IEnumerator PostAllModuleModel()
     {
         /* First request to retrieve selected components */
-        UnityWebRequest requestComponents = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetAllComponent);
+        UnityWebRequest requestComponents = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllComponentsUrl);
 
         requestComponents.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         requestComponents.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -353,26 +390,30 @@ public class CreateModule : MonoBehaviour
             }
         }
 
+        /* Foreach to retrieve the ID of the selected range */
+        foreach (KeyValuePair<string, string> item in dictRangesIDNames)
+        {
+            if (item.Value == ddrange.options[ddrange.value].text)
+            {
+                rangeIDForForm = item.Key;
+            }
+        }
+
         /* Convert components selected from dropdowns on the right to string JSON */
-        string componentsSelected = CreateJsonToSend(listComponents, listSelectedModules);
+        componentsSelected = CreateJsonToSend(listComponents, listSelectedModules);
 
         WWWForm form = new WWWForm(); // New form for web request
 
-        form.AddField("name", nameModule);
-        form.AddField("cost", costModule);
-        form.AddField("angle", angleModule);
-        form.AddField("cut", cutModule);
-        form.AddField("range", getRangeForForm);
-        form.AddField("rangeName", getRangeNameForForm);
+        form.AddField("name", ddmodel.options[ddmodel.value].text);
+        form.AddField("cost", "");
+        form.AddField("angle", "");
+        form.AddField("cut", "");
+        form.AddField("range", rangeIDForForm);
+        form.AddField("rangeName", ddrange.options[ddrange.value].text);
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
         form.AddField("components", componentsSelected);
-
-        Debug.Log("Name: " + nameModule);
-        Debug.Log("Cost: " + costModule);
-        Debug.Log("Angle: " + angleModule);
-        Debug.Log("Cut: " + cutModule);
-        Debug.Log("Range: " + getRangeForForm);
-        Debug.Log("Range name: " + getRangeNameForForm);
-        Debug.Log("Selected components: " + componentsSelected);
+        form.AddField("rangeAttributes", "[]");
+        
 
         /* Second request to create new module */
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))

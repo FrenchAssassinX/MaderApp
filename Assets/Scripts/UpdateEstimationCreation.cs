@@ -34,7 +34,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Button addModuleButton;                      // Button to add new module on scene                      
 
     public Dropdown dropdownRanges;                     // Dropdown for ranges
-    public Dropdown dropdownModeles;                    // Dropdown for modeles
+    public Dropdown dropdownModels;                    // Dropdown for modeles
     public Dropdown dropdownInsulatings;                // Dropdown for insulatings
     public Dropdown dropdownFrames;                     // Dropdown for frames quality
     public Dropdown dropdownFinishingExt;               // Dropdown for exterior finishings
@@ -42,7 +42,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Dropdown dropdownCuts;                       // Dropdown for cuts
 
     private List<string> listRanges;                    // String elements for dropdownRanges
-    private List<string> listModeles;                   // String elements for dropdownModeles
+    private List<string> listModels;                   // String elements for dropdownModels
     private List<string> listInsulatings;               // String elements for dropdownInsulatings
     private List<string> listFrames;                    // String elements for dropdownFrames
     private List<string> listFinishingExt;              // String elements for dropdownFinishingExt
@@ -110,7 +110,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         /* Instantiate list for string results */
         listRanges = new List<string>();
-        listModeles = new List<string>();
+        listModels = new List<string>();
         listInsulatings = new List<string>();
         listFrames = new List<string>();
         listFinishingExt = new List<string>();
@@ -260,8 +260,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to detect Dropdown select value event */
     private void DropdownValueChanged(Dropdown pDropdown)
     {
-        StartCoroutine(GetAllModulesModel(pDropdown.options[pDropdown.value].text));        // Start function to get all modules equals to the range
         StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));        // Start function for get all ranges values
+        StartCoroutine(GetAllModulesModel(pDropdown.options[pDropdown.value].text));        // Start function to get all modules equals to the range
     }
     /* -----------------------------------    END MODULE PART     ---------------------------------- */
 
@@ -314,7 +314,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      
             form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                                                                                  
             form.AddField("range", dropdownRanges.options[dropdownRanges.value].text);                                                         
-            form.AddField("estimationID", "5ddbf64db8cb5a77a435e2fb");      // TO MODIFY                                            
+            form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);                                           
 
             UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);      // Create new form
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                          // Complete form with authentication datas
@@ -503,6 +503,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
+                listModels.Clear();                         // Unfill list before feeling it with new datas
+
                 /* Get all modules */
                 foreach (var item in entities.modules)
                 {
@@ -517,13 +519,13 @@ public class UpdateEstimationCreation : MonoBehaviour
                             // If id of module from database is equal to a module linked to estimation..
                             if (idModulesInEstimation == module._id)
                             {
-                                listModeles.Add(module.name);           // Add name of the module in list
+                                listModels.Add(module.name);           // Add name of the module in list
                             }
                         }
                     }
                 }
-                dropdownModeles.options.Clear();                    // Clear dropdown
-                dropdownModeles.AddOptions(listModeles);            // Fill dropdown with module list
+                dropdownModels.options.Clear();                    // Clear dropdown
+                dropdownModels.AddOptions(listModels);            // Fill dropdown with module list
             }
         }
     }
