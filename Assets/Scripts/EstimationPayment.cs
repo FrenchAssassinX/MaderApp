@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEditorInternal.VersionControl;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,37 +14,68 @@ public class EstimationPayment : MonoBehaviour
     public GameObject CONST; // CONST object contains server route, token and user infos
     private string url;
     private string URLCreatePayment = "v1/createpayement"; //Specific route to Post create payment
-    private string URLUpdateEstimation = "v1/getpayementbyid"; //Specific route to Post to get payment state by id
+    private string URLGetPaymentById = "v1/getpayementbyid"; //Specific route to Post and get payment state by id
+    private string URLGetEstimationById = "v1/getestimationbyid"; //Specific route to Post and get for take estimation id 
+    private string URLGetProjectById = "v1/getprojectbyid"; //Specific route to Post and get for take project id
 
     public Dropdown stateEstimation; //Dropdown for stateEstimation
     public Dropdown statePayment; //Dropdown for statePayment
     public Button buttonSave; //Button for save 
     public Button buttonReturn; //Button for to TechnicalFolder scene
     public Slider sliderStatePayment; //ProgressBar for Advancement Payment
-    public Text percentageText; //Text for poster avencement in % for user
+    public Text percentageText; //Text for show avencement in % for user
 
-    List<Dropdown.OptionData> dropdownStateEstimation = new List<Dropdown.OptionData>(); //Create dropdown for state estimation
-    List<Dropdown.OptionData> dropdownStatePayment = new List<Dropdown.OptionData>(); //Create dropdown for state payment
+    public List<string> dropdownStateEstimation; //List for dropdown Estimation
+    public List<string> dropdownStatePayment; //List for dropdown Payment
 
     public Canvas canvasPayment; //Canvas for statePayment
     public string changeEstimation; //Define string for take change estimation
     public string changePayment; //Define string for take change payment
     public string stepPayment; //Define string for step in payment
-    public int stepPaymentInt; 
+    public int stepPaymentInt;
     public string percentPayment; //Define string for percent in payment
 
-    
+    public GameObject textSavePayment; //valide message
 
     public string getStep; //take step in database
     public string getPercent; //take percent in database
+    public string getStateEstimation; //take entities to GetEstimationBYId
+    RequestAProject requestAProject; //take entities to RequestAProject
 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     void Start()
     {
-        CONST = GameObject.Find("CONST"); //Get the CONST gameObject
 
+        CONST = GameObject.Find("CONST"); //Get the CONST gameObject
+        //Debug.Log(CONST);
+        string state = CONST.GetComponent<CONST>().state;
         url = CONST.GetComponent<CONST>().url; //url take CONST
+
+        Debug.Log("State estimation = " + getStateEstimation);
+
+        DropdownList();
+
+        //if choise a existing project
+        if (state == "consult")
+        {
+            //get estimation by id
+            StartCoroutine(BigCoroutine());
+            //if payment is existant
+
+            Debug.Log("State is consult");
+            Debug.Log("Start verification");
+
+
+        }
+        //if choise a new project
+        else
+        {
+            Debug.Log("State is not consult");
+            StartCoroutine(CreatePayment());
+
+        }
+
 
         //Button save states
         Button btnSV = buttonSave.GetComponent<Button>();
@@ -55,6 +87,9 @@ public class EstimationPayment : MonoBehaviour
 
         //State payment is not visible for now
         canvasPayment.transform.gameObject.SetActive(false);
+
+        //succès message for save advancement payment
+        textSavePayment.transform.gameObject.SetActive(false);
 
         //For dropdown estimation
         stateEstimation.onValueChanged.AddListener(delegate
@@ -68,24 +103,49 @@ public class EstimationPayment : MonoBehaviour
             StateAdvancementModif(statePayment);
         });
 
-        StartCoroutine(UpdateEstimation());
 
 
     }
 
-    //Poster all estimation state
+    void Update()
+    {
+
+    }
+
+    //Options for dropdown
+    public void DropdownList()
+    {
+        List<string> dropdownStateEstimation = new List<string> { "Brouillons", "Accepté" }; //Create dropdown for state estimation
+        //var dropdown = GetComponent<Dropdown>();
+        stateEstimation.options.Clear();
+        foreach (string option in dropdownStateEstimation)
+        {
+            //Add option in dropdown state Estimation
+            stateEstimation.options.Add(new Dropdown.OptionData(option));
+        }
+        List<string> dropdownStatePayment = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" }; //Create dropdown for state estimation
+        //var dropdown = GetComponent<Dropdown>();
+        statePayment.options.Clear();
+        foreach (string option in dropdownStatePayment)
+        {
+            //Add option in dropdown state Payment
+            statePayment.options.Add(new Dropdown.OptionData(option));
+        }
+    }
+
+    //Show all estimation state
     public void StateEstimationModification(Dropdown pChangeEstimation)
     {
-        //Add option in dropdown state Estimation
-        stateEstimation.AddOptions(dropdownStateEstimation);
         //Change state
         changeEstimation = pChangeEstimation.options[pChangeEstimation.value].text;
         Debug.Log("change estimation : " + changeEstimation);
 
+
+
         //If you select "Accepté" in the dropdown canvasPyament will appear
         if (changeEstimation == "Accepté")
         {
-            canvasPayment.transform.gameObject.SetActive(true); //Poster payment state
+            canvasPayment.transform.gameObject.SetActive(true); //Show payment state
             //Start CreatePayment if "Accepté" is selected
             //if "Accepté" is selected dropdown state esimation is disabled
             stateEstimation.enabled = false;
@@ -97,7 +157,7 @@ public class EstimationPayment : MonoBehaviour
         }
     }
 
-    //Poster all estimation advancement
+    //Show all estimation advancement
     //The Client select a state of payment and the slider folow.
     public void StateAdvancementModif(Dropdown pChangePayment)
     {
@@ -110,7 +170,13 @@ public class EstimationPayment : MonoBehaviour
 
         //Max slider is 1, it's full position
         sliderStatePayment.maxValue = 1.0f;
-        switch (changePayment) {
+
+        //--------------------------------
+        //Find a solution for no regression
+        //--------------------------------
+
+        switch (changePayment)
+        {
             case "A la signature":
                 {
                     stepPayment = "1"; //Number for step
@@ -119,6 +185,7 @@ public class EstimationPayment : MonoBehaviour
                     percentPayment = "3%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.03f; //Value to advance the progress bar 
                     break;
+
                 }
             case "Obtension du permis de construire":
                 {
@@ -127,11 +194,6 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log(stepPaymentInt);
                     percentPayment = "10%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.1f; //Value to advance the progress bar  
-                    //changePayment.items[0].Attributes.Add("disabled", "disabled");
-                    //if(stepPayment >= 1)
-                    //{
-
-                    //}
                     break;
                 }
             case "Ouverture du chantier":
@@ -218,13 +280,14 @@ public class EstimationPayment : MonoBehaviour
     public IEnumerator CreatePayment()
     {
         WWWForm form = new WWWForm(); //New form for web request
+        //TODO step payement est vide a logé pour corrigé
         form.AddField("step", stepPayment); //Add to the form the value of the UI Element 'stepPyament'
         form.AddField("percent", percentPayment); //Add to the form the value of the UI Element 'percentPyament'
         form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID); //Add to the form the value of the selectedProjectID in CONST
 
         Debug.Log("step : " + stepPayment);
         Debug.Log("percent : " + percentPayment);
-        Debug.Log("const create payment: " + CONST.GetComponent<CONST>().selectedProjectID);
+        Debug.Log("const ESTIMATION ID : " + CONST.GetComponent<CONST>().selectedEstimationID);
 
         // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreatePayment, form)) //Create new form
@@ -237,7 +300,7 @@ public class EstimationPayment : MonoBehaviour
             //If connection failed
             if (request.isNetworkError || request.isHttpError)
             {
-                Debug.Log("*** ERROR: " + request.error + " ***");
+                Debug.Log("*** ERROR CREATE: " + request.error + " ***");
             }
             //If connection succeeded
             else
@@ -245,33 +308,28 @@ public class EstimationPayment : MonoBehaviour
                 if (request.isDone)
                 {
                     //The database return a JSON file of all user infos
-                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          //Get JSON file
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
                     //Create a create payment thanks to the JSON file
-                    //RequestCreatePayment entities = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);         //Convert JSON file
-
                     Debug.Log("jsons result payment: " + jsonResult);
                     //Take id payment for convert in payment Id for update payment
-                    RequestCreatePayment entity = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);
-                    //Create ID for paymentID
-                    CONST.GetComponent<CONST>().paymentID = entity.payement._id;
-                    Debug.Log("paymentID : " + CONST.GetComponent<CONST>().paymentID);
-                    //Debug.Log("ID : " + entity._id);
-                    
+                    RequestCreatePayment entity = JsonUtility.FromJson<RequestCreatePayment>(jsonResult); //Convert JSON file
+
+
                 }
             }
         }
     }
 
     //Function for update payment, it recovers step and percent advancement payment
-    public IEnumerator UpdateEstimation()
+    public IEnumerator GetPaymentByID()
     {
         Debug.Log("start update");
         WWWForm form = new WWWForm(); //New form for web request
-        form.AddField("payementID", CONST.GetComponent<CONST>().paymentID); //Add to the form the value of the paymentID in CONST
-        Debug.Log("const update estimation : " + CONST.GetComponent<CONST>().paymentID);
+        form.AddField("payementID", requestAProject.result.payement[requestAProject.result.payement.Count -1].id); //Add to the form the value of the paymentID in CONST
+        
 
         // New webrequest with: CONST url, local url and the form
-        using (UnityWebRequest request = UnityWebRequest.Post(url + URLUpdateEstimation, form))
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetPaymentById, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
@@ -282,8 +340,8 @@ public class EstimationPayment : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 Debug.Log("*** ERROR: " + request.error + " ***");
-            }   
-            
+            }
+
             //If connection succeeded
             else
             {
@@ -296,15 +354,264 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log("jsons result update project: " + jsonResult);
 
                     //Take step and percent in this customer for payment
-                    foreach(var item in entities.getPayment)
-                    {
-                        getStep = item.step; //Get the step
-                        getPercent = item.percentage; //Get the percent
 
-                        Debug.Log("step & percent : " + getStep + " " + getPercent);
+                    getStep = entities.payement.step;
+                    Debug.Log("1 : "+ getStep);
+                    getPercent = entities.payement.percentage;
+
+                    Debug.Log("step & percent : " + getStep + " " + getPercent);
+
+                }
+            }
+        }
+    }
+
+
+    public IEnumerator GetEstimationByID()
+    {
+        WWWForm form = new WWWForm(); //New form for web request
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetEstimationById, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+            yield return request.SendWebRequest(); //Send request
+
+            //If connection failed
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("*** ERROR ESTIMATION: " + request.error + " ***");
+            }
+            //If connection succeeded
+            else
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
+
+                RequestAnEstimation entities = JsonUtility.FromJson<RequestAnEstimation>(jsonResult); //Convert JSON file
+                Estimation estimation = entities.estimation;
+                getStateEstimation = estimation.state;
+
+                //Add save value in dropdown
+                //stateEstimation
+                //statePayment
+
+                Debug.Log("ici :" + getStateEstimation);
+
+                //----------!!!-----PAS DE VALEUR DANS getStateEstimation DONC VA DIRECTEMENT DANS LE ELSE...-----!!!----------
+                if (getStateEstimation == "1")
+                {
+                    Debug.Log("State estimation is equal to 1");
+                    //get project by id
+                    
+                    //Take last payment to list
+                    Debug.Log("1");
+                    //Thread.Sleep(1000);
+                    //Debug.Log("count : "+requestAProject.result.payement.Count);
+                    //string lastPayementId = requestAProject.result.payement[requestAProject.result.payement.Count - 1].id;
+                    Debug.Log("2");
+                    //Debug.Log("lastPayementId : " + lastPayementId);
+                    
+                    Debug.Log("3");
+                    //Get payement by id
+                    Debug.Log("2 : " + getStep);
+                    int stepLevel = Int32.Parse(getStep);
+                    Debug.Log("steplevel : " + stepLevel);
+                    //Depending on the step, you provision your dropdown only with the same step and all those above
+                    List<string> stateList = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" };
+                    statePayment.options.Clear();
+                    for (int i = 0; i < stateList.Count; i++)
+                    {
+                        if ((i + 1) >= stepLevel)
+                        {
+                            statePayment.options.Add(new Dropdown.OptionData(stateList[i]));
+                        }
+                    }
+                }
+                //if no payment
+                else
+                {
+                    StartCoroutine(CreatePayment());
+                    Debug.Log("Estimation state isn't equals to 1");
+
+                }
+
+            }
+        }
+    }
+
+    public IEnumerator GetProjetByID()
+    {
+        WWWForm form = new WWWForm(); //New form for web request
+        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);
+        
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetProjectById, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+            yield return request.SendWebRequest(); //Send request
+
+            //If connection failed
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("*** ERROR PROJECT: " + request.error + " ***");
+            }
+            //If connection succeeded
+            else
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
+                Debug.Log(jsonResult);
+
+                RequestAProject entities = JsonUtility.FromJson<RequestAProject>(jsonResult);
+                //getPaymentProject = entities.payement;
+                //Debug.Log("payment entities : " + entities.payement.);
+                Debug.Log("entities.payment : " + entities.result.payement[entities.result.payement.Count - 1].id);
+                //getPaymentProject = entities.payement;
+                requestAProject = entities;
+            }
+        }
+    }
+
+    public IEnumerator BigCoroutine()
+    {
+        WWWForm form = new WWWForm(); //New form for web request
+        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);
+
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetProjectById, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+            yield return request.SendWebRequest(); //Send request
+
+            //If connection failed
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("*** ERROR PROJECT: " + request.error + " ***");
+            }
+            //If connection succeeded
+            else
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
+                Debug.Log(jsonResult);
+
+                RequestAProject entities = JsonUtility.FromJson<RequestAProject>(jsonResult);
+                //getPaymentProject = entities.payement;
+                //Debug.Log("payment entities : " + entities.payement.);
+                Debug.Log("entities.payment : " + entities.result.payement[entities.result.payement.Count - 1].id);
+                //getPaymentProject = entities.payement;
+                requestAProject = entities;
+                Debug.Log("start update");
+                form = new WWWForm(); //New form for web request
+                form.AddField("payementID", requestAProject.result.payement[requestAProject.result.payement.Count - 1].id); //Add to the form the value of the paymentID in CONST
+
+
+                // New webrequest with: CONST url, local url and the form
+                using (UnityWebRequest request2 = UnityWebRequest.Post(url + URLGetPaymentById, form))
+                {
+                    request2.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+                    request2.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+
+                    yield return request2.SendWebRequest(); //Send request
+
+                    //If connection failed
+                    if (request2.isNetworkError || request2.isHttpError)
+                    {
+                        Debug.Log("*** ERROR: " + request2.error + " ***");
+                    }
+
+                    //If connection succeeded
+                    else
+                    {
+                        if (request2.isDone)
+                        {
+                            string jsonResult2 = System.Text.Encoding.UTF8.GetString(request2.downloadHandler.data); //Get JSON file
+
+                            GetPaymentById entities2 = JsonUtility.FromJson<GetPaymentById>(jsonResult2); //Convert JSON file
+
+                            Debug.Log("jsons result update project: " + jsonResult2);
+
+                            //Take step and percent in this customer for payment
+
+                            getStep = entities2.payement.step;
+                            Debug.Log("1 : " + getStep);
+                            getPercent = entities2.payement.percentage;
+
+                            Debug.Log("step & percent : " + getStep + " " + getPercent);
+
+                            form = new WWWForm(); //New form for web request
+                            form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+                            using (UnityWebRequest request3 = UnityWebRequest.Post(url + URLGetEstimationById, form))
+                            {
+                                request3.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
+                                request3.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+                                yield return request3.SendWebRequest(); //Send request
+
+                                //If connection failed
+                                if (request3.isNetworkError || request3.isHttpError)
+                                {
+                                    Debug.Log("*** ERROR ESTIMATION: " + request3.error + " ***");
+                                }
+                                //If connection succeeded
+                                else
+                                {
+                                    string jsonResult3 = System.Text.Encoding.UTF8.GetString(request3.downloadHandler.data); //Get JSON file
+
+                                    RequestAnEstimation entities3 = JsonUtility.FromJson<RequestAnEstimation>(jsonResult3); //Convert JSON file
+                                    Estimation estimation = entities3.estimation;
+                                    getStateEstimation = estimation.state;
+
+                                    //Add save value in dropdown
+                                    //stateEstimation
+                                    //statePayment
+
+                                    //Debug.Log("ici :" + getStateEstimation);
+
+                                    //----------!!!-----PAS DE VALEUR DANS getStateEstimation DONC VA DIRECTEMENT DANS LE ELSE...-----!!!----------
+                                    if (getStateEstimation == "1")
+                                    {
+                                        Debug.Log("State estimation is equal to 1");
+                                        //get project by id
+                                        stateEstimation.value = 1;
+                                        //Take last payment to list
+                                        //Debug.Log("1");
+                                        //Thread.Sleep(1000);
+                                        //Debug.Log("count : "+requestAProject.result.payement.Count);
+                                        //string lastPayementId = requestAProject.result.payement[requestAProject.result.payement.Count - 1].id;
+                                        //Debug.Log("2");
+                                        //Debug.Log("lastPayementId : " + lastPayementId);
+
+                                        //Debug.Log("3");
+                                        //Get payement by id
+                                        //Debug.Log("2 : " + getStep);
+                                        int stepLevel = Int32.Parse(getStep);
+                                        //Debug.Log("steplevel : " + stepLevel);
+                                        //Depending on the step, you provision your dropdown only with the same step and all those above
+                                        List<string> stateList = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" };
+                                        statePayment.options.Clear();
+                                        for (int i = 0; i < stateList.Count; i++)
+                                        {
+                                            if ((i + 1) >= stepLevel)
+                                            {
+                                                statePayment.options.Add(new Dropdown.OptionData(stateList[i]));
+                                            }
+                                        }
+                                        statePayment.value = 0;
+                                        StateAdvancementModif(statePayment);
+                                    }
+                                    //if no payment
+                                    else
+                                    {
+                                        StartCoroutine(CreatePayment());
+                                        Debug.Log("Estimation state isn't equals to 1");
+
+                                    }
+
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+

@@ -429,7 +429,7 @@ public class CreatePayement
 public class GetPaymentById
 {
     public string message;
-    public List<GetPayment> getPayment;
+    public GetPayment payement;
 }
 
 [System.Serializable]
