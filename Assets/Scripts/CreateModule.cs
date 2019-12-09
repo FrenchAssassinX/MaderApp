@@ -81,7 +81,7 @@ public class CreateModule : MonoBehaviour
 
     // 
     public List<Components> listComponents = new List<Components>();
-    public List<string> listSelectedModules = new List<string>();
+    public List<string> listSelectedComponents = new List<string>();
     public Dictionary<string, string> dictRangesIDNames = new Dictionary<string, string>();
 
     void Start()
@@ -239,36 +239,6 @@ public class CreateModule : MonoBehaviour
         }
     }
 
-    /* Function to get all components from Database */
-    public IEnumerator GetAllComponents()
-    {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllComponentsUrl);   // New request, passing url and form
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
-        {
-            Debug.Log("Error: " + request.error);
-        }
-        else
-        {
-            if (request.isDone)
-            {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);         // Convert JSON file to serializable object
-
-                foreach (var item in entities.components)
-                {
-                    Components component = item;
-
-
-                }
-            }
-        }
-    }
-
     private void DropdownValueChanged(Dropdown pChange)
     {
         Debug.Log("pchange " + pChange.options[pChange.value].text);
@@ -369,6 +339,8 @@ public class CreateModule : MonoBehaviour
         {
             if (requestComponents.isDone)
             {
+                float moduleCost = 0f;                              // Temp variable to calculate total cost of the module
+
                 //The database return a JSON file of all user infos
                 string jsonResult = System.Text.Encoding.UTF8.GetString(requestComponents.downloadHandler.data);
                 //Create a root object thanks to the JSON file
@@ -384,9 +356,11 @@ public class CreateModule : MonoBehaviour
                             item.name == ddhatchPanels.options[ddhatchPanels.value].text ||
                             item.name == ddfloor.options[ddfloor.value].text)
                     {
-                        listSelectedModules.Add(item.name);
+                        listSelectedComponents.Add(item.name);
+                        moduleCost += float.Parse(item.cost);       // Increment module cost with component cost
                     }
                 }
+                costModule = moduleCost.ToString();                 // Convert cost to string to pass in form for web request
             }
         }
 
@@ -400,12 +374,12 @@ public class CreateModule : MonoBehaviour
         }
 
         /* Convert components selected from dropdowns on the right to string JSON */
-        componentsSelected = CreateJsonToSend(listComponents, listSelectedModules);
+        componentsSelected = CreateJsonToSend(listComponents, listSelectedComponents);
 
         WWWForm form = new WWWForm(); // New form for web request
 
         form.AddField("name", ddmodel.options[ddmodel.value].text);
-        form.AddField("cost", "");
+        form.AddField("cost", costModule);
         form.AddField("angle", "");
         form.AddField("cut", "");
         form.AddField("range", rangeIDForForm);

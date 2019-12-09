@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
     private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
     private string getAllModulesUrl = "v1/getallmodule";                                // Specific route to get all modules
+    private string getModuleByIDUrl = "v1/getmodulebyid";                               // Specific route to get one module
 
     public GameObject modulePrefab;                     // Prefab of component for 2D scene
     public GameObject middleCanvas;                     // Useful to set component prefab position 
@@ -34,7 +36,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Button addModuleButton;                      // Button to add new module on scene                      
 
     public Dropdown dropdownRanges;                     // Dropdown for ranges
-    public Dropdown dropdownModels;                    // Dropdown for modeles
+    public Dropdown dropdownModels;                     // Dropdown for modeles
     public Dropdown dropdownInsulatings;                // Dropdown for insulatings
     public Dropdown dropdownFrames;                     // Dropdown for frames quality
     public Dropdown dropdownFinishingExt;               // Dropdown for exterior finishings
@@ -42,7 +44,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Dropdown dropdownCuts;                       // Dropdown for cuts
 
     private List<string> listRanges;                    // String elements for dropdownRanges
-    private List<string> listModels;                   // String elements for dropdownModels
+    private List<string> listModels;                    // String elements for dropdownModels
     private List<string> listInsulatings;               // String elements for dropdownInsulatings
     private List<string> listFrames;                    // String elements for dropdownFrames
     private List<string> listFinishingExt;              // String elements for dropdownFinishingExt
@@ -50,6 +52,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     private List<string> listCuts;                      // String elements for dropdownCuts
 
     private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
+
+    private Dictionary<string, string> dictModuleIDName;    // Dictionnary to keep ID and name of the modules 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -200,12 +204,14 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* Verify if a panel is selected */
         if (destinationPanel != null)
         {
-            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);     // Create new module
-            newModule.transform.SetParent(destinationPanel.transform);                                                      // Change parent on scene hierarchy
-            newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;   // Set default size as parent size: useful for responsivity
+            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);                     // Create new module
+            newModule.transform.SetParent(destinationPanel.transform);                                                                      // Change parent on scene hierarchy
+            newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
             newModule.GetComponent<RectTransform>().anchoredPosition = destinationPanel.GetComponent<RectTransform>().anchoredPosition;
-            newModule.name = "Module" + moduleCounter;                                                                      // Change name of module
-            moduleCounter++;                                                                                                // Increase counter after rename module
+            newModule.name = "Module" + moduleCounter;                                                                                      // Change name of module
+            newModule.GetComponent<UpdateModule2D>().modelName = dropdownModels.options[dropdownModels.value].text;                         // Keep model name of the module
+            newModule.GetComponent<UpdateModule2D>().destinationFloor = destinationPanel.name;                                              // Keep destination floor of the module
+            moduleCounter++;                                                                                                                // Increase counter after rename module
         }
     }
 
@@ -304,36 +310,91 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public IEnumerator AddModulesToEstimation()
     {
+        string idModule = "";                                                                       // String to keep id of the module
+        string idFrameQuality = dropdownFrames.options[dropdownFrames.value].text;                  // String to keep id of frame quality before creating a json
+        string idWindowFrameQuality = "";                                                           // String to keep id of window frame quality before creating a json
+        string idInsulating = dropdownInsulatings.options[dropdownInsulatings.value].text;          // String to keep id of insulating before creating a json
+        string idCovering = "";                                                                     // String to keep id of covering before creating a json
+        string idFinishingExt = dropdownFinishingExt.options[dropdownFinishingExt.value].text;      // String to keep id of finishing exterior before creating a json
+        string idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;      // String to keep id of finishing interior before creating a json
+        string rangeAttributesForm = "";                                                            // String to create a json file to send rangeAttributes in form
+
+        /* Foreach to verify all module added to 2D scene */
         foreach (Transform child in destinationPanel.transform)
         {
-            GameObject module = child.gameObject;
-
-            WWWForm form = new WWWForm();                                   // New form for web request
-            form.AddField("name", module.name);                             // TO MODIFY                          
-            form.AddField("cost", "12");                                    // TO MODIFY                                                             
-            form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      
-            form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                                                                                  
-            form.AddField("range", dropdownRanges.options[dropdownRanges.value].text);                                                         
-            form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);                                           
-
-            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);      // Create new form
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                          // Complete form with authentication datas
-            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-            yield return request.SendWebRequest();          // Send request                                                              
-
-            if (request.isNetworkError || request.isHttpError)
+            /* Foreach to retrieve the id of the module model using to create the module */
+            foreach (KeyValuePair<string, string> item in dictModuleIDName)
             {
-                Debug.Log("*** ERROR: " + request.error + " ***");
+                if (item.Value == child.GetComponent<UpdateModule2D>().modelName)
+                {
+                    idModule = item.Key;
+                }
+            }
+
+            // First request to find module property
+            WWWForm formModule = new WWWForm();                                                               // New form for web request                                                         
+            formModule.AddField("moduleID", idModule);
+
+            UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);    // Create new form
+            requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                              // Complete form with authentication datas
+            requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return requestModule.SendWebRequest();          // Send request                                                              
+
+            if (requestModule.isNetworkError || requestModule.isHttpError)
+            {
+                Debug.Log("*** ERROR: " + requestModule.error + " ***");
             }
             else
             {
-                if (request.isDone)
+                if (requestModule.isDone)
                 {
-                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                    Debug.Log(jsonResult);
+                    string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
+                    RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                           // Convert JSON to manipulating C# object
+                    Module modelModule = entity.module;
 
-                    GoToEstimationView();
+                    // Creating json as string with the id retrieve in the last foreach
+                    rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);
+                    Debug.Log("RangeAttributes: " + rangeAttributesForm);
+
+                    GameObject module = child.gameObject;
+
+                    WWWForm form = new WWWForm();                                                               // New form for web request                                                         
+                    form.AddField("name", module.name);
+                    form.AddField("cost", modelModule.cost);
+                    form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());
+                    form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);
+                    form.AddField("range", modelModule.range);
+                    form.AddField("components", "");                // TO CHANGE
+                    form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+                    form.AddField("rangeName", modelModule.rangeName);
+                    form.AddField("rangeAttributes", rangeAttributesForm);
+                    form.AddField("x", module.GetComponent<RectTransform>().localScale.x.ToString());
+                    form.AddField("y", module.GetComponent<RectTransform>().localScale.y.ToString());
+                    form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);
+                    form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());
+                    form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());
+
+                    UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);    // Create new form
+                    request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                              // Complete form with authentication datas
+                    request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                    yield return request.SendWebRequest();          // Send request                                                              
+
+                    if (request.isNetworkError || request.isHttpError)
+                    {
+                        Debug.Log("*** ERROR: " + request.error + " ***");
+                    }
+                    else
+                    {
+                        if (request.isDone)
+                        {
+                            string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                            Debug.Log(jsonResult);
+
+                            GoToEstimationView();
+                        }
+                    }
                 }
             }
         }
@@ -409,25 +470,25 @@ public class UpdateEstimationCreation : MonoBehaviour
                         /* Get all Frames Quality for range */
                         foreach (var frameQuality in range.framequality)
                         {
-                            listFrames.Add(frameQuality);       // Add frameQuality to string list  
-                        }
+                            listFrames.Add(frameQuality);                               // Add frameQuality to string list  
+                        }   
 
                         /* Get all Insulatings for range */
                         foreach (var insulating in range.insulating)
                         {
-                            listInsulatings.Add(insulating);       // Add insulating to string list  
+                            listInsulatings.Add(insulating);                            // Add insulating to string list  
                         }
 
                         /* Get all Exterior Finishings for range */
                         foreach (var finishingExt in range.finishingext)
                         {
-                            listFinishingExt.Add(finishingExt);       // Add exterior finishing to string list  
+                            listFinishingExt.Add(finishingExt);                         // Add exterior finishing to string list  
                         }
 
                         /* Get all Interior Finishings for range */
                         foreach (var finishingInt in range.finishingint)
                         {
-                            listFinishingInt.Add(finishingInt);       // Add interior finishing to string list  
+                            listFinishingInt.Add(finishingInt);                         // Add interior finishing to string list  
                         }
                     }
 
@@ -519,7 +580,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                             // If id of module from database is equal to a module linked to estimation..
                             if (idModulesInEstimation == module._id)
                             {
-                                listModels.Add(module.name);           // Add name of the module in list
+                                listModels.Add(module.name);                        // Add name of the module in list
+                                dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
                             }
                         }
                     }
@@ -530,4 +592,87 @@ public class UpdateEstimationCreation : MonoBehaviour
         }
     }
     /* -----------------------------------    END WEB REQUEST PART     ---------------------------------- */
+
+    public string CreateJSON(string pFrameQuality, string pInsulating, string pCovering, 
+                                string pWindowFrameQuality, string pFinishingInt, string pFinishingExt)
+    {
+        string beginArray = "[";
+        string endArray = "]";
+        string beginObj = "{";
+        string endObj = "}";
+        string virgule = ",";
+        string quote = "\"";
+        string doublePoint = ":";
+
+        StringBuilder sb = new StringBuilder();
+
+        /* Start */
+        sb.Append(beginArray);                      // [
+        sb.Append(beginObj);                        // {
+
+        /* Frame Quality */
+        sb.Append(quote);                           // "
+        sb.Append("frameQuality");                  // frameQuality
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFrameQuality);                   // frameQuality value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Insulating */
+        sb.Append(quote);                           // "
+        sb.Append("insulating");                    // insulating
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pInsulating);                     // insulating value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Covering */
+        sb.Append(quote);                           // "
+        sb.Append("covering");                      // covering
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pCovering);                       // covering value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Windows Frame Quality */
+        sb.Append(quote);                           // "
+        sb.Append("windowsframequality");           // windowsframequality
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pWindowFrameQuality);             // windowsframequality value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Finishing Interior */
+        sb.Append(quote);                           // "
+        sb.Append("finishingint");                  // finishingint
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFinishingInt);                   // finishingint value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Finishing Exterior */
+        sb.Append(quote);                           // "
+        sb.Append("finishingext");                  // finishingext
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFinishingExt);                   // finishingext value
+        sb.Append(quote);                           // "
+
+        /* End */
+        sb.Append(endObj);                          // }
+        sb.Append(endArray);                        // ]
+
+        return sb.ToString();
+    }
 }
