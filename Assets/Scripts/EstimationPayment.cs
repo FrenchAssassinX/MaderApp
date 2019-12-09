@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditorInternal.VersionControl;
 using UnityEngine;
@@ -28,7 +29,10 @@ public class EstimationPayment : MonoBehaviour
     public string changeEstimation; //Define string for take change estimation
     public string changePayment; //Define string for take change payment
     public string stepPayment; //Define string for step in payment
+    public int stepPaymentInt; 
     public string percentPayment; //Define string for percent in payment
+
+    
 
     public string getStep; //take step in database
     public string getPercent; //take percent in database
@@ -64,7 +68,7 @@ public class EstimationPayment : MonoBehaviour
             StateAdvancementModif(statePayment);
         });
 
-        //StartCoroutine(UpdateEstimation());
+        StartCoroutine(UpdateEstimation());
 
 
     }
@@ -83,18 +87,19 @@ public class EstimationPayment : MonoBehaviour
         {
             canvasPayment.transform.gameObject.SetActive(true); //Poster payment state
             //Start CreatePayment if "Accepté" is selected
-
+            //if "Accepté" is selected dropdown state esimation is disabled
+            stateEstimation.enabled = false;
         }
         else
         {
             canvasPayment.transform.gameObject.SetActive(false); //Hidden payment state
 
         }
-    }    
+    }
 
     //Poster all estimation advancement
     //The Client select a state of payment and the slider folow.
-    public void StateAdvancementModif( Dropdown pChangePayment)
+    public void StateAdvancementModif(Dropdown pChangePayment)
     {
         //Add option in dropdown state payment
         statePayment.AddOptions(dropdownStatePayment);
@@ -105,87 +110,88 @@ public class EstimationPayment : MonoBehaviour
 
         //Max slider is 1, it's full position
         sliderStatePayment.maxValue = 1.0f;
+        switch (changePayment) {
+            case "A la signature":
+                {
+                    stepPayment = "1"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "3%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.03f; //Value to advance the progress bar 
+                    break;
+                }
+            case "Obtension du permis de construire":
+                {
+                    stepPayment = "2"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "10%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.1f; //Value to advance the progress bar  
+                    //changePayment.items[0].Attributes.Add("disabled", "disabled");
+                    //if(stepPayment >= 1)
+                    //{
 
-        //The user can choose the state of progress which will advance the pregress bar
-        if (changePayment == "A la signature")
-        {
-            //Progress bar at 3%
-            stepPayment = "1"; //Number for step
-            percentPayment = "3%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.03f; //Value to advance the progress bar                                           
-
+                    //}
+                    break;
+                }
+            case "Ouverture du chantier":
+                {
+                    stepPayment = "3"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "15%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.15f; //Value to advance the progress bar   
+                    break;
+                }
+            case "Achèvement des fondations":
+                {
+                    stepPayment = "4"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "25%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.25f; //Value to advance the progress bar   
+                    break;
+                }
+            case "Achèvement des murs":
+                {
+                    stepPayment = "5"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "40%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.40f; //Value to advance the progress bar   
+                    break;
+                }
+            case "Mise hors d'eau/hors d'aire":
+                {
+                    //Progress bar at 75%
+                    stepPayment = "6"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "75%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.75f; //Value to advance the progress bar 
+                    break;
+                }
+            case "Achèvement des travaux d'équipement":
+                {
+                    //Progress bar at 95%
+                    stepPayment = "7"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "95%"; //Percent for advancement payment
+                    sliderStatePayment.value = 0.95f; //Value to advance the progress bar
+                    break;
+                }
+            case "Remise des clés":
+                {
+                    //Progress bar at 100%
+                    stepPayment = "8"; //Number for step
+                    stepPaymentInt = Int32.Parse(stepPayment);
+                    Debug.Log(stepPaymentInt);
+                    percentPayment = "100%"; //Percent for advancement payment
+                    sliderStatePayment.value = 1.0f; //Value to advance the progress bar
+                    break;
+                }
         }
-
-        else if (changePayment == "Obtension du permis de construire")
-        {
-            //Progress bar at 10%
-            stepPayment = "2"; //Number for step
-            percentPayment = "10%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.1f; //Value to advance the progress bar                                          
-
-        }
-
-        else if (changePayment == "Ouverture du chantier")
-        {
-            //Progress bar at 15%
-            stepPayment = "3"; //Number for step
-            percentPayment = "15%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.15f; //Value to advance the progress bar                                              
-
-        }
-
-        else if (changePayment == "Achèvement des fondations")
-        {
-            //Progress bar at 25%
-            stepPayment = "4"; //Number for step
-            percentPayment = "25%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.25f; //Value to advance the progress bar                                             
-
-        }
-
-        else if (changePayment == "Achèvement des murs")
-        {
-            //Progress bar at 40%
-            stepPayment = "5"; //Number for step
-            percentPayment = "40%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.4f; //Value to advance the progress bar                    
-
-        }
-
-        else if (changePayment == "Mise hors d'eau/hors d'aire")
-        {
-            //Progress bar at 75%
-            stepPayment = "6"; //Number for step
-            percentPayment = "75%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.75f; //Value to advance the progress bar                                            
-
-        }
-
-        else if (changePayment == "Achèvement des travaux d'équipement")
-        {
-            //Progress bar at 95%
-            stepPayment = "7"; //Number for step
-            percentPayment = "95%"; //Percent for advancement payment
-            sliderStatePayment.value = 0.95f; //Value to advance the progress bar
-
-        }
-
-        else if (changePayment == "Remise des clés")
-        {
-            //Progress bar at 100%
-            stepPayment = "8"; //Number for step
-            percentPayment = "100%"; //Percent for advancement payment
-            sliderStatePayment.value = 1.0f; //Value to advance the progress bar
-
-        }
-
-        else
-        {
-            stepPayment = "0"; //Number for step
-            percentPayment = "0%"; //Percent for advancement payment
-        }
-
-
     }
 
     //Function for update estimation
@@ -241,17 +247,16 @@ public class EstimationPayment : MonoBehaviour
                     //The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          //Get JSON file
                     //Create a create payment thanks to the JSON file
-                    RequestCreatePayment entities = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);         //Convert JSON file
+                    //RequestCreatePayment entities = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);         //Convert JSON file
+
                     Debug.Log("jsons result payment: " + jsonResult);
                     //Take id payment for convert in payment Id for update payment
-                    foreach (var item in entities.payement)
-                    {
-                        Debug.Log("dedans");
-                        //Create ID for paymentID
-                        CONST.GetComponent<CONST>().paymentID = item._id;
-                        Debug.Log("paymentID créée: " + CONST.GetComponent<CONST>().paymentID);
-                        
-                    }
+                    RequestCreatePayment entity = JsonUtility.FromJson<RequestCreatePayment>(jsonResult);
+                    //Create ID for paymentID
+                    CONST.GetComponent<CONST>().paymentID = entity.payement._id;
+                    Debug.Log("paymentID : " + CONST.GetComponent<CONST>().paymentID);
+                    //Debug.Log("ID : " + entity._id);
+                    
                 }
             }
         }

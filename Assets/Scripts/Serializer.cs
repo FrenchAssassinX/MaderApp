@@ -412,7 +412,7 @@ public class RequestGetAllCuts
 public class RequestCreatePayment
 {
     public string message;
-    public List<CreatePayement> payement;
+    public CreatePayement payement;
 }
 
 [System.Serializable]
