@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -9,39 +10,39 @@ using UnityEngine.UI;
 
 public class NewProject : MonoBehaviour
 {
-    public GameObject CONST;
-    private string url;
-    private string URLCreateCustomer = "v1/createcustomer"; // Specific url for create customer
-    private string URLCreateProject = "v1/createproject"; // Specific url for create project
-    private string URLGetCustomers = "v1/getallcustomer"; // Specific url for get all customers
+    public GameObject CONST;                                        // CONST Object to keep infos in all app
+    private string URLCreateCustomer = "v1/createcustomer";         // Specific url for create customer
+    private string URLCreateProject = "v1/createproject";           // Specific url for create project
+    private string URLGetCustomers = "v1/getallcustomer";           // Specific url for get all customers
+    private string URLCreateEstimation = "v1/createestimation";     // Specific url for create estimation
 
-    //project (CanvasLeft)
-    public InputField nameProject;
-    public InputField referenceProject;
-    public Dropdown idCustomer;
-    public Button ButtonCreateCustomer;
-    public Button ButtonCreateProject;
+    /* Top Canvas */
+    public Button buttonReturn;
 
-    //new client (CanvasRight)
-    public InputField name;
-    public InputField surname;
-    public InputField roadNum;
-    public InputField road;
-    public InputField zipcode;
-    public InputField city;
-    public InputField roadExtra;
-    public InputField email;
-    public InputField phone;
-    public Button ButtonCreateNewCustomer;
-    public Canvas canvasNewClient;
+    /* Left canvas */
+    public InputField nameProject;              // Input Field for project name
+    public InputField referenceProject;         // Readonly Input Field for project reference
+    public Dropdown idCustomer;                 // Dropdown to get customer by id
+    public Button buttonDisplayRightCanvas;     // Button to display right canvas
+    public Button buttonCreateProject;          // Button to create new project
 
-    //text information
-    public GameObject createValideCustomer;
-    public GameObject createValideProject;
-    public GameObject errorCreateCustomer;
+    /* Right canvas */
+    public Canvas canvasNewClient;              // Right canvas to display all fields to create new client
+    public InputField name;                     // Input Field for client name
+    public InputField surname;                  // Input Field for client surename
+    public InputField roadNum;                  // Input Field for client road number
+    public InputField road;                     // Input Field for client road name
+    public InputField zipcode;                  // Input Field for client zipcode
+    public InputField city;                     // Input Field for client city
+    public InputField roadExtra;                // Input Field for client road extra information
+    public InputField email;                    // Input Field for client email
+    public InputField phone;                    // Input Field for client phone number
+    public Button buttonCreateNewCustomer;      // Button to create new client
 
-    //Top
-    public Button ButtonReturn;
+    /* Text messages displayed when create action are successful or failure */
+    public GameObject createValideCustomer;     // Customer successfully created
+    public GameObject createValideProject;      // Project successfully created
+    public GameObject errorCreateCustomer;      // Customer creation failed
 
     public string idClientForForm;
     string IdCustomerGenerated;
@@ -53,35 +54,28 @@ public class NewProject : MonoBehaviour
     string newGetSurname;
     string newGetName;
 
-    // Start is called before the first frame update
     void Start()
     {
+        CONST = GameObject.Find("CONST");               // Get the CONST gameObject
 
-        CONST = GameObject.Find("CONST"); //Get the CONST gameObject
-
-        url = CONST.GetComponent<CONST>().url;
-
-        //it's not visible for now
+        // By default don't display certain elements on start scene
         canvasNewClient.transform.gameObject.SetActive(false);
         createValideCustomer.transform.gameObject.SetActive(false);
         errorCreateCustomer.transform.gameObject.SetActive(false);
         createValideProject.transform.gameObject.SetActive(false);
         referenceProject.enabled = false;
+
         //Active canvasRight for add new customer
-        Button btnCC = ButtonCreateCustomer.GetComponent<Button>();
-        btnCC.onClick.AddListener(DisplayCreateNewCustomer);
+        buttonDisplayRightCanvas.onClick.AddListener(DisplayCreateNewCustomer);
 
         //send new project
-        Button btnCP = ButtonCreateProject.GetComponent<Button>();
-        btnCP.onClick.AddListener(SendCreateProject);
+        buttonCreateProject.onClick.AddListener(SendCreateProject);
 
         //send new customer
-        Button btnNC = ButtonCreateNewCustomer.GetComponent<Button>();
-        btnNC.onClick.AddListener(SendCreateCustomer);
+        buttonCreateNewCustomer.onClick.AddListener(SendCreateCustomer);
 
         //return home page
-        Button btnHP = ButtonReturn.GetComponent<Button>();
-        btnHP.onClick.AddListener(ReturnHomePage);
+        buttonReturn.onClick.AddListener(ReturnHomePage);
 
         StartCoroutine(GetAllCustomers());
 
@@ -89,171 +83,188 @@ public class NewProject : MonoBehaviour
         {
             DropdownValueChanged(idCustomer);
         });
+    }
+      
+    //active CreateNewCient
+    void DisplayCreateNewCustomer()
+    {
+        canvasNewClient.transform.gameObject.SetActive(true);
+    }
 
-        }
+    //add new project
+    void SendCreateProject()
+    {
+        StartCoroutine(PostFormNewProject());
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
+    }
 
-    //void Update()
-    //{
-    //    if (!idCustomer.GetComponent<Dropdown>().options.Equals("Client"))
-    //    {
-    //        referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
-    //    }
-    //}         
+    //add new customer
+    void SendCreateCustomer()
+    {
+        StartCoroutine(PostFormNewCustomer());
+    }
+
+    //return to home page
+    void ReturnHomePage()
+    {
+        //Send the previous scene (home page)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    IEnumerator PostFormNewCustomer()
+    {
+        WWWForm form = new WWWForm();                   // New form for web request
+        form.AddField("name", name.text);
+        form.AddField("surename", surname.text);
+        form.AddField("road", road.text);
+        form.AddField("roadNum", roadNum.text);
+        form.AddField("zipcode", zipcode.text);
+        form.AddField("city", city.text);
+        form.AddField("roadExtra", roadExtra.text);
+        form.AddField("phone", phone.text);
+        form.AddField("email", email.text);
+        form.AddField("_id", "12345");
+        form.AddField("__v", "0");
 
 
-
-        //active CreateNewCient
-        void DisplayCreateNewCustomer()
+        /* New webrequest with: CONST url, local URLCreateCustomer and the form */
+        using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateCustomer, form))
         {
-            canvasNewClient.transform.gameObject.SetActive(true);
-
-        }
-
-        //add new project
-        void SendCreateProject()
-        {
-            StartCoroutine(PostFormNewProject());
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
-
-        }
-
-        //add new customer
-        void SendCreateCustomer()
-        {
-
-            StartCoroutine(PostFormNewCustomer());
-
-        }
-
-        //return to home page
-        void ReturnHomePage()
-        {
-            //Send the previous scene (home page)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
-        }
-
-        IEnumerator PostFormNewCustomer()
-        {
-            WWWForm form = new WWWForm();                   // New form for web request
-            form.AddField("name", name.text);
-            form.AddField("surename", surname.text);
-            form.AddField("road", road.text);
-            form.AddField("roadNum", roadNum.text);
-            form.AddField("zipcode", zipcode.text);
-            form.AddField("city", city.text);
-            form.AddField("roadExtra", roadExtra.text);
-            form.AddField("phone", phone.text);
-            form.AddField("email", email.text);
-            form.AddField("_id", "12345");
-            form.AddField("__v", "0");
-
-
-            /* New webrequest with: CONST url, local URLCreateCustomer and the form */
-            using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateCustomer, form))
-            {
-                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-
-                yield return request.SendWebRequest();
-                if (request.isNetworkError || request.isHttpError)
-                {
-                    // error
-                    errorCreateCustomer.transform.gameObject.SetActive(true);
-                }
-                else
-                {
-                    if (request.isDone)
-                    {
-                        // The database return a JSON file of all user infos
-                        string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                        // Create a root object thanks to the JSON file
-                        CreateCustomer entity = JsonUtility.FromJson<CreateCustomer>(jsonResult);
-                        //message validate new customer
-                        createValideCustomer.transform.gameObject.SetActive(true);
-
-                        DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
-                        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);   // Load Create Module scene
-                    }
-
-                }
-            }
-
-
-
-        }
-
-        IEnumerator PostFormNewProject()
-        {
-
-            WWWForm form = new WWWForm();
-            form.AddField("userID", "5dbee1c6e9b5241f704fdca9");
-            form.AddField("date", "2019-11-22");
-            form.AddField("road", road.text);
-            form.AddField("roadNum", roadNum.text);
-            form.AddField("roadExtra", roadExtra.text);
-            form.AddField("zipcode", zipcode.text);
-            form.AddField("city", city.text);
-            form.AddField("customerID", idClientForForm); //not .text in the end because is a string
-            form.AddField("reference", referenceProject.text);
-            form.AddField("projectName", nameProject.text);
-
-
-            using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateProject, form))
-            {
-                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-                yield return request.SendWebRequest();
-                if (request.isNetworkError || request.isHttpError)
-                {
-                    //error
-                }
-                else
-                {
-                    if (request.isDone)
-                    {
-                        // The database return a JSON file of all user infos
-                        string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                        // Create a root object thanks to the JSON file
-                        CreateProject entity = JsonUtility.FromJson<CreateProject>(jsonResult);
-                        //message validate new customer
-                        createValideProject.transform.gameObject.SetActive(true);
-
-                    }
-
-                }
-            }
-
-
-        }
-
-        IEnumerator GetAllCustomers()
-        {
-            UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
             yield return request.SendWebRequest();
-
             if (request.isNetworkError || request.isHttpError)
             {
-                //error
+                // error
+                errorCreateCustomer.transform.gameObject.SetActive(true);
             }
             else
             {
                 if (request.isDone)
                 {
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    // Create a root object thanks to the JSON file
+                    CreateCustomer entity = JsonUtility.FromJson<CreateCustomer>(jsonResult);
+                    //message validate new customer
+                    createValideCustomer.transform.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
 
-                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+    IEnumerator PostFormNewProject()
+    {
+        /* Converting actual date to string to pass it on form for web request */
+        string dateValueText = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+        Debug.Log("Date convert to string : " + dateValueText);
 
-                    RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);         // Convert JSON file
+        WWWForm form = new WWWForm();
+        form.AddField("userID", CONST.GetComponent<CONST>().userID);
+        form.AddField("date", dateValueText);
+        form.AddField("road", road.text);
+        form.AddField("roadNum", roadNum.text);
+        form.AddField("roadExtra", roadExtra.text);
+        form.AddField("zipcode", zipcode.text);
+        form.AddField("city", city.text);
+        form.AddField("customerID", idClientForForm);
+        form.AddField("reference", referenceProject.text);
+        form.AddField("projectName", nameProject.text);
 
-                    Debug.Log("jsons result : " + jsonResult);
+        using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateProject, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("ERROR: " + request.error);
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    // Create a root object thanks to the JSON file
+                    RequestCreateProject entity = JsonUtility.FromJson<RequestCreateProject>(jsonResult);         // Convert JSON file
 
-                    foreach (var item in entities.customers)
-                    {
+                    Project project = entity.project;
+                    CONST.GetComponent<CONST>().selectedProjectID = project._id;
+
+                    StartCoroutine(CreateNewEstimation(CONST.GetComponent<CONST>().selectedProjectID));
+
+                    //message validate new customer
+                    createValideProject.transform.gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+
+    private IEnumerator CreateNewEstimation(string pProjectID)
+    {
+        Debug.Log("CreateNewEstimation Start");
+
+        WWWForm form = new WWWForm();                               // New form for web request
+
+        form.AddField("projectID", pProjectID);     
+        form.AddField("price", "0");     
+        form.AddField("discount", "0");     
+        form.AddField("module", "{}");     
+
+        using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateEstimation, form))
+        {
+            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+            yield return request.SendWebRequest();
+            if (request.isNetworkError || request.isHttpError)
+            {
+                Debug.Log("ERROR: " + request.error);
+            }
+            else
+            {
+                if (request.isDone)
+                {
+                    // The database return a JSON file of all user infos
+                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                    Debug.Log(jsonResult);
+                    // Create a root object thanks to the JSON file
+                    RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
+
+                    Estimation estimation = entity.estimation;
+                    CONST.GetComponent<CONST>().selectedEstimationID = estimation._id;
+
+                    DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);   // Load Create Module scene
+                }
+            }
+        }
+    }
+
+    IEnumerator GetAllCustomers()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);       // Convert JSON file
+
+                foreach (var item in entities.customers)
+                {
                     //recuperation values in customers
                     string getId = item._id;
                     getSurname = item.surename;
@@ -262,24 +273,15 @@ public class NewProject : MonoBehaviour
                     //Poster all customers
                     dropdowncustomer.Add(getName + getSurname);
 
-                    //Debug.Log("Dropdown customer :" + idCustomer);
-                    //Select the 5 firsts letters for surname
-                    
-                    
-
                     //Select the first letters for name
-                    
-                    
-                                    
-
                     idClientForForm = getId;
                 }
                 idCustomer.options.Clear();
                 idCustomer.AddOptions(dropdowncustomer);
-
-                }
             }
         }
+    }
+
     void DropdownValueChanged(Dropdown pChange)
     {
         Debug.Log(pChange.options[pChange.value].text);
@@ -304,7 +306,5 @@ public class NewProject : MonoBehaviour
 
         //post ref project
         referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
-
-        //-------------------------------------------------------------------------------------
     }
 }

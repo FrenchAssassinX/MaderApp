@@ -22,6 +22,9 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     Vector2 moduleInitialPos;               // Keep initial position of module to avoid to place out of panel
     bool outOfSection;                      // boolean to detect
 
+    public string destinationFloor;         // String to keep floor of module 2D: useful for loading scene
+    public string modelName;                // String to keep name of the model using to create the module
+
     void Start()
     {
         moduleInitialPos = this.GetComponent<RectTransform>().position;                     // Get the iniital position of the component
