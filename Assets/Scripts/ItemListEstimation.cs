@@ -142,7 +142,7 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("Fenêtre de modalités de paiement ouverte");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowPaymentTerms(this.gameObject);
         }
     }
 
