@@ -84,7 +84,7 @@ public class NewProject : MonoBehaviour
             DropdownValueChanged(idCustomer);
         });
     }
-      
+
     //active CreateNewCient
     void DisplayCreateNewCustomer()
     {
@@ -209,10 +209,10 @@ public class NewProject : MonoBehaviour
 
         WWWForm form = new WWWForm();                               // New form for web request
 
-        form.AddField("projectID", pProjectID);     
-        form.AddField("price", "0");     
-        form.AddField("discount", "0");     
-        form.AddField("module", "{}");     
+        form.AddField("projectID", pProjectID);
+        form.AddField("price", "0");
+        form.AddField("discount", "0");
+        form.AddField("module", "{}");
 
         using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateEstimation, form))
         {
@@ -254,7 +254,7 @@ public class NewProject : MonoBehaviour
 
         if (request.isNetworkError || request.isHttpError)
         {
-            
+
         }
         else
         {
@@ -269,7 +269,7 @@ public class NewProject : MonoBehaviour
                     string getId = item._id;
                     getSurname = item.surename;
                     getName = item.name;
-                    
+
                     //Poster all customers
                     dropdowncustomer.Add(getName + getSurname);
 

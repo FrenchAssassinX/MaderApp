@@ -125,6 +125,13 @@ public class RequestCreateProject
     public Project project;
 }
 
+[System.Serializable]
+public class CreateProject
+{
+    public string message;
+    public Project project;
+}
+
 /* Estimation request constructor */
 [System.Serializable]
 public class RequestAnEstimation
@@ -398,4 +405,37 @@ public class RequestGetAllCuts
 {
     public string message;
     public List<Cuts> cuts;
+}
+
+[System.Serializable] 
+public class RequestCreatePayment
+{
+    public string message;
+    public CreatePayement payement;
+}
+
+[System.Serializable]
+public class CreatePayement
+{
+    public string _id;
+    public string step;
+    public string percentage;
+    public string date;
+    public string __v;
+}
+
+[System.Serializable]
+public class GetPaymentById
+{
+    public string message;
+    public GetPayment payement;
+}
+
+[System.Serializable]
+public class GetPayment
+{
+    public string _id;
+    public string step;
+    public string percentage;
+    public string date;
 }

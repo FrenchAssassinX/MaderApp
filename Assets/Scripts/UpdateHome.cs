@@ -29,6 +29,7 @@ public class UpdateHome : MonoBehaviour
         // Keep the CONST gameObject between scenes
         DontDestroyOnLoad(CONST.transform);
         // Go to Home Scene
+        CONST.GetComponent<CONST>().state = "create";
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         Debug.Log("Create project click"); 
     }
@@ -37,6 +38,7 @@ public class UpdateHome : MonoBehaviour
     public void ConsultProjects()
     {
         DontDestroyOnLoad(CONST);
+        CONST.GetComponent<CONST>().state = "consult";
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2); //Go to the Projects List Scene
     }
 
@@ -49,6 +51,7 @@ public class UpdateHome : MonoBehaviour
     public void GoToEstimationScene()
     {
         DontDestroyOnLoad(CONST);
+        
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 4);
     }
 }

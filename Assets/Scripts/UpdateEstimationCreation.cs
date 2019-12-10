@@ -124,6 +124,8 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
+
+        
     }
 
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
