@@ -15,8 +15,8 @@ public class EstimationPayment : MonoBehaviour
     private string url;
     private string URLCreatePayment = "v1/createpayement"; //Specific route to Post create payment
     private string URLGetPaymentById = "v1/getpayementbyid"; //Specific route to Post and get payment state by id
-    private string URLGetEstimationById = "v1/getestimationbyid"; //Specific route to Post and get for take estimation id 
-    private string URLGetProjectById = "v1/getprojectbyid"; //Specific route to Post and get for take project id
+    private string URLGetEstimationById = "v1/getestimationbyid"; //Specific route to Post and get for get estimation id 
+    private string URLGetProjectById = "v1/getprojectbyid"; //Specific route to Post and get for get project id
 
     public Dropdown stateEstimation; //Dropdown for stateEstimation
     public Dropdown statePayment; //Dropdown for statePayment
@@ -29,18 +29,22 @@ public class EstimationPayment : MonoBehaviour
     public List<string> dropdownStatePayment; //List for dropdown Payment
 
     public Canvas canvasPayment; //Canvas for statePayment
-    public string changeEstimation; //Define string for take change estimation
-    public string changePayment; //Define string for take change payment
+    public string changeEstimation; //Define string for get change estimation
+    public string changePayment; //Define string for get change payment
+    public string changeStep; //Define string for get step
+    public string changePercent; //Define string for get percent
     public string stepPayment; //Define string for step in payment
-    public int stepPaymentInt;
+    public int stepPaymentInt; //Define int for step payment
     public string percentPayment; //Define string for percent in payment
 
     public GameObject textSavePayment; //valide message
 
-    public string getStep; //take step in database
-    public string getPercent; //take percent in database
-    public string getStateEstimation; //take entities to GetEstimationBYId
-    RequestAProject requestAProject; //take entities to RequestAProject
+    public string getStep; //get step in database
+    public string getPercent; //get percent in database
+    public string getPaymentStep; //get step in database
+    public string getPaymentPercent; //get percent in database
+    public string getStateEstimation; //get entities to GetEstimationBYId
+    RequestAProject requestAProject; //get entities to RequestAProject
 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
@@ -48,12 +52,10 @@ public class EstimationPayment : MonoBehaviour
     {
 
         CONST = GameObject.Find("CONST"); //Get the CONST gameObject
-        //Debug.Log(CONST);
-        string state = CONST.GetComponent<CONST>().state;
-        url = CONST.GetComponent<CONST>().url; //url take CONST
+        string state = CONST.GetComponent<CONST>().state; //Get state in const
+        url = CONST.GetComponent<CONST>().url; //Url get CONST
 
-        Debug.Log("State estimation = " + getStateEstimation);
-
+        //Add value in dropdown estimation and payment
         DropdownList();
 
         //if choise a existing project
@@ -72,7 +74,7 @@ public class EstimationPayment : MonoBehaviour
         else
         {
             Debug.Log("State is not consult");
-            StartCoroutine(CreatePayment());
+            //StartCoroutine(CreatePayment());
 
         }
 
@@ -149,6 +151,8 @@ public class EstimationPayment : MonoBehaviour
             //Start CreatePayment if "Accepté" is selected
             //if "Accepté" is selected dropdown state esimation is disabled
             stateEstimation.enabled = false;
+            sliderStatePayment.value = 0.03f;
+
         }
         else
         {
@@ -158,22 +162,21 @@ public class EstimationPayment : MonoBehaviour
     }
 
     //Show all estimation advancement
-    //The Client select a state of payment and the slider folow.
+    //Customer select a state of payment and the slider folow.
     public void StateAdvancementModif(Dropdown pChangePayment)
     {
         //Add option in dropdown state payment
         statePayment.AddOptions(dropdownStatePayment);
         //Change state
         changePayment = pChangePayment.options[pChangePayment.value].text;
-
-        Debug.Log("change payment : " + changePayment);
+        //-----------ici----------
+        changePercent = percentPayment;
+        changeStep = stepPayment;
+        //-----------ici----------
+        Debug.Log("change payment step & percent: " + changePayment + changePercent + changeStep);
 
         //Max slider is 1, it's full position
         sliderStatePayment.maxValue = 1.0f;
-
-        //--------------------------------
-        //Find a solution for no regression
-        //--------------------------------
 
         switch (changePayment)
         {
@@ -259,7 +262,7 @@ public class EstimationPayment : MonoBehaviour
     //Function for update estimation
     public void SaveAdvancement()
     {
-        StartCoroutine(CreatePayment());
+        StartCoroutine(CreatePayment()); //start create payment
     }
 
     //Function to return to Home scene
@@ -279,15 +282,16 @@ public class EstimationPayment : MonoBehaviour
     //Function for create payment, it's send step and percent advancement payment
     public IEnumerator CreatePayment()
     {
+        Debug.Log("in create payment");
         WWWForm form = new WWWForm(); //New form for web request
         //TODO step payement est vide a logé pour corrigé
         form.AddField("step", stepPayment); //Add to the form the value of the UI Element 'stepPyament'
         form.AddField("percent", percentPayment); //Add to the form the value of the UI Element 'percentPyament'
         form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID); //Add to the form the value of the selectedProjectID in CONST
 
-        Debug.Log("step : " + stepPayment);
-        Debug.Log("percent : " + percentPayment);
-        Debug.Log("const ESTIMATION ID : " + CONST.GetComponent<CONST>().selectedEstimationID);
+        Debug.Log("step log: " + stepPayment);
+        Debug.Log("percent log: " + percentPayment);
+        Debug.Log("const ESTIMATION ID log: " + CONST.GetComponent<CONST>().selectedEstimationID);
 
         // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreatePayment, form)) //Create new form
@@ -311,10 +315,16 @@ public class EstimationPayment : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
                     //Create a create payment thanks to the JSON file
                     Debug.Log("jsons result payment: " + jsonResult);
-                    //Take id payment for convert in payment Id for update payment
+                    //Get id payment for convert in payment Id for update payment
                     RequestCreatePayment entity = JsonUtility.FromJson<RequestCreatePayment>(jsonResult); //Convert JSON file
+                    //---------------ici------------------
+                    CreatePayement payement = entity.payement;
+                    getPaymentStep = payement.step;
+                    getPaymentPercent = payement.percentage;
 
-
+                    Debug.Log("getPaymentStep: " + getPaymentStep);
+                    Debug.Log("getPaymentPercent: " + getPaymentPercent);
+                    //-----------------ici-------------------
                 }
             }
         }
@@ -353,12 +363,11 @@ public class EstimationPayment : MonoBehaviour
 
                     Debug.Log("jsons result update project: " + jsonResult);
 
-                    //Take step and percent in this customer for payment
+                    //Get step and percent in this customer for payment
 
                     getStep = entities.payement.step;
                     Debug.Log("1 : "+ getStep);
                     getPercent = entities.payement.percentage;
-
                     Debug.Log("step & percent : " + getStep + " " + getPercent);
 
                 }
@@ -366,11 +375,12 @@ public class EstimationPayment : MonoBehaviour
         }
     }
 
-
+    //Function for get estimation by id
     public IEnumerator GetEstimationByID()
     {
         WWWForm form = new WWWForm(); //New form for web request
-        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);//New form for web request
+        // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetEstimationById, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
@@ -388,49 +398,35 @@ public class EstimationPayment : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
 
                 RequestAnEstimation entities = JsonUtility.FromJson<RequestAnEstimation>(jsonResult); //Convert JSON file
-                Estimation estimation = entities.estimation;
-                getStateEstimation = estimation.state;
+                Estimation estimation = entities.estimation; //Call estimation in Estimation
+                getStateEstimation = estimation.state; //Get state in getStateEstimation
 
-                //Add save value in dropdown
-                //stateEstimation
-                //statePayment
+                Debug.Log("getStateEstimation :" + getStateEstimation);
 
-                Debug.Log("ici :" + getStateEstimation);
-
-                //----------!!!-----PAS DE VALEUR DANS getStateEstimation DONC VA DIRECTEMENT DANS LE ELSE...-----!!!----------
-                if (getStateEstimation == "1")
+                if (getStateEstimation == "1") //if estimation is "Accepté"
                 {
                     Debug.Log("State estimation is equal to 1");
-                    //get project by id
-                    
-                    //Take last payment to list
-                    Debug.Log("1");
-                    //Thread.Sleep(1000);
-                    //Debug.Log("count : "+requestAProject.result.payement.Count);
-                    //string lastPayementId = requestAProject.result.payement[requestAProject.result.payement.Count - 1].id;
-                    Debug.Log("2");
-                    //Debug.Log("lastPayementId : " + lastPayementId);
-                    
-                    Debug.Log("3");
                     //Get payement by id
                     Debug.Log("2 : " + getStep);
-                    int stepLevel = Int32.Parse(getStep);
+                    int stepLevel = Int32.Parse(getStep); //Parse string step to int
                     Debug.Log("steplevel : " + stepLevel);
                     //Depending on the step, you provision your dropdown only with the same step and all those above
                     List<string> stateList = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" };
-                    statePayment.options.Clear();
+                    statePayment.options.Clear(); //Clear dropdown payment 
+
+                    //Loop for no regression in payment, if you choose a state of payment the elements of advent will disappear
                     for (int i = 0; i < stateList.Count; i++)
                     {
                         if ((i + 1) >= stepLevel)
                         {
-                            statePayment.options.Add(new Dropdown.OptionData(stateList[i]));
+                            statePayment.options.Add(new Dropdown.OptionData(stateList[i])); //Add new list in dropdown payment
                         }
                     }
                 }
-                //if no payment
+                //if no payment exist
                 else
                 {
-                    StartCoroutine(CreatePayment());
+                    StartCoroutine(CreatePayment()); //Start create payment
                     Debug.Log("Estimation state isn't equals to 1");
 
                 }
@@ -439,11 +435,12 @@ public class EstimationPayment : MonoBehaviour
         }
     }
 
+    //Function for get project by id
     public IEnumerator GetProjetByID()
     {
         WWWForm form = new WWWForm(); //New form for web request
-        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);
-        
+        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);//New form for web request
+        // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetProjectById, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
@@ -462,20 +459,20 @@ public class EstimationPayment : MonoBehaviour
                 Debug.Log(jsonResult);
 
                 RequestAProject entities = JsonUtility.FromJson<RequestAProject>(jsonResult);
-                //getPaymentProject = entities.payement;
-                //Debug.Log("payment entities : " + entities.payement.);
+
                 Debug.Log("entities.payment : " + entities.result.payement[entities.result.payement.Count - 1].id);
-                //getPaymentProject = entities.payement;
+                //Get jsonresult in RequestAProject 
                 requestAProject = entities;
             }
         }
     }
 
+    //Function with get jsonresult RequestAProject and jsonresult RequestAnEstimation
     public IEnumerator BigCoroutine()
     {
         WWWForm form = new WWWForm(); //New form for web request
-        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);
-
+        form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID);//New form for web request
+        // New webrequest with: CONST url, local url and the form
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLGetProjectById, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
@@ -491,15 +488,14 @@ public class EstimationPayment : MonoBehaviour
             else
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data); //Get JSON file
-                Debug.Log(jsonResult);
+                Debug.Log("BigCoroutine : " + jsonResult);
 
                 RequestAProject entities = JsonUtility.FromJson<RequestAProject>(jsonResult);
-                //getPaymentProject = entities.payement;
-                //Debug.Log("payment entities : " + entities.payement.);
                 Debug.Log("entities.payment : " + entities.result.payement[entities.result.payement.Count - 1].id);
-                //getPaymentProject = entities.payement;
+                //Get jsonresult in requestAProject
                 requestAProject = entities;
                 Debug.Log("start update");
+
                 form = new WWWForm(); //New form for web request
                 form.AddField("payementID", requestAProject.result.payement[requestAProject.result.payement.Count - 1].id); //Add to the form the value of the paymentID in CONST
 
@@ -529,10 +525,9 @@ public class EstimationPayment : MonoBehaviour
 
                             Debug.Log("jsons result update project: " + jsonResult2);
 
-                            //Take step and percent in this customer for payment
-
+                            //Get step and percent in this customer for payment
                             getStep = entities2.payement.step;
-                            Debug.Log("1 : " + getStep);
+                            Debug.Log("getStep in bigcoroutine : " + getStep);
                             getPercent = entities2.payement.percentage;
 
                             Debug.Log("step & percent : " + getStep + " " + getPercent);
@@ -557,36 +552,19 @@ public class EstimationPayment : MonoBehaviour
 
                                     RequestAnEstimation entities3 = JsonUtility.FromJson<RequestAnEstimation>(jsonResult3); //Convert JSON file
                                     Estimation estimation = entities3.estimation;
+                                    //Get state of estimation
                                     getStateEstimation = estimation.state;
-
-                                    //Add save value in dropdown
-                                    //stateEstimation
-                                    //statePayment
-
-                                    //Debug.Log("ici :" + getStateEstimation);
-
-                                    //----------!!!-----PAS DE VALEUR DANS getStateEstimation DONC VA DIRECTEMENT DANS LE ELSE...-----!!!----------
+                                    Debug.Log("after declare estimation getStateEstimation :" + getStateEstimation);
                                     if (getStateEstimation == "1")
                                     {
                                         Debug.Log("State estimation is equal to 1");
                                         //get project by id
                                         stateEstimation.value = 1;
-                                        //Take last payment to list
-                                        //Debug.Log("1");
-                                        //Thread.Sleep(1000);
-                                        //Debug.Log("count : "+requestAProject.result.payement.Count);
-                                        //string lastPayementId = requestAProject.result.payement[requestAProject.result.payement.Count - 1].id;
-                                        //Debug.Log("2");
-                                        //Debug.Log("lastPayementId : " + lastPayementId);
-
-                                        //Debug.Log("3");
-                                        //Get payement by id
-                                        //Debug.Log("2 : " + getStep);
+                                        //Get last payment to list
                                         int stepLevel = Int32.Parse(getStep);
-                                        //Debug.Log("steplevel : " + stepLevel);
                                         //Depending on the step, you provision your dropdown only with the same step and all those above
                                         List<string> stateList = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" };
-                                        statePayment.options.Clear();
+                                        statePayment.options.Clear();// Clear dropdown payment
                                         for (int i = 0; i < stateList.Count; i++)
                                         {
                                             if ((i + 1) >= stepLevel)
@@ -594,15 +572,14 @@ public class EstimationPayment : MonoBehaviour
                                                 statePayment.options.Add(new Dropdown.OptionData(stateList[i]));
                                             }
                                         }
-                                        statePayment.value = 0;
-                                        StateAdvancementModif(statePayment);
+                                        statePayment.value = 0; //start dropdown with "A la signature"
+                                        StateAdvancementModif(statePayment); //Poster in dropdown payment
                                     }
                                     //if no payment
                                     else
                                     {
-                                        StartCoroutine(CreatePayment());
+                                        //StartCoroutine(CreatePayment());
                                         Debug.Log("Estimation state isn't equals to 1");
-
                                     }
 
                                 }
@@ -614,4 +591,3 @@ public class EstimationPayment : MonoBehaviour
         }
     }
 }
-
