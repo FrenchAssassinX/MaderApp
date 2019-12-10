@@ -387,7 +387,11 @@ public class CreateModule : MonoBehaviour
         form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
         form.AddField("components", componentsSelected);
         form.AddField("rangeAttributes", "[]");
-        
+        form.AddField("x", "");
+        form.AddField("y", "");
+        form.AddField("floorHouse", "");
+        form.AddField("width", "");
+        form.AddField("height", "");
 
         /* Second request to create new module */
         using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))
@@ -417,6 +421,9 @@ public class CreateModule : MonoBehaviour
 
                     Module module = entity.module;                                      // Convert root object to module object
                     CONST.GetComponent<CONST>().listModulesCreated.Add(module._id);     // Add created module id to listModulesCreated: useful to Create Estimation Scene
+
+                    /* Keep components selected and module ID to retrieve on Create Estimation scene */
+                    CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, componentsSelected);
 
                     // Display good message
                     goodSendModule.transform.gameObject.SetActive(true);
