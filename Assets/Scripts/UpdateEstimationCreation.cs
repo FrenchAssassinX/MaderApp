@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,9 @@ public class UpdateEstimationCreation : MonoBehaviour
     private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
     private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
+    private string getAllModulesUrl = "v1/getallmodule";                                // Specific route to get all modules
+    private string getModuleByIDUrl = "v1/getmodulebyid";                               // Specific route to get one module
+    private string getEstimationByIDUrl = "v1/getestimationbyid";
 
     public GameObject modulePrefab;                     // Prefab of component for 2D scene
     public GameObject middleCanvas;                     // Useful to set component prefab position 
@@ -33,7 +37,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Button addModuleButton;                      // Button to add new module on scene                      
 
     public Dropdown dropdownRanges;                     // Dropdown for ranges
-    public Dropdown dropdownModeles;                    // Dropdown for modeles
+    public Dropdown dropdownModels;                     // Dropdown for modeles
     public Dropdown dropdownInsulatings;                // Dropdown for insulatings
     public Dropdown dropdownFrames;                     // Dropdown for frames quality
     public Dropdown dropdownFinishingExt;               // Dropdown for exterior finishings
@@ -41,7 +45,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public Dropdown dropdownCuts;                       // Dropdown for cuts
 
     private List<string> listRanges;                    // String elements for dropdownRanges
-    private List<string> listModeles;                   // String elements for dropdownModeles
+    private List<string> listModels;                    // String elements for dropdownModels
     private List<string> listInsulatings;               // String elements for dropdownInsulatings
     private List<string> listFrames;                    // String elements for dropdownFrames
     private List<string> listFinishingExt;              // String elements for dropdownFinishingExt
@@ -49,6 +53,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     private List<string> listCuts;                      // String elements for dropdownCuts
 
     private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
+
+    private Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -109,7 +115,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         /* Instantiate list for string results */
         listRanges = new List<string>();
-        listModeles = new List<string>();
+        listModels = new List<string>();
         listInsulatings = new List<string>();
         listFrames = new List<string>();
         listFinishingExt = new List<string>();
@@ -119,11 +125,6 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
 
-        
-    }
-
-    void Update()
-    {
         
     }
 
@@ -153,6 +154,20 @@ public class UpdateEstimationCreation : MonoBehaviour
         floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
     }
 
+    /* Function to replace existing floor from database if floors were previously created for an estimation */
+    public void RecreateFloors(string pNumberOfFloors)
+    {
+        float numberFloors = float.Parse(pNumberOfFloors);
+
+        if (numberFloors > 2)
+        {
+            for (int i = 2; i < numberFloors; i++)
+            {
+                AddFloor();
+            }
+        }
+    }
+
     /* Function to display delete panel */
     public void DisplayDeletePanel()
     {
@@ -162,13 +177,13 @@ public class UpdateEstimationCreation : MonoBehaviour
             // Check all modules on panel
             foreach (Transform child in destinationPanel.transform)
             {
-                GameObject module = child.gameObject;       // Convert child to Module object
+                GameObject module = child.gameObject;                   // Convert child to Module object
 
                 // Check if is the module selected to delete
                 if (module.GetComponent<UpdateModule2D>().isSelected)
                 {
-                    deletePanel.SetActive(true);                    // Display delete panel
-                    deletePanelErrorMessage.SetActive(false);       // Don't display error message on delete panel
+                    deletePanel.SetActive(true);                        // Display delete panel
+                    deletePanelErrorMessage.SetActive(false);           // Don't display error message on delete panel
                 }
             }
         }
@@ -201,13 +216,35 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* Verify if a panel is selected */
         if (destinationPanel != null)
         {
-            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);     // Create new module
-            newModule.transform.SetParent(destinationPanel.transform);                                                      // Change parent on scene hierarchy
-            newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;   // Set default size as parent size: useful for responsivity
-            newModule.GetComponent<RectTransform>().anchoredPosition = destinationPanel.GetComponent<RectTransform>().anchoredPosition;
-            newModule.name = "Module" + moduleCounter;                                                                      // Change name of module
-            moduleCounter++;                                                                                                // Increase counter after rename module
+            GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);                     // Create new module
+            newModule.transform.SetParent(destinationPanel.transform);                                                                      // Change parent on scene hierarchy
+            newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
+            newModule.GetComponent<RectTransform>().anchoredPosition = destinationPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
+            newModule.name = "Module" + moduleCounter;                                                                                      // Change name of module
+            newModule.GetComponent<UpdateModule2D>().modelName = dropdownModels.options[dropdownModels.value].text;                         // Keep model name of the module
+            newModule.GetComponent<UpdateModule2D>().destinationFloor = destinationPanel.name;                                              // Keep destination floor of the module
+            moduleCounter++;                                                                                                                // Increase counter after rename module
         }
+    }
+
+    /* Function to replace existing module from database if modules were previously created for an estimation */
+    public void RecreateModule(string pModuleID, string pModuleName, string pDestinationPanel, string pPosX, string pPosY, string pWidth, string pHeight, string pAngle)
+    {
+        GameObject destPanel = GameObject.Find(pDestinationPanel);                                                              // Retrieve destination panel on scene with name
+
+        GameObject newModule = Instantiate(modulePrefab, destPanel.transform.position, Quaternion.identity);                     // Create new module
+        newModule.transform.SetParent(destPanel.transform);                                                                      // Change parent on scene hierarchy
+
+        newModule.GetComponent<RectTransform>().localScale = destPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
+        newModule.GetComponent<RectTransform>().anchoredPosition = destPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
+
+        newModule.GetComponent<RectTransform>().position = new Vector3(float.Parse(pPosX), float.Parse(pPosY), 0f);             // Replace as good position on 2D scene
+        newModule.GetComponent<RectTransform>().sizeDelta = new Vector2(float.Parse(pWidth), float.Parse(pHeight));             // Give saved size to the module
+        newModule.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, float.Parse(pAngle));                       // Give saved rotation to module
+
+        newModule.name = pModuleName;
+
+        newModule.GetComponent<UpdateModule2D>().id = pModuleID;
     }
 
     /* Function to unselect module */
@@ -262,6 +299,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private void DropdownValueChanged(Dropdown pDropdown)
     {
         StartCoroutine(GetAllRangesValues(pDropdown.options[pDropdown.value].text));        // Start function for get all ranges values
+        StartCoroutine(GetAllModulesModel(pDropdown.options[pDropdown.value].text));        // Start function to get all modules equals to the range
     }
     /* -----------------------------------    END MODULE PART     ---------------------------------- */
 
@@ -304,39 +342,139 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public IEnumerator AddModulesToEstimation()
     {
+        string idModule = "";                                                                       // String to keep id of the module
+        string moduleComponents = "";                                                               // String to keep components of the module from previous scene
+
+        string idFrameQuality = dropdownFrames.options[dropdownFrames.value].text;                  // String to keep id of frame quality before creating a json
+        string idWindowFrameQuality = "";                                                           // String to keep id of window frame quality before creating a json
+        string idInsulating = dropdownInsulatings.options[dropdownInsulatings.value].text;          // String to keep id of insulating before creating a json
+        string idCovering = "";                                                                     // String to keep id of covering before creating a json
+        string idFinishingExt = dropdownFinishingExt.options[dropdownFinishingExt.value].text;      // String to keep id of finishing exterior before creating a json
+        string idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;      // String to keep id of finishing interior before creating a json
+        string rangeAttributesForm = "";                                                            // String to create a json file to send rangeAttributes in form
+
+        /* Foreach to verify all module added to 2D scene */
         foreach (Transform child in destinationPanel.transform)
         {
-            GameObject module = child.gameObject;
+            GameObject module = child.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
 
-            WWWForm form = new WWWForm();                                   // New form for web request
-            form.AddField("name", module.name);                             // TO MODIFY                          
-            form.AddField("cost", "12");                                    // TO MODIFY                                                             
-            form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      
-            form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                                                                                  
-            form.AddField("range", dropdownRanges.options[dropdownRanges.value].text);                                                         
-            form.AddField("estimationID", "5ddbf64db8cb5a77a435e2fb");      // TO MODIFY                                            
-
-            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);      // Create new form
-            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                          // Complete form with authentication datas
-            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-            yield return request.SendWebRequest();          // Send request                                                              
-
-            if (request.isNetworkError || request.isHttpError)
+            /* Register module only if it not already exist on database */
+            if (module.GetComponent<UpdateModule2D>().id == "" || module.GetComponent<UpdateModule2D>().id == null)
             {
-                Debug.Log("*** ERROR: " + request.error + " ***");
-            }
-            else
-            {
-                if (request.isDone)
+                /* Foreach to retrieve the id of the module model using to create the module */
+                foreach (KeyValuePair<string, string> item in dictModuleIDName)
                 {
-                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                    Debug.Log(jsonResult);
-
-
-                    
-                    GoToEstimationView();
+                    if (item.Value == child.GetComponent<UpdateModule2D>().modelName)
+                    {
+                        idModule = item.Key;
+                    }
                 }
+
+                // First request to find module property
+                WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                formModule.AddField("moduleID", idModule);
+
+                UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
+                requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+                requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                yield return requestModule.SendWebRequest();          // Send request                                                              
+
+                if (requestModule.isNetworkError || requestModule.isHttpError)
+                {
+                    Debug.Log("*** ERROR: " + requestModule.error + " ***");
+                }
+                else
+                {
+                    if (requestModule.isDone)
+                    {
+                        string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);      // Get JSON file
+                        RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                         // Convert JSON to manipulating C# object
+                        Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
+
+                        // Creating json as string with the id retrieve in the last foreach
+                        rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
+
+                        /* Retrieve components of the module with id of module in dictionnary */
+                        foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
+                        {
+                            if (item.Key == modelModule._id)
+                            {
+                                moduleComponents = item.Value;
+                            }
+                        }
+
+                        WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
+                        form.AddField("name", module.name);                                                         // Module name
+                        form.AddField("cost", modelModule.cost);                                                    // Module cost
+                        form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      // Module angle in 2D scene
+                        form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                        // Module cut
+                        form.AddField("range", modelModule.range);                                                  // Module range
+                        form.AddField("components", moduleComponents);                                              // Module components from previous scene
+                        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);            // Estimation ID where the module is created
+                        form.AddField("rangeName", modelModule.rangeName);                                          // Name of the range module
+                        form.AddField("rangeAttributes", rangeAttributesForm);                                      // All values from dropdown (Finishing int..)
+                        form.AddField("x", module.GetComponent<RectTransform>().localScale.x.ToString());           // Position X of the module in 2D scene
+                        form.AddField("y", module.GetComponent<RectTransform>().localScale.y.ToString());           // Position Y of the module in 2D scene
+                        form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
+                        form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
+                        form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
+
+                        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
+                        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
+                        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                        yield return request.SendWebRequest();          // Send request                                                              
+
+                        if (request.isNetworkError || request.isHttpError)
+                        {
+                            Debug.Log("*** ERROR: " + request.error + " ***");
+                        }
+                        else
+                        {
+                            if (request.isDone)
+                            {
+                                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                                Debug.Log(jsonResult);
+
+                                /* VERIFY UTILITY */
+                                RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResult);                 // Convert JSON to entity object
+                                Module moduleResult = entityModule.module;                                                      // Convert entity object to module object
+                                module.GetComponent<UpdateModule2D>().id = moduleResult._id;
+                                /* END VERIFY UTILITY */
+
+                                GoToEstimationView();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* Function to Delete module from database */
+    public IEnumerator DeleteModuleFromEstimation(string pModuleID)
+    {
+        WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+        form.AddField("moduleID", pModuleID);
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);   // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();          // Send request                                                              
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
             }
         }
     }
@@ -345,7 +483,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     public IEnumerator GetAllRanges()
     {
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllRangesUrl);       // New request, passing url and form
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
         yield return request.SendWebRequest();
@@ -364,13 +502,13 @@ public class UpdateEstimationCreation : MonoBehaviour
                 /* Get all ranges */
                 foreach (var item in entities.range)
                 {
-                    Range range = item;                 // Convert item to range object
+                    Range range = item;                     // Convert item to range object
 
-                    listRanges.Add(range.libelle);
+                    listRanges.Add(range.libelle);          // Add range name to list
                 }
 
-                dropdownRanges.options.Clear();
-                dropdownRanges.AddOptions(listRanges);
+                dropdownRanges.options.Clear();             // Clear dropdown 
+                dropdownRanges.AddOptions(listRanges);      // Fill dropdown with new list
             }
         }
     }
@@ -411,25 +549,25 @@ public class UpdateEstimationCreation : MonoBehaviour
                         /* Get all Frames Quality for range */
                         foreach (var frameQuality in range.framequality)
                         {
-                            listFrames.Add(frameQuality);       // Add frameQuality to string list  
-                        }
+                            listFrames.Add(frameQuality);                       // Add frameQuality to string list  
+                        }   
 
                         /* Get all Insulatings for range */
                         foreach (var insulating in range.insulating)
                         {
-                            listInsulatings.Add(insulating);       // Add insulating to string list  
+                            listInsulatings.Add(insulating);                    // Add insulating to string list  
                         }
 
                         /* Get all Exterior Finishings for range */
                         foreach (var finishingExt in range.finishingext)
                         {
-                            listFinishingExt.Add(finishingExt);       // Add exterior finishing to string list  
+                            listFinishingExt.Add(finishingExt);                 // Add exterior finishing to string list  
                         }
 
                         /* Get all Interior Finishings for range */
                         foreach (var finishingInt in range.finishingint)
                         {
-                            listFinishingInt.Add(finishingInt);       // Add interior finishing to string list  
+                            listFinishingInt.Add(finishingInt);                 // Add interior finishing to string list  
                         }
                     }
 
@@ -474,15 +612,215 @@ public class UpdateEstimationCreation : MonoBehaviour
                 /* Get all cuts */
                 foreach (var item in entities.cuts)
                 {
-                    Cuts cut = item;                     // Convert item to cut object
+                    Cuts cut = item;                    // Convert item to cut object
 
-                    listCuts.Add(cut.name);
+                    listCuts.Add(cut.name);             // Add cut name to list         
                 }
 
-                dropdownCuts.options.Clear();
-                dropdownCuts.AddOptions(listCuts);
+                dropdownCuts.options.Clear();           // Clear dropdown   
+                dropdownCuts.AddOptions(listCuts);      // fill dropdown with list of cuts name
             }
         }
     }
+
+    /* Fucntion to get all modules models from database */
+    public IEnumerator GetAllModulesModel(string pRangeName)
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllModulesUrl);     // New request, passing url and form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
+                RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
+
+                listModels.Clear();                         // Unfill list before feeling it with new datas
+
+                /* Get all modules */
+                foreach (var item in entities.modules)
+                {
+                    Module module = item;                 // Convert root object item to module object
+
+                    /* If module from database have the same range as the dropdown */
+                    if (module.rangeName == pRangeName)
+                    {
+                        /* Verify all modules linked to estimation */
+                        foreach (string idModulesInEstimation in CONST.GetComponent<CONST>().listModulesCreated)
+                        {
+                            // If id of module from database is equal to a module linked to estimation..
+                            if (idModulesInEstimation == module._id)
+                            {
+                                listModels.Add(module.name);                        // Add name of the module in list
+                                dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
+                            }
+                        }
+                    }
+                }
+                dropdownModels.options.Clear();                    // Clear dropdown
+                dropdownModels.AddOptions(listModels);            // Fill dropdown with module list
+            }
+        }
+    }
+
+    /*
+     * TO DO: Pour un devis sur lequel on revient plus tard, faire en sorte de ne pas enregistrer à nouveau
+     * en base les modules créé au préalable
+     */
+
+    /* Function to retrieve all modules in estimation in progress: NEED ANTHONY */
+    public IEnumerator GetAllEstimationModules()
+    {
+        /* First web request to retrieve all datas of the selected estimation */
+        WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getEstimationByIDUrl, form);   // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();          // Send request                                                              
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
+
+                RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
+                Estimation estimation = entity.estimation;
+
+                foreach (var item in estimation.module)
+                {
+                    /* Second web request to retrieve all properties of selected modules */
+                    WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                    formModule.AddField("moduleID", item.id);
+
+                    UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
+                    requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+                    requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                    yield return requestModule.SendWebRequest();          // Send request                                                              
+
+                    if (requestModule.isNetworkError || requestModule.isHttpError)
+                    {
+                        Debug.Log("*** ERROR: " + requestModule.error + " ***");
+                    }
+                    else
+                    {
+                        if (requestModule.isDone)
+                        {
+                            string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
+                            Debug.Log(jsonResultModule);
+
+                            RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
+                            Module myModule = entityModule.module;
+
+                            RecreateModule(myModule._id, myModule.name, myModule.floorHouse, myModule.x, myModule.y, myModule.width, myModule.height, myModule.angle);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /* -----------------------------------    END WEB REQUEST PART     ---------------------------------- */
+
+    /* Function to create a string like JSON and pass it to request */
+    public string CreateJSON(string pFrameQuality, string pInsulating, string pCovering, 
+                                string pWindowFrameQuality, string pFinishingInt, string pFinishingExt)
+    {
+        string beginArray = "[";
+        string endArray = "]";
+        string beginObj = "{";
+        string endObj = "}";
+        string virgule = ",";
+        string quote = "\"";
+        string doublePoint = ":";
+
+        StringBuilder sb = new StringBuilder();
+
+        /* Start */
+        sb.Append(beginArray);                      // [
+        sb.Append(beginObj);                        // {
+
+        /* Frame Quality */
+        sb.Append(quote);                           // "
+        sb.Append("frameQuality");                  // frameQuality
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFrameQuality);                   // frameQuality value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Insulating */
+        sb.Append(quote);                           // "
+        sb.Append("insulating");                    // insulating
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pInsulating);                     // insulating value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Covering */
+        sb.Append(quote);                           // "
+        sb.Append("covering");                      // covering
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pCovering);                       // covering value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Windows Frame Quality */
+        sb.Append(quote);                           // "
+        sb.Append("windowsframequality");           // windowsframequality
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pWindowFrameQuality);             // windowsframequality value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Finishing Interior */
+        sb.Append(quote);                           // "
+        sb.Append("finishingint");                  // finishingint
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFinishingInt);                   // finishingint value
+        sb.Append(quote);                           // "
+        sb.Append(virgule);                         // ,
+
+        /* Finishing Exterior */
+        sb.Append(quote);                           // "
+        sb.Append("finishingext");                  // finishingext
+        sb.Append(quote);                           // "
+        sb.Append(doublePoint);                     // :
+        sb.Append(quote);                           // "
+        sb.Append(pFinishingExt);                   // finishingext value
+        sb.Append(quote);                           // "
+
+        /* End */
+        sb.Append(endObj);                          // }
+        sb.Append(endArray);                        // ]
+
+        return sb.ToString();
+    }
 }

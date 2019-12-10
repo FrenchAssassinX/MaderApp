@@ -128,14 +128,8 @@ public class RequestCreateProject
 [System.Serializable]
 public class CreateProject
 {
-    public string userID;
-    public string date;
-    public string road;
-    public string roadNum;
-    public string roadExtra;
-    public string zipcode;
-    public string city;
-    public string customerID;
+    public string message;
+    public Project project;
 }
 
 /* Estimation request constructor */
@@ -274,8 +268,13 @@ public class Module
     public string cut;
     public string range;
     public string rangeName;
-    public string __v;
     public RangeAttribute rangeAttributes;
+    public string x;
+    public string y;
+    public string height;
+    public string width;
+    public string floorHouse;
+    public string __v;
 }
 
 [System.Serializable]
