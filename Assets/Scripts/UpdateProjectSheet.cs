@@ -298,6 +298,20 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
     }
 
+    /* Function to show an estimation */
+    public void ShowScene2D(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+        CONST.GetComponent<CONST>().customerName = clientNameGO.GetComponent<UnityEngine.UI.Text>().text + " " + clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
+        CONST.GetComponent<CONST>().estimationPrice = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
+        CONST.GetComponent<CONST>().estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
+
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2); //load the next scene
+    }
+
     /* Function to show the technical folder */
     public void ShowTechnicalFolder(GameObject pItemSelected)
     {

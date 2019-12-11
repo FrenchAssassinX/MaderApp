@@ -46,6 +46,7 @@ public class Login : MonoBehaviour
         /* New webrequest with: CONST url, local url and the form */
         using (UnityWebRequest request = UnityWebRequest.Post(url + loginUrl, form))
         {
+            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
             yield return request.SendWebRequest();
 
             // If connection failed
@@ -53,6 +54,8 @@ public class Login : MonoBehaviour
             {
                 // Display UI Element error message 
                 textConnectionError.transform.gameObject.SetActive(true);
+
+                Debug.Log("ERROR: " + request.error);
             }
             // If connection succeeded
             else

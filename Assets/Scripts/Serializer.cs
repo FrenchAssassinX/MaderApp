@@ -149,6 +149,7 @@ public class Estimation
     public string state;
     public string date;
     public string discount;
+    public string floorNumber;
     public List<ModuleId> module;
 }
 

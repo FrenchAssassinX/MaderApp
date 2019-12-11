@@ -18,6 +18,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private string getAllModulesUrl = "v1/getallmodule";                                // Specific route to get all modules
     private string getModuleByIDUrl = "v1/getmodulebyid";                               // Specific route to get one module
     private string getEstimationByIDUrl = "v1/getestimationbyid";
+    private string updateEstimationFloorUrl = "v1/updateestimationfloor";               // Specific route to add number of floors in estimation
 
     public GameObject modulePrefab;                     // Prefab of component for 2D scene
     public GameObject middleCanvas;                     // Useful to set component prefab position 
@@ -124,7 +125,6 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
-
         
     }
 
@@ -155,13 +155,11 @@ public class UpdateEstimationCreation : MonoBehaviour
     }
 
     /* Function to replace existing floor from database if floors were previously created for an estimation */
-    public void RecreateFloors(string pNumberOfFloors)
+    public void RecreateFloors(int pNumberOfFloors)
     {
-        float numberFloors = float.Parse(pNumberOfFloors);
-
-        if (numberFloors > 2)
+        if (pNumberOfFloors > 2)
         {
-            for (int i = 2; i < numberFloors; i++)
+            for (int i = 2; i < pNumberOfFloors; i++)
             {
                 AddFloor();
             }
@@ -325,7 +323,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Intermediary function to start AddModulesToEstimation function */
     public void StartAddModulesToEstimation()
     {
-        StartCoroutine(AddModulesToEstimation());
+        //StartCoroutine(AddModulesToEstimation());
+        StartCoroutine(AddFloorNumberToEstimation());
     }
 
     /* Intermediary function to start GetAllRanges function */
@@ -353,7 +352,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         string idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;      // String to keep id of finishing interior before creating a json
         string rangeAttributesForm = "";                                                            // String to create a json file to send rangeAttributes in form
 
-        /* Foreach to verify all module added to 2D scene */
+        /* Foreach instruction to verify all module added to 2D scene */
         foreach (Transform child in destinationPanel.transform)
         {
             GameObject module = child.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
@@ -442,12 +441,37 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 Module moduleResult = entityModule.module;                                                      // Convert entity object to module object
                                 module.GetComponent<UpdateModule2D>().id = moduleResult._id;
                                 /* END VERIFY UTILITY */
-
-                                GoToEstimationView();
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /* Function to add floor number to estimation */
+    public IEnumerator AddFloorNumberToEstimation()
+    {
+        WWWForm form = new WWWForm();                                                                               // New form for web request for module with type basic                                                         
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);                            // ID of the estimation
+        form.AddField("floorNumber", floorCount.GetComponent<FloorCount>().floorCounter.ToString());                // Number of floor in estimation
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl, form);   // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();          // Send request                                                              
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
             }
         }
     }
@@ -672,12 +696,47 @@ public class UpdateEstimationCreation : MonoBehaviour
         }
     }
 
-    /*
-     * TO DO: Pour un devis sur lequel on revient plus tard, faire en sorte de ne pas enregistrer à nouveau
-     * en base les modules créé au préalable
-     */
+    /* Function to retrieve all floors in estimation in progress */
+    public IEnumerator GetAllEstimationFloors()
+    {
+        /* First web request to retrieve all datas of the selected estimation */
+        WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
 
-    /* Function to retrieve all modules in estimation in progress: NEED ANTHONY */
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getEstimationByIDUrl, form);   // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        yield return request.SendWebRequest();          // Send request                                                              
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
+
+                RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
+                Estimation estimation = entity.estimation;
+
+                floorCount.GetComponent<FloorCount>().floorCounter = int.Parse(estimation.floorNumber);
+
+                /* If estimation don't have any floor, starting counter to 1 */
+                if (floorCount.GetComponent<FloorCount>().floorCounter <= 0)
+                {
+                    floorCount.GetComponent<FloorCount>().floorCounter = 1;
+                }
+
+                RecreateFloors(floorCount.GetComponent<FloorCount>().floorCounter);
+            }
+        }
+    }
+
+    /* Function to retrieve all modules in estimation in progress */
     public IEnumerator GetAllEstimationModules()
     {
         /* First web request to retrieve all datas of the selected estimation */
