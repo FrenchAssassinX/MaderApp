@@ -17,7 +17,12 @@ public class CONST : MonoBehaviour
     public string state;
     public List<string> listModulesCreated = new List<string>();
     public Dictionary<string, string> dictComponentsForModule = new Dictionary<string, string>();
-    public BypassCertificate certificateHandler = new BypassCertificate();
+    public BypassCertificate certificateHandler;
+
+    public void Start()
+    {
+        certificateHandler = new BypassCertificate();
+    }
 
     public class BypassCertificate : CertificateHandler
     {
