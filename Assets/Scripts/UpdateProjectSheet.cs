@@ -304,6 +304,24 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
     }
 
+    /* Function to show the create estimation window */
+    public void ShowCreateEstimation(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(6); //load the next scene
+    }
+
+    /* Function to show the payment terms window */
+    public void ShowPaymentTerms(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
+    }
+
     /* Function to show the technical folder */
     public void ShowTechnicalFolder(GameObject pItemSelected)
     {
