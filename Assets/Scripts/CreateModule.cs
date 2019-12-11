@@ -155,7 +155,7 @@ public class CreateModule : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
 
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError)
@@ -196,7 +196,7 @@ public class CreateModule : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -255,7 +255,7 @@ public class CreateModule : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -334,7 +334,7 @@ public class CreateModule : MonoBehaviour
         requestComponents.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         requestComponents.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestComponents.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestComponents.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestComponents.SendWebRequest();
 
@@ -407,7 +407,7 @@ public class CreateModule : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
             yield return request.SendWebRequest();
 

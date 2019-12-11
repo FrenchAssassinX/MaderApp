@@ -36,7 +36,7 @@ public class TechnicalFolder : MonoBehaviour
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestForEstimation.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestForEstimation.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForEstimation.SendWebRequest();
 
@@ -72,7 +72,7 @@ public class TechnicalFolder : MonoBehaviour
         requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestForModule.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestForModule.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForModule.SendWebRequest();
 
@@ -128,7 +128,7 @@ public class TechnicalFolder : MonoBehaviour
         requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestForModule.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestForModule.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForModule.SendWebRequest(); //execute the web request
 
@@ -162,7 +162,7 @@ public class TechnicalFolder : MonoBehaviour
         requestForComponent.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForComponent.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestForComponent.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestForComponent.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForComponent.SendWebRequest();
 

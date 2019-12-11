@@ -46,7 +46,7 @@ public class Login : MonoBehaviour
         /* New webrequest with: CONST url, local url and the form */
         using (UnityWebRequest request = UnityWebRequest.Post(url + loginUrl, form))
         {
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();
             yield return request.SendWebRequest();
 
             // If connection failed
@@ -70,7 +70,6 @@ public class Login : MonoBehaviour
                     CONST.GetComponent<CONST>().token = entity.token.ToString();
                     CONST.GetComponent<CONST>().userID = entity.user._id.ToString();
                     CONST.GetComponent<CONST>().userName = entity.user.prenom.ToString();
-                    CONST.GetComponent<CONST>().certificateHandler = new CONST.BypassCertificate();
 
                     // Keep the CONST gameObject between scenes
                     DontDestroyOnLoad(CONST.transform);

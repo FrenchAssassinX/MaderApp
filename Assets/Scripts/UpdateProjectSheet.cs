@@ -143,7 +143,7 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -200,7 +200,7 @@ public class UpdateProjectSheet : MonoBehaviour
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        requestForEstimation.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        requestForEstimation.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForEstimation.SendWebRequest();
 
@@ -268,7 +268,7 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -302,20 +302,6 @@ public class UpdateProjectSheet : MonoBehaviour
 
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
-    }
-
-    /* Function to show an estimation */
-    public void ShowScene2D(GameObject pItemSelected)
-    {
-        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
-        CONST.GetComponent<CONST>().customerName = clientNameGO.GetComponent<UnityEngine.UI.Text>().text + " " + clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
-        CONST.GetComponent<CONST>().projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
-        CONST.GetComponent<CONST>().estimationPrice = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
-        CONST.GetComponent<CONST>().estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
-
-
-        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2); //load the next scene
     }
 
     /* Function to show the technical folder */
@@ -414,7 +400,7 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -564,7 +550,7 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -827,7 +813,7 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 

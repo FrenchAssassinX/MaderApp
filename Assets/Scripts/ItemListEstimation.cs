@@ -21,7 +21,6 @@ public class ItemListEstimation : MonoBehaviour
     private GameObject buttonPaymentTerms;
     private GameObject buttonTechnicalFile;
     private GameObject buttonShowEstimation;
-    private GameObject buttonShowScene2D;
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +35,6 @@ public class ItemListEstimation : MonoBehaviour
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
         buttonShowEstimation = GameObject.Find("showEstimationButton");
-        buttonShowEstimation = GameObject.Find("showScene2DButton");
 
         //Hide the previous buttons
         if (buttonDelete != null)
@@ -59,10 +57,6 @@ public class ItemListEstimation : MonoBehaviour
         {
             buttonShowEstimation.SetActive(false);
         }
-        if (buttonShowScene2D != null)
-        {
-            buttonShowScene2D.SetActive(false);
-        }
 
         /* Affect specific onClick behaviours to the buttons */
         if (buttonDelete != null)
@@ -84,10 +78,6 @@ public class ItemListEstimation : MonoBehaviour
         if (buttonShowEstimation != null)
         {
             buttonShowEstimation.GetComponent<Button>().onClick.AddListener(ShowEstimation);
-        }
-        if (buttonShowScene2D != null)
-        {
-            buttonShowScene2D.GetComponent<Button>().onClick.AddListener(ShowScene2D);
         }
     }
 
@@ -116,10 +106,6 @@ public class ItemListEstimation : MonoBehaviour
         {
             buttonShowEstimation.SetActive(true);
         }
-        if (buttonShowScene2D != null)
-        {
-            buttonShowScene2D.SetActive(true);
-        }
         isSelected = true;
     }
 
@@ -129,15 +115,6 @@ public class ItemListEstimation : MonoBehaviour
         if (isSelected)
         {
             GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowEstimation(this.gameObject);
-        }
-    }
-
-    /* Function to show an scene 2D */
-    public void ShowScene2D()
-    {
-        if (isSelected)
-        {
-            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowScene2D(this.gameObject);
         }
     }
 

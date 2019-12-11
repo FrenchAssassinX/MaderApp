@@ -299,7 +299,7 @@ public class EstimationPayment : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
 
             yield return request.SendWebRequest(); // Send request
 
@@ -346,7 +346,7 @@ public class EstimationPayment : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
             yield return request.SendWebRequest(); //Send request
 
@@ -390,7 +390,7 @@ public class EstimationPayment : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
             yield return request.SendWebRequest(); //Send request
 
@@ -453,7 +453,7 @@ public class EstimationPayment : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
             yield return request.SendWebRequest(); //Send request
 
@@ -488,7 +488,7 @@ public class EstimationPayment : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+            request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
             yield return request.SendWebRequest(); //Send request
 
@@ -519,7 +519,7 @@ public class EstimationPayment : MonoBehaviour
                     request2.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
                     request2.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
 
-                    request2.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+                    request2.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
                     yield return request2.SendWebRequest(); //Send request
 
