@@ -22,6 +22,7 @@ public class CONST : MonoBehaviour
     public void Start()
     {
         certificateHandler = new BypassCertificate();
+        Debug.Log("Certificate = " + certificateHandler);
     }
 
     public class BypassCertificate : CertificateHandler

@@ -70,7 +70,8 @@ public class Login : MonoBehaviour
                     CONST.GetComponent<CONST>().token = entity.token.ToString();
                     CONST.GetComponent<CONST>().userID = entity.user._id.ToString();
                     CONST.GetComponent<CONST>().userName = entity.user.prenom.ToString();
-                    
+                    CONST.GetComponent<CONST>().certificateHandler = new CONST.BypassCertificate();
+
                     // Keep the CONST gameObject between scenes
                     DontDestroyOnLoad(CONST.transform);
                     // Go to Home Scene

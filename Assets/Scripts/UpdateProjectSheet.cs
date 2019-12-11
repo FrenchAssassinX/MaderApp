@@ -143,6 +143,8 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -197,6 +199,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        requestForEstimation.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return requestForEstimation.SendWebRequest();
 
@@ -263,6 +267,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -407,6 +413,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -555,6 +563,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -816,6 +826,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(urlToGetUser, form);     // Create new form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return request.SendWebRequest();
 

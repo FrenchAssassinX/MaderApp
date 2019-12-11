@@ -133,6 +133,8 @@ public class NewProject : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
@@ -177,6 +179,8 @@ public class NewProject : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
@@ -219,6 +223,8 @@ public class NewProject : MonoBehaviour
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+            request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
             yield return request.SendWebRequest();
             if (request.isNetworkError || request.isHttpError)
             {
@@ -249,6 +255,8 @@ public class NewProject : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return request.SendWebRequest();
 

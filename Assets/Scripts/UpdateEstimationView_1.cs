@@ -65,6 +65,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");           // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        requestForEstimation.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
         yield return requestForEstimation.SendWebRequest(); //execute the web request
 
         if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError) 
@@ -100,6 +102,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        requestForModule.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
+
         yield return requestForModule.SendWebRequest(); //execute the web request
 
         if (requestForModule.isNetworkError || requestForModule.isHttpError)
@@ -131,6 +135,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         UnityWebRequest requestForComponent = UnityWebRequest.Post(urlToGetComponent, componentForm);     // Create new WebRequest
         requestForComponent.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForComponent.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        requestForComponent.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return requestForComponent.SendWebRequest();
 
@@ -224,6 +230,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToUpdateEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        requestForEstimation.certificateHandler = CONST.GetComponent<CONST>().certificateHandler;    // Bypass certificate for https
 
         yield return requestForEstimation.SendWebRequest(); //execute the web request 
 
