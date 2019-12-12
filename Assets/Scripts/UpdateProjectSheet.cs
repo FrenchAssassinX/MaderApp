@@ -143,6 +143,8 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -197,6 +199,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        requestForEstimation.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForEstimation.SendWebRequest();
 
@@ -264,6 +268,8 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -296,6 +302,24 @@ public class UpdateProjectSheet : MonoBehaviour
 
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3); //load the next scene
+    }
+
+    /* Function to show the create estimation window */
+    public void ShowCreateEstimation(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(6); //load the next scene
+    }
+
+    /* Function to show the payment terms window */
+    public void ShowPaymentTerms(GameObject pItemSelected)
+    {
+        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
     }
 
     /* Function to show the technical folder */
@@ -389,7 +413,7 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm form = new WWWForm();                       // New form for web request
 
         form.AddField("projectID", projectId);    // Add to the form the values of the project to update
-        form.AddField("userID", projectSailorId);
+        form.AddField("userID", sailorID);
         form.AddField("road", project.road);
         form.AddField("roadNum", project.roadNum);
         form.AddField("roadExtra", project.roadExtra);
@@ -402,6 +426,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(url, form);       // New request, passing url and form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 
@@ -551,6 +577,8 @@ public class UpdateProjectSheet : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -618,7 +646,7 @@ public class UpdateProjectSheet : MonoBehaviour
         string osRunning = SystemInfo.operatingSystem; //value that contains the current os
         string[] osTab = osRunning.Split(' ');
         string OS = osTab[0];
-
+        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
         //pdf creation with windows os
         if (OS.Equals("Windows"))
         {
@@ -626,7 +654,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_"+ pItemSelected.GetComponent<ItemListEstimation>().idValue+ ".pdf"; //name of the document
+            string attachName = "Devis_"+ pItemSelected.GetComponent<ItemListEstimation>().idValue+"_"+ Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
@@ -684,7 +712,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + "_" + Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
@@ -744,7 +772,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + "_" + Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
@@ -811,6 +839,8 @@ public class UpdateProjectSheet : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Post(urlToGetUser, form);     // Create new form
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
 

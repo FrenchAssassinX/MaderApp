@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class CONST : MonoBehaviour
 {
@@ -16,4 +17,13 @@ public class CONST : MonoBehaviour
     public string state;
     public List<string> listModulesCreated = new List<string>();
     public Dictionary<string, string> dictComponentsForModule = new Dictionary<string, string>();
+
+    public class BypassCertificate : CertificateHandler
+    {
+        protected override bool ValidateCertificate(byte[] certificateData)
+        {
+            //Simply return true no matter what
+            return true;
+        }
+    }
 }

@@ -1465,8 +1465,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb1f7c77598e09c4ca04ced382b42040, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: http://madera-figueiredo.space/
+  url: https://madera-figueiredo.space/
   token: 
   userID: 
   userName: 
   selectedProjectID: 
+  selectedEstimationID: 
+  customerName: 
+  projectName: 
+  estimationPrice: 
+  estimationDiscount: 
+  state: 
+  listModulesCreated: []
