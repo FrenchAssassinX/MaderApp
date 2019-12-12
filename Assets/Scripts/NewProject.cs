@@ -216,7 +216,7 @@ public class NewProject : MonoBehaviour
         form.AddField("projectID", pProjectID);
         form.AddField("price", "0");
         form.AddField("discount", "0");
-        form.AddField("module", "{}");
+        form.AddField("module", "[]");
 
         using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateEstimation, form))
         {

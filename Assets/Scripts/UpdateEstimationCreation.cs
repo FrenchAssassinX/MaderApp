@@ -87,7 +87,8 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
 
-        StartCoroutine(GetAllEstimationFloors());
+        StartCoroutine(GetAllEstimationFloors());   // Function lauching on start to get all floors if it's an existing project
+        StartCoroutine(GetAllEstimationModules());  // Function lauching on start to get all modules if it's an existing project
     }
 
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
@@ -119,10 +120,10 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to replace existing floor from database if floors were previously created for an estimation */
     public void RecreateFloors(int pNumberOfFloors)
     {
-        Debug.Log("NUMBER OF FLOORS: " + pNumberOfFloors);
-
+        /* If number of floors is under the standard floor (Floor0 & Rooftop) */
         if (pNumberOfFloors > 2)
         {
+            /* Check all floors in FOR instruction */
             for (int i = 0; i < pNumberOfFloors; i++)
             {
                 /* Adding button in the list on down panel */
@@ -162,9 +163,9 @@ public class UpdateEstimationCreation : MonoBehaviour
                     textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + (i - 1);
                     panelNewFloor.name = "panelFloor" + (i - 1);
                 }
-
             }
         }
+        /* If we have only initial floors */
         else
         {
             /* Instantiate automatic floors */
@@ -364,10 +365,10 @@ public class UpdateEstimationCreation : MonoBehaviour
 
 
     /* ------------------------------------     WEB REQUEST PART     ------------------------------------ */
-    /* Intermediary function to start AddModulesToEstimation function */
-    public void StartAddModulesToEstimation()
+    /* Intermediary function to start AddModulesToEstimation and AddFloorNumberToEstimation functions */
+    public void StartAddDatasToEstimation()
     {
-        //StartCoroutine(AddModulesToEstimation());
+        StartCoroutine(AddModulesToEstimation());
         StartCoroutine(AddFloorNumberToEstimation());
     }
 
@@ -459,8 +460,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                         form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);            // Estimation ID where the module is created
                         form.AddField("rangeName", modelModule.rangeName);                                          // Name of the range module
                         form.AddField("rangeAttributes", rangeAttributesForm);                                      // All values from dropdown (Finishing int..)
-                        form.AddField("x", module.GetComponent<RectTransform>().localScale.x.ToString());           // Position X of the module in 2D scene
-                        form.AddField("y", module.GetComponent<RectTransform>().localScale.y.ToString());           // Position Y of the module in 2D scene
+                        form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());           // Position X of the module in 2D scene
+                        form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());           // Position Y of the module in 2D scene
                         form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
                         form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
                         form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
@@ -550,7 +551,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
             }
         }
     }
@@ -689,7 +690,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
 
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
                 
                 /* Get all cuts */
                 foreach (var item in entities.cuts)
@@ -725,7 +726,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
                 listModels.Clear();                         // Unfill list before feeling it with new datas
@@ -780,7 +781,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
@@ -824,46 +825,86 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                //Debug.Log(jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
 
                 foreach (var item in estimation.module)
                 {
-                    /* Second web request to retrieve all properties of selected modules */
-                    WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
-                    formModule.AddField("moduleID", item.id);
-
-                    UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
-                    requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
-                    requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-                    requestModule.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
-
-                    yield return requestModule.SendWebRequest();          // Send request                                                              
-
-                    if (requestModule.isNetworkError || requestModule.isHttpError)
+                    if (item.id != null && item.id != "")
                     {
-                        Debug.Log("*** ERROR: " + requestModule.error + " ***");
-                    }
-                    else
-                    {
-                        if (requestModule.isDone)
+                        /* Second web request to retrieve all properties of selected modules */
+                        WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                        formModule.AddField("moduleID", item.id);
+
+                        UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
+                        requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+                        requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                        requestModule.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
+
+                        yield return requestModule.SendWebRequest();          // Send request                                                              
+
+                        if (requestModule.isNetworkError || requestModule.isHttpError)
                         {
-                            string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
-                            Debug.Log(jsonResultModule);
+                            Debug.Log("*** ERROR: " + requestModule.error + " ***");
+                        }
+                        else
+                        {
+                            if (requestModule.isDone)
+                            {
+                                string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
+                                //Debug.Log(jsonResultModule);                                                                                                        //Debug.Log(jsonResultModule);
 
-                            RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
-                            Module myModule = entityModule.module;
+                                RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
+                                Module myModule = entityModule.module;
 
-                            RecreateModule(myModule._id, myModule.name, myModule.floorHouse, myModule.x, myModule.y, myModule.width, myModule.height, myModule.angle);
+                                if (myModule._id != null && myModule._id != "" &&
+                                        myModule.floorHouse != null && myModule.floorHouse != "" &&
+                                        myModule.x != null && myModule.x != "" &&
+                                        myModule.y != null && myModule.y != "" &&
+                                        myModule.width != null && myModule.width != "" &&
+                                        myModule.height != null && myModule.height != "" &&
+                                        myModule.angle != null && myModule.angle != "")
+                                {
+                                    RecreateModule(myModule._id, myModule.name, myModule.floorHouse, myModule.x, myModule.y, myModule.width, myModule.height, myModule.angle);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+    /* Fucntion to get all cuts from database */
+    /*public IEnumerator DeleteFloorFromDatabase()
+    {
+        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllCutsUrl);         // New request, passing url
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("Error: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
+
+                Debug.Log(jsonResult);
+
+            }
+        }
+    }*/
 
     /* -----------------------------------    END WEB REQUEST PART     ---------------------------------- */
 
