@@ -42,7 +42,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             DisplayAllFloorPanels();
             DisplaySelectedFloorPanel();
 
-            //Debug.Log("Selected button:" + this.gameObject.name);
+            Debug.Log("Selected button:" + this.gameObject.name);
 
             deleteButton.GetComponent<Button>().onClick.AddListener(DeleteFloor);       // Event to delete floor
         }
