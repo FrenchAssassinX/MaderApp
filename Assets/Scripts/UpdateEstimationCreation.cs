@@ -70,45 +70,6 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         deletePanel.SetActive(false);       // Disable delete panel by default
 
-        /* Instantiate automatic floors */
-        /* Ground floor */
-        GameObject floor0 = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);   // Creation of the prefab
-        floor0.name = "Floor0";                                                                                 // Change name of floor
-        GameObject text = GameObject.Find("FloorButtonText");                                                   // Find text in the prefab
-        text.name = floor0.name + "Text";                                                                       // Change name of text
-        text.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";                                      // Change text in the prefab
-        floor0.transform.SetParent(gridList.transform);                                                         // Set prefab as child of the gridList
-        floor0.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
-        floor0.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                    // Set default position as parent position: useful for responsivity
-
-        /* Rooftop */
-        GameObject rooftop = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
-        rooftop.name = "Rooftop";                                                                               // Change name of floor
-        GameObject textRooftop = GameObject.Find("FloorButtonText");                                            // Find text in the prefab
-        textRooftop.name = rooftop.name + "Text";                                                               // Change name of text
-        textRooftop.GetComponent<UnityEngine.UI.Text>().text = "Toiture";                                       // Change text in the prefab
-        rooftop.transform.SetParent(gridList.transform);                                                        // Set prefab as child of the gridList
-        rooftop.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);    // Set default size as parent size: useful for responsivity
-        rooftop.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                   // Set default position as parent position: useful for responsivity
-        // Not increase floor counter for the rooftop: avoid counter error 
-
-        /* Adding panels for default floors */
-        /* Floor 0 */
-        GameObject panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);       // Create new prefab
-        panelFloor0.name = "panelFloor0";                                                                                   // Change prefab name
-        panelFloor0.transform.SetParent(middleCanvas.transform);                                                            // Set prefab as child of MiddleCanvas
-        panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;       // Set default position as parent position: useful for responsivity
-        panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;         // Set default size as parent size: useful for responsivity
-        panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);                                             // Add listener to panel to launch UnselectModule function
-
-        /* Rooftop */
-        GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);      // Create new prefab
-        panelRooftop.name = "panelRooftop";                                                                                 // Change prefab name
-        panelRooftop.transform.SetParent(middleCanvas.transform);                                                           // Set prefab as child of MiddleCanvas
-        panelRooftop.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;        // Set default position as parent position: useful for responsivity
-        panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;      // Set default size as parent size: useful for responsivity
-        panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);                                            // Add listener to panel to launch UnselectModule function
-
         /* Add listener to dropdowns */
         dropdownRanges.onValueChanged.AddListener(delegate {
             DropdownValueChanged(dropdownRanges);
@@ -125,7 +86,8 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
         StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
-        
+
+        StartCoroutine(GetAllEstimationFloors());
     }
 
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
@@ -134,10 +96,10 @@ public class UpdateEstimationCreation : MonoBehaviour
     {
         /* Adding button in the list on down panel */
         GameObject newFloor = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);                     // Creation of the prefab
-        newFloor.name = "Floor" + floorCount.GetComponent<FloorCount>().floorCounter;                                               // Change prefab name
+        newFloor.name = "Floor" + (floorCount.GetComponent<FloorCount>().floorCounter - 1);                                               // Change prefab name
         GameObject textNewFloor = GameObject.Find("FloorButtonText");                                                               // Find text in the prefab
         textNewFloor.name = newFloor.name + "Text";                                                                                 // Change name of text
-        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + floorCount.GetComponent<FloorCount>().floorCounter;      // Change text in the prefab
+        textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + (floorCount.GetComponent<FloorCount>().floorCounter - 1);      // Change text in the prefab
         newFloor.transform.SetParent(gridList.transform);                                                                           // Change parent on scene hierarchy 
         newFloor.GetComponent<RectTransform>().sizeDelta = new Vector2(newFloor.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
         newFloor.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                      // Set default position as parent position: useful for responsivity
@@ -145,7 +107,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         /* Adding specific panel for the floor */
         GameObject panelNewFloor = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);     // Create new prefab
-        panelNewFloor.name = "panelFloor" + floorCount.GetComponent<FloorCount>().floorCounter;                             // Change prefab name
+        panelNewFloor.name = "panelFloor" + +(floorCount.GetComponent<FloorCount>().floorCounter - 1);                             // Change prefab name
         panelNewFloor.transform.SetParent(middleCanvas.transform);                                                          // Set prefab as child of MiddleCanvas
         panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;     // Set default position as parent position: useful for responsivity
         panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;       // Set default size as parent size: useful for responsivity
@@ -157,12 +119,94 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to replace existing floor from database if floors were previously created for an estimation */
     public void RecreateFloors(int pNumberOfFloors)
     {
+        Debug.Log("NUMBER OF FLOORS: " + pNumberOfFloors);
+
         if (pNumberOfFloors > 2)
         {
-            for (int i = 2; i < pNumberOfFloors; i++)
+            for (int i = 0; i < pNumberOfFloors; i++)
             {
-                AddFloor();
+                /* Adding button in the list on down panel */
+                GameObject newFloor = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);                     // Creation of the prefab
+                newFloor.name = "Floor" + i;                                                                                                // Change prefab name
+                GameObject textNewFloor = GameObject.Find("FloorButtonText");                                                               // Find text in the prefab
+                textNewFloor.name = newFloor.name + "Text";                                                                                 // Change name of text
+                textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + i;                                                       // Change text in the prefab
+                newFloor.transform.SetParent(gridList.transform);                                                                           // Change parent on scene hierarchy 
+                newFloor.GetComponent<RectTransform>().sizeDelta = new Vector2(newFloor.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
+                newFloor.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                      // Set default position as parent position: useful for responsivity
+                floorCount.GetComponent<FloorCount>().listFloorButtons.Add(newFloor);                                                       // Add new button on listButtons
+
+                /* Adding specific panel for the floor */
+                GameObject panelNewFloor = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);     // Create new prefab
+                panelNewFloor.name = "panelFloor" + i;                                                                              // Change prefab name
+                panelNewFloor.transform.SetParent(middleCanvas.transform);                                                          // Set prefab as child of MiddleCanvas
+                panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;     // Set default position as parent position: useful for responsivity
+                panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;       // Set default size as parent size: useful for responsivity
+                floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);                                           // Add new panel on listPanels
+
+                /* Rename initial floors */
+                if (newFloor.name == "Floor0")
+                {
+                    textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";
+                }
+                else if (newFloor.name == "Floor1")
+                {
+                    newFloor.name = "Rooftop";
+                    textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Toiture";
+                    panelNewFloor.name = "panelFloorRooftop";
+                }
+                /* Rename other floors */
+                else
+                {
+                    newFloor.name = "Floor" + (i - 1);
+                    textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + (i - 1);
+                    panelNewFloor.name = "panelFloor" + (i - 1);
+                }
+
             }
+        }
+        else
+        {
+            /* Instantiate automatic floors */
+            /* Ground floor */
+            GameObject floor0 = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);   // Creation of the prefab
+            floor0.name = "Floor0";                                                                                 // Change name of floor
+            GameObject text = GameObject.Find("FloorButtonText");                                                   // Find text in the prefab
+            text.name = floor0.name + "Text";                                                                       // Change name of text
+            text.GetComponent<UnityEngine.UI.Text>().text = "Rez-de-chaussée";                                      // Change text in the prefab
+            floor0.transform.SetParent(gridList.transform);                                                         // Set prefab as child of the gridList
+            floor0.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);     // Set default size as parent size: useful for responsivity
+            floor0.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                    // Set default position as parent position: useful for responsivity
+
+            /* Rooftop */
+            GameObject rooftop = Instantiate(buttonFloorPrefab, gridList.transform.position, Quaternion.identity);  // Creation of the prefab
+            rooftop.name = "Rooftop";                                                                               // Change name of floor
+            GameObject textRooftop = GameObject.Find("FloorButtonText");                                            // Find text in the prefab
+            textRooftop.name = rooftop.name + "Text";                                                               // Change name of text
+            textRooftop.GetComponent<UnityEngine.UI.Text>().text = "Toiture";                                       // Change text in the prefab
+            rooftop.transform.SetParent(gridList.transform);                                                        // Set prefab as child of the gridList
+            rooftop.GetComponent<RectTransform>().sizeDelta = new Vector2(floor0.GetComponent<RectTransform>().sizeDelta.x, list.GetComponent<RectTransform>().sizeDelta.y);    // Set default size as parent size: useful for responsivity
+            rooftop.GetComponent<RectTransform>().localScale = list.GetComponent<RectTransform>().localScale;                                                                   // Set default position as parent position: useful for responsivity
+                                                                                                                                                                                // Not increase floor counter for the rooftop: avoid counter error 
+
+            /* Adding panels for default floors */
+            /* Floor 0 */
+            GameObject panelFloor0 = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);       // Create new prefab
+            panelFloor0.name = "panelFloor0";                                                                                   // Change prefab name
+            panelFloor0.transform.SetParent(middleCanvas.transform);                                                            // Set prefab as child of MiddleCanvas
+            panelFloor0.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;       // Set default position as parent position: useful for responsivity
+            panelFloor0.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;         // Set default size as parent size: useful for responsivity
+            panelFloor0.GetComponent<Button>().onClick.AddListener(UnselectModule);                                             // Add listener to panel to launch UnselectModule function
+
+            /* Rooftop */
+            GameObject panelRooftop = Instantiate(panelFloorPrefab, middleCanvas.transform.position, Quaternion.identity);      // Create new prefab
+            panelRooftop.name = "panelRooftop";                                                                                 // Change prefab name
+            panelRooftop.transform.SetParent(middleCanvas.transform);                                                           // Set prefab as child of MiddleCanvas
+            panelRooftop.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;        // Set default position as parent position: useful for responsivity
+            panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;      // Set default size as parent size: useful for responsivity
+            panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);                                            // Add listener to panel to launch UnselectModule function
+
+            floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
         }
     }
 
@@ -741,12 +785,14 @@ public class UpdateEstimationCreation : MonoBehaviour
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
 
-                floorCount.GetComponent<FloorCount>().floorCounter = int.Parse(estimation.floorNumber);
-
                 /* If estimation don't have any floor, starting counter to 1 */
-                if (floorCount.GetComponent<FloorCount>().floorCounter <= 0)
+                if (estimation.floorNumber == "" || estimation.floorNumber == null)
                 {
                     floorCount.GetComponent<FloorCount>().floorCounter = 1;
+                } 
+                else
+                {
+                    floorCount.GetComponent<FloorCount>().floorCounter = int.Parse(estimation.floorNumber);
                 }
 
                 RecreateFloors(floorCount.GetComponent<FloorCount>().floorCounter);
