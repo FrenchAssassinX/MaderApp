@@ -35,7 +35,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     public GameObject panelFloorPrefab;                 // Prefab item to add floor on scene 
     public GameObject destinationPanel = null;          // GameObject to set the destination scene of the new component
 
-    public Button addModuleButton;                      // Button to add new module on scene                      
+    public Button addModuleButton;                      // Button to add new module on scene  
+    public Button deleteModuleButton;                   // Button to delete module from scene and databse
 
     public Dropdown dropdownRanges;                     // Dropdown for ranges
     public Dropdown dropdownModels;                     // Dropdown for modeles
@@ -63,10 +64,12 @@ public class UpdateEstimationCreation : MonoBehaviour
     
     void Start()
     {
-        CONST = GameObject.Find("CONST");                                                   // Get CONST object
-        floorCount = GameObject.Find("FloorCount");                                         // Retrieve counter on the scene
-        addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();        // Retrieve button on scene
-        addModuleButton.onClick.AddListener(AddModuleOnScene);                              // Add listener to button to launch AddModuleOnScene function
+        CONST = GameObject.Find("CONST");                                                           // Get CONST object
+        floorCount = GameObject.Find("FloorCount");                                                 // Retrieve counter on the scene
+        addModuleButton = GameObject.Find("ButtonAddModule").GetComponent<Button>();                // Retrieve button on scene
+        addModuleButton.onClick.AddListener(AddModuleOnScene);                                      // Add listener to button to launch AddModuleOnScene function
+        deleteModuleButton = GameObject.Find("ButtonConfirmDeletePanel").GetComponent<Button>();    // Retrieve button on scene
+        deleteModuleButton.onClick.AddListener(StartDeleteModuleFromEstimation);                    // Add listener to button to launch DeleteModule function
 
         moduleCounter = 1;                      // Starting counter for module name                                                       
 
@@ -399,6 +402,12 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartCoroutine(GetAllCuts());
     }
 
+    /* Intermediary function to start GetAllCuts function */
+    public void StartDeleteModuleFromEstimation()
+    {
+        StartCoroutine(DeleteModuleFromEstimation());
+    }
+
     public IEnumerator AddModulesToEstimation()
     {
         string idModule = "";                                                                       // String to keep id of the module
@@ -548,30 +557,54 @@ public class UpdateEstimationCreation : MonoBehaviour
     }
 
     /* Function to Delete module from database */
-    public IEnumerator DeleteModuleFromEstimation(string pModuleID)
+    public IEnumerator DeleteModuleFromEstimation()
     {
-        WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
-        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
-        form.AddField("moduleID", pModuleID);
-
-        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);   // Create new form
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
-
-        yield return request.SendWebRequest();          // Send request                                                              
-
-        if (request.isNetworkError || request.isHttpError)
+        /* Check all modules in panel */
+        foreach (Transform child in destinationPanel.transform)
         {
-            Debug.Log("*** ERROR: " + request.error + " ***");
-        }
-        else
-        {
-            if (request.isDone)
+            GameObject module = child.gameObject;                               // Convert child to module object
+
+            // If this module is selected
+            if (module.GetComponent<UpdateModule2D>().isSelected)
             {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                //Debug.Log(jsonResult);
+                /* If module is already exist on database */
+                if (module.GetComponent<UpdateModule2D>().id != "" &&
+                        module.GetComponent<UpdateModule2D>().id != null)
+                {
+                    WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                    form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+                    form.AddField("moduleID", module.GetComponent<UpdateModule2D>().id);
+
+                    UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);   // Create new form
+                    request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+                    request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                    request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+                    yield return request.SendWebRequest();          // Send request                                                              
+
+                    if (request.isNetworkError || request.isHttpError)
+                    {
+                        Debug.Log("*** ERROR: " + request.error + " ***");
+                    }
+                    else
+                    {
+                        if (request.isDone)
+                        {
+                            string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                            Debug.Log(jsonResult);
+
+                            HideDeletePanel();                                      // Hide delete panel
+                            Destroy(module);                                        // Destroy module from scene
+                        }
+                    }
+                }
+                /* If module is only local, then delete it */
+                else
+                {
+                    HideDeletePanel();                                      // Hide delete panel
+                    Destroy(module);                                        // Destroy module from scene
+                }
             }
         }
     }
