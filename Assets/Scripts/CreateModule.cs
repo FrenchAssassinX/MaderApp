@@ -11,7 +11,7 @@ public class CreateModule : MonoBehaviour
     public GameObject CONST;
     private string url;
     private string URLCreateModule = "v1/createmodule";                         // Specific url for create module
-    private string URLEstimationModule = "v1/createmodulewithestimation";       // Specific url for estimation module
+    private string URLCreateModuleBasic = "v1/createmodulebasic";                // Specific url for estimation module
     private string URLRange = "v1/getallrange";                                 // Specific url for range
     private string URLgetAllModule = "v1/getAllModule";                         // Specific url for get module
     private string URLGetRangeById = "v1/getrangebyid";                         // Specific url for Post range id
@@ -402,7 +402,7 @@ public class CreateModule : MonoBehaviour
         form.AddField("height", "");
 
         /* Second request to create new module */
-        using (UnityWebRequest request = UnityWebRequest.Post(url + URLEstimationModule, form))
+        using (UnityWebRequest request = UnityWebRequest.Post(url + URLCreateModuleBasic, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -430,7 +430,7 @@ public class CreateModule : MonoBehaviour
                     RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResult);
 
                     Module module = entity.module;                                      // Convert root object to module object
-                    CONST.GetComponent<CONST>().listModulesCreated.Add(module._id);     // Add created module id to listModulesCreated: useful to Create Estimation Scene
+                    //CONST.GetComponent<CONST>().listModulesCreated.Add(module._id);     // Add created module id to listModulesCreated: useful to Create Estimation Scene
 
                     /* Keep components selected and module ID to retrieve on Create Estimation scene */
                     CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, componentsSelected);

@@ -159,7 +159,7 @@ public class NewProject : MonoBehaviour
     IEnumerator PostFormNewProject()
     {
         /* Converting actual date to string to pass it on form for web request */
-        string dateValueText = DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+        string dateValueText = DateTime.Now.ToString("MM-dd-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
         Debug.Log("Date convert to string : " + dateValueText);
 
         WWWForm form = new WWWForm();

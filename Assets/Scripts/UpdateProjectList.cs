@@ -13,6 +13,7 @@ public class UpdateProjectList : MonoBehaviour
     public GameObject CONST;                                    // CONST object contains server route, token and user infos
 
     private string getProjectUrl = "v1/getallproject";          // Specific route to get all projects
+    private string getAllCustomersUrl = "v1/getallcustomer";    // Specific route to get all projects
     private string deleteProjectUrl = "v1/deleteproject";       // Specific route to delete one project
 
     public GameObject listItemPrefab;                           // Prefab item to display all elements in project list

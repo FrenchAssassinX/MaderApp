@@ -90,9 +90,6 @@ public class UpdateEstimationCreation : MonoBehaviour
         listFinishingInt = new List<string>();
         listCuts = new List<string>();        
 
-        StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
-        StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
-
         StartCoroutine(GetAllEstimationFloors());   // Function lauching on start to get all floors if it's an existing project
         StartCoroutine(GetAllEstimationModules());  // Function lauching on start to get all modules if it's an existing project
     }
@@ -463,6 +460,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                         if (requestModule.isDone)
                         {
                             string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);      // Get JSON file
+                            Debug.Log(jsonResultModule);
                             RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                         // Convert JSON to manipulating C# object
                             Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
 
@@ -493,6 +491,21 @@ public class UpdateEstimationCreation : MonoBehaviour
                             form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
                             form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
                             form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
+
+                            Debug.Log("Module name: " + module.name);
+                            Debug.Log("Module cost: " + modelModule.cost);
+                            Debug.Log("Module angle: " + module.GetComponent<RectTransform>().eulerAngles.z.ToString());
+                            Debug.Log("Module cut: " + dropdownCuts.options[dropdownCuts.value].text);
+                            Debug.Log("Module range: " + modelModule.range);
+                            Debug.Log("Module components: " + moduleComponents);
+                            Debug.Log("Module estimationID: " + CONST.GetComponent<CONST>().selectedEstimationID);
+                            Debug.Log("Module rangeName: " + modelModule.rangeName);
+                            Debug.Log("Module rangeAttributes: " + rangeAttributesForm);
+                            Debug.Log("Module x: " + module.GetComponent<RectTransform>().position.x.ToString());
+                            Debug.Log("Module y: " + module.GetComponent<RectTransform>().position.y.ToString());
+                            Debug.Log("Module destFloor: " + module.GetComponent<UpdateModule2D>().destinationFloor);
+                            Debug.Log("Module width: " + module.GetComponent<RectTransform>().sizeDelta.x.ToString());
+                            Debug.Log("Module height: " + module.GetComponent<RectTransform>().sizeDelta.y.ToString());
 
                             UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
                             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
@@ -800,6 +813,10 @@ public class UpdateEstimationCreation : MonoBehaviour
                             {
                                 listModels.Add(module.name);                        // Add name of the module in list
                                 dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
+                                string listComponents = CreateJSONComponents(module.components);
+                                Debug.Log("COMPONENTS: " + listComponents);
+                                CONST.GetComponent<CONST>().dictComponentsForModule.Clear();
+                                CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, listComponents);
                             }
                         }
                     }
@@ -878,10 +895,12 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                //Debug.Log(jsonResult);
+                Debug.Log(jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
+
+                CONST.GetComponent<CONST>().listModulesCreated.Clear();
 
                 foreach (var item in estimation.module)
                 {
@@ -913,20 +932,30 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
                                 Module myModule = entityModule.module;
 
-                                if (myModule._id != null && myModule._id != "" &&
+                                if (myModule.type == "basic")
+                                {
+                                    CONST.GetComponent<CONST>().listModulesCreated.Add(myModule._id);
+                                }
+                                else if (myModule.type == "custom")
+                                {
+                                    if (myModule._id != null && myModule._id != "" &&
                                         myModule.floorHouse != null && myModule.floorHouse != "" &&
                                         myModule.x != null && myModule.x != "" &&
                                         myModule.y != null && myModule.y != "" &&
                                         myModule.width != null && myModule.width != "" &&
                                         myModule.height != null && myModule.height != "" &&
                                         myModule.angle != null && myModule.angle != "")
-                                {
-                                    RecreateModule(myModule._id, myModule.name, myModule.floorHouse, myModule.x, myModule.y, myModule.width, myModule.height, myModule.angle);
+                                    {
+                                        RecreateModule(myModule._id, myModule.name, myModule.floorHouse, myModule.x, myModule.y, myModule.width, myModule.height, myModule.angle);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                StartGetAllRanges();                        // Function launching on start to get all ranges on dropdown
+                StartGetAllCuts();                          // Function launching on start to get all cuts on dropdown
             }
         }
     }
@@ -1041,6 +1070,63 @@ public class UpdateEstimationCreation : MonoBehaviour
         /* End */
         sb.Append(endObj);                          // }
         sb.Append(endArray);                        // ]
+
+        return sb.ToString();
+    }
+
+    /* Function to create a string like JSON and pass it to request */
+    public string CreateJSONComponents(List<Component> pListComponents)
+    {
+        string beginArray = "[";
+        string endArray = "]";
+        string beginObj = "{";
+        string endObj = "}";
+        string virgule = ",";
+        string quote = "\"";
+        string doublePoint = ":";
+
+        StringBuilder sb = new StringBuilder();
+
+        /* Start */
+        sb.Append(beginArray);                      // [
+
+        for (int i = 0; i < pListComponents.Count; i++)
+        {
+            sb.Append(beginObj);                        // {
+
+            /* ID */
+            sb.Append(quote);                           // "
+            sb.Append("id");
+            sb.Append(quote);                           // "
+            sb.Append(doublePoint);                     // :
+            sb.Append(quote);                           // "
+            sb.Append(pListComponents[i].id);
+            sb.Append(quote);                           // "
+            sb.Append(virgule);                         // ,
+
+            /* Quantity */
+            sb.Append(quote);                           // "
+            sb.Append("qte");                    
+            sb.Append(quote);                           // "
+            sb.Append(doublePoint);                     // :
+            sb.Append(quote);                           // "
+            sb.Append(pListComponents[i].qte);                     // insulating value
+            sb.Append(quote);                           // "
+
+            sb.Append(endObj);                          // }
+
+            if (i < (pListComponents.Count - 1))
+            {
+                //ajoute une virgule si et seulement si il y a un suivant dans la liste des modules selectionné
+                sb.Append(virgule);                     // ,
+            }
+
+            if (i == (pListComponents.Count - 1))
+            {
+                //ajoute le crochet de fin de array si et seulement si c'est le dernier item de la liste
+                sb.Append(endArray);                    // ]
+            }
+        }
 
         return sb.ToString();
     }
