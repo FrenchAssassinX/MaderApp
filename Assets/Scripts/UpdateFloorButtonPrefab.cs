@@ -1,23 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class UpdateFloorButtonPrefab : MonoBehaviour
 {
-    private GameObject middleCanvas;                                    // Parent canvas of the floor panels
-    public GameObject gridList;                                         // Parent of the buttons
+    public GameObject CONST;                                                // CONST object contains server route, token and user infos
 
-    private Button floorButton;                                         // Button on the list
-    private GameObject panelFloor;                                      // Panel for the concerned floor
-    public GameObject floorCount;                                       // Counter to set name of the floor
+    private GameObject middleCanvas;                                        // Parent canvas of the floor panels
+    public GameObject gridList;                                             // Parent of the buttons
 
-    private GameObject deleteButton;                                    // Button to delete prefab
+    private Button floorButton;                                             // Button on the list
+    private GameObject panelFloor;                                          // Panel for the concerned floor
+    public GameObject floorCount;                                           // Counter to set name of the floor
 
-    public bool isSelected;                                             // Boolean for onClick function
+    private GameObject deleteButton;                                        // Button to delete prefab
+
+    private string updateEstimationFloorUrl = "v1/updateestimationfloor";   // Specific route to add number of floors in estimation
+
+    public bool isSelected;                                                 // Boolean for onClick function
 
     void Start()
     {
+        CONST = GameObject.Find("CONST");                               // Get CONST object
+
         gridList = GameObject.Find("GridList");                         // Retrieve gridList on the scene
 
         floorButton = GetComponent<Button>();                           // Retrieve button element on the scene
@@ -44,7 +51,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
             Debug.Log("Selected button:" + this.gameObject.name);
 
-            deleteButton.GetComponent<Button>().onClick.AddListener(DeleteFloor);       // Event to delete floor
+            deleteButton.GetComponent<Button>().onClick.AddListener(StartDeleteFloor);       // Event to delete floor
         }
 
     }
@@ -88,20 +95,70 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         }
     }
 
-    /* Function to delete floor */ 
-    private void DeleteFloor()
+    /* Intermediary function to lunch DeleteFloor function */
+    public void StartDeleteFloor()
     {
-        // Cannot delete Floor0 and Rooftop
+        StartCoroutine(DeleteFloor());
+    }
+
+    /* Function to delete floor */
+    public IEnumerator DeleteFloor()
+    {
         if (this.gameObject.name != "Floor0" && this.gameObject.name != "Rooftop")
         {
-            floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
-            floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
+            if (CONST.GetComponent<CONST>().floorCounterDatabase != null &&
+                        CONST.GetComponent<CONST>().floorCounterDatabase > 2)
+            {
+                WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+                form.AddField("floorNumber", (floorCount.GetComponent<FloorCount>().floorCounter - 1).ToString());
 
-            Destroy(this.gameObject);                                                           // Destroy floor button
-            Destroy(panelFloor);                                                                // Destroy floor panel
+                Debug.Log("Estimation ID: " + CONST.GetComponent<CONST>().selectedEstimationID);
+                Debug.Log("floorNumber: " + (floorCount.GetComponent<FloorCount>().floorCounter - 1).ToString());
 
-            RenameFloors();                                                                     // Launch function to rename the surviving floors
+                UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl);      // New request, passing url
+                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
+                request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
+
+                yield return request.SendWebRequest();
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    Debug.Log("Error: " + request.error);
+                }
+                else
+                {
+                    if (request.isDone)
+                    {
+                        string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                        Debug.Log("Destroyed floor :" + jsonResult);
+
+                        floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
+                        floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
+                        floorCount.GetComponent<FloorCount>().floorCounter -= 1;
+
+                        Destroy(this.gameObject);                                                           // Destroy floor button
+                        Destroy(panelFloor);                                                                // Destroy floor panel
+
+                        RenameFloors();                                                                     // Launch function to rename the surviving floors
+                    }
+                }
+            }
+            else
+            {
+                floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
+                floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
+                floorCount.GetComponent<FloorCount>().floorCounter -= 1;
+
+                Destroy(this.gameObject);                                                           // Destroy floor button
+                Destroy(panelFloor);                                                                // Destroy floor panel
+
+                RenameFloors();                                                                     // Launch function to rename the surviving floors
+            }
         }
+
     }
 
     /* Function to rename floors when a floor is delete by user */

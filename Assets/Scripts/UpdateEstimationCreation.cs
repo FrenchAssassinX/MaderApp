@@ -94,6 +94,21 @@ public class UpdateEstimationCreation : MonoBehaviour
         StartCoroutine(GetAllEstimationModules());  // Function lauching on start to get all modules if it's an existing project
     }
 
+    public void Update()
+    {
+        /* Search wich button is selected */
+        foreach (Transform child in middleCanvas.transform)
+        {
+            GameObject panel = child.gameObject;        // Convert child to Panel object
+
+            /* Detect wich panel is active */
+            if (panel.activeSelf)
+            {
+                destinationPanel = panel;               // Affect panel as default panel for module destination
+            }
+        }
+    }
+
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
     /* Function to add floor on scene (button and panel) */
     public void AddFloor()
@@ -866,6 +881,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                     floorCount.GetComponent<FloorCount>().floorCounter = int.Parse(estimation.floorNumber);
                 }
 
+                CONST.GetComponent<CONST>().floorCounterDatabase = int.Parse(estimation.floorNumber);
+
                 RecreateFloors(floorCount.GetComponent<FloorCount>().floorCounter);
             }
         }
@@ -959,34 +976,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             }
         }
     }
-
-    /* Fucntion to get all cuts from database */
-    /*public IEnumerator DeleteFloorFromDatabase()
-    {
-        UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + getAllCutsUrl);         // New request, passing url
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                          // Set request authentications
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-        request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
-
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
-        {
-            Debug.Log("Error: " + request.error);
-        }
-        else
-        {
-            if (request.isDone)
-            {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
-
-                Debug.Log(jsonResult);
-
-            }
-        }
-    }*/
 
     /* -----------------------------------    END WEB REQUEST PART     ---------------------------------- */
 
