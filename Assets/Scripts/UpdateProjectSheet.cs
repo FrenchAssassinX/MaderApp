@@ -331,14 +331,16 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
     }
 
+    // ________________demander a nico c'est quoi parce que ça beug___________________
     /* Function to show the technical folder */
-    public void ShowPaymentTerms(GameObject pItemSelected)
-    {
-        CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+    //public void ShowPaymentTerms(GameObject pItemSelected)
+    //{
+    //    CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
 
-        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
-    }
+    //    DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+    //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
+    //}
+    // ________________fin demander a nico c'est quoi parce que ça beug___________________
 
     //Get back  button function
     public void BackPage()

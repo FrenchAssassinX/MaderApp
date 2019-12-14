@@ -29,6 +29,8 @@ public class Login : MonoBehaviour
         btn.onClick.AddListener(SendConnection);
     }
 
+    
+
     /* Function starting when the connection button will be pressed */
     void SendConnection()
     {
