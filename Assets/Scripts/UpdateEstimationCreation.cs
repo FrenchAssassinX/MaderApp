@@ -303,21 +303,30 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to replace existing module from database if modules were previously created for an estimation */
     public void RecreateModule(string pModuleID, string pModuleName, string pDestinationPanel, string pPosX, string pPosY, string pWidth, string pHeight, string pAngle)
     {
+        Debug.Log("pDestinationPanel: " + pDestinationPanel);
+
         GameObject destPanel = GameObject.Find(pDestinationPanel);                                                              // Retrieve destination panel on scene with name
 
-        GameObject newModule = Instantiate(modulePrefab, destPanel.transform.position, Quaternion.identity);                     // Create new module
-        newModule.transform.SetParent(destPanel.transform);                                                                      // Change parent on scene hierarchy
+        if (GameObject.Find(pDestinationPanel) != null)
+        {
+            GameObject newModule = Instantiate(modulePrefab, destPanel.transform.position, Quaternion.identity);                     // Create new module
+            newModule.transform.SetParent(destPanel.transform);                                                                      // Change parent on scene hierarchy
 
-        newModule.GetComponent<RectTransform>().localScale = destPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
-        newModule.GetComponent<RectTransform>().anchoredPosition = destPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
+            newModule.GetComponent<RectTransform>().localScale = destPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
+            newModule.GetComponent<RectTransform>().anchoredPosition = destPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
 
-        newModule.GetComponent<RectTransform>().position = new Vector3(float.Parse(pPosX), float.Parse(pPosY), 0f);             // Replace as good position on 2D scene
-        newModule.GetComponent<RectTransform>().sizeDelta = new Vector2(float.Parse(pWidth), float.Parse(pHeight));             // Give saved size to the module
-        newModule.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, float.Parse(pAngle));                       // Give saved rotation to module
+            newModule.GetComponent<RectTransform>().position = new Vector3(float.Parse(pPosX), float.Parse(pPosY), 0f);             // Replace as good position on 2D scene
+            newModule.GetComponent<RectTransform>().sizeDelta = new Vector2(float.Parse(pWidth), float.Parse(pHeight));             // Give saved size to the module
+            newModule.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, float.Parse(pAngle));                       // Give saved rotation to module
 
-        newModule.name = pModuleName;
+            newModule.name = pModuleName;
 
-        newModule.GetComponent<UpdateModule2D>().id = pModuleID;
+            newModule.GetComponent<UpdateModule2D>().id = pModuleID;
+        }
+        else
+        {
+            StartCoroutine(DeleteModuleWithUnexistedFloor(pModuleID));
+        }
     }
 
     /* Function to unselect module */
@@ -641,6 +650,35 @@ public class UpdateEstimationCreation : MonoBehaviour
                     HideDeletePanel();                                      // Hide delete panel
                     Destroy(module);                                        // Destroy module from scene
                 }
+            }
+        }
+    }
+
+    /* Function to delete Module from estimation if floor where the module is dosn't exist anymore */
+    public IEnumerator DeleteModuleWithUnexistedFloor(string pModuleID)
+    {
+        WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+        form.AddField("moduleID", pModuleID);
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteModuleUrl, form);   // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+        yield return request.SendWebRequest();          // Send request                                                              
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                Debug.Log(jsonResult);
             }
         }
     }

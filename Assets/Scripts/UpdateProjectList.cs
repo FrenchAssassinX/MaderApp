@@ -159,7 +159,7 @@ public class UpdateProjectList : MonoBehaviour
                         if (requestCustomer.isDone)
                         {
                             string jsonResultCustomer = System.Text.Encoding.UTF8.GetString(requestCustomer.downloadHandler.data);          // Get JSON file
-                            Debug.Log(jsonResultCustomer);
+                            //Debug.Log(jsonResultCustomer);
 
                             RequestACustomer entityCustomer = JsonUtility.FromJson<RequestACustomer>(jsonResultCustomer);
                             Customer customer = entityCustomer.customer;

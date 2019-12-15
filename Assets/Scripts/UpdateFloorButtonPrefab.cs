@@ -111,12 +111,14 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             {
                 WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
                 form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
-                form.AddField("floorNumber", (floorCount.GetComponent<FloorCount>().floorCounter - 1).ToString());
+                form.AddField("floorNumber", (CONST.GetComponent<CONST>().floorCounterDatabase - 1).ToString());
 
                 Debug.Log("Estimation ID: " + CONST.GetComponent<CONST>().selectedEstimationID);
-                Debug.Log("floorNumber: " + (floorCount.GetComponent<FloorCount>().floorCounter - 1).ToString());
+                Debug.Log("floorNumber: " + (CONST.GetComponent<CONST>().floorCounterDatabase - 1).ToString());
 
-                UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl);      // New request, passing url
+                UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl, form);      // New request, passing url
+                Debug.Log("Email: *" + CONST.GetComponent<CONST>().url + updateEstimationFloorUrl + "*");
+
                 request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
                 request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
