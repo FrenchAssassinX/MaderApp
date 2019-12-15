@@ -379,6 +379,14 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     /* ------------------------------------     CHANGE SCENE PART     ------------------------------------ */
     // Function to Go to EstimationView scene
+    public void GoToMainMenu()
+    {
+        DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 5);       // Load MainMenu scene
+    }
+
+
+    // Function to Go to EstimationView scene
     public void GoToEstimationView()
     {
         DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes

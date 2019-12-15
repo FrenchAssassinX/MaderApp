@@ -440,3 +440,10 @@ public class GetPayment
     public string percentage;
     public string date;
 }
+
+[System.Serializable]
+public class RequestACustomer
+{
+    public string message;
+    public Customer customer;
+}

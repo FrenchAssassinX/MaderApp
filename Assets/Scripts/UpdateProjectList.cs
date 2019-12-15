@@ -13,7 +13,8 @@ public class UpdateProjectList : MonoBehaviour
     public GameObject CONST;                                    // CONST object contains server route, token and user infos
 
     private string getProjectUrl = "v1/getallproject";          // Specific route to get all projects
-    private string getAllCustomersUrl = "v1/getallcustomer";    // Specific route to get all projects
+    private string getAllCustomersUrl = "v1/getallcustomer";    // Specific route to get all customers
+    private string getCustomerByIDUrl = "v1/getcustomerbyid";   // Specific route to get a customer
     private string deleteProjectUrl = "v1/deleteproject";       // Specific route to delete one project
 
     public GameObject listItemPrefab;                           // Prefab item to display all elements in project list
@@ -137,42 +138,70 @@ public class UpdateProjectList : MonoBehaviour
                     // Create project with datas from database
                     Project entity = item;
 
-                    // Create prefab
-                    GameObject listItem = Instantiate(listItemPrefab, gridList.transform.position, Quaternion.identity);
-                    // Set GridList as parent of prefab in project hierarchy
-                    listItem.transform.SetParent(gridList.transform);
+                    /* Retrieve customer linked to the current project */
+                    WWWForm formCustomer = new WWWForm();                       // New form for web request
+                    formCustomer.AddField("customerID", entity.customer);       // Add to the form the value of the ID of the project to delete
 
-                    // Find children in listItem to use their
-                    GameObject dateValue = GameObject.Find("DateValue");
-                    GameObject refValue = GameObject.Find("RefValue");
-                    GameObject clientValue = GameObject.Find("ClientValue");
-                    GameObject sellerValue = GameObject.Find("SellerValue");
+                    UnityWebRequest requestCustomer = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getCustomerByIDUrl, formCustomer);     // New request, passing url and form
+                    requestCustomer.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                          // Set request authentications
+                    requestCustomer.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-                    // Customize props name of the prefab to find it when it will be create
-                    dateValue.name = dateValue.name + listItem.GetComponent<ItemListProject>().name;
-                    refValue.name = refValue.name + listItem.GetComponent<ItemListProject>().name;
-                    clientValue.name = clientValue.name + listItem.GetComponent<ItemListProject>().name;
-                    sellerValue.name = sellerValue.name + listItem.GetComponent<ItemListProject>().name;
+                    requestCustomer.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
-                    // Formating date to French timeset
-                    string dateValueText = entity.date.ToString();
-                    dateValueText = dateValueText.Remove(10, 14);
-                    DateTime dateTimeText = Convert.ToDateTime(dateValueText);
-                    dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+                    yield return requestCustomer.SendWebRequest();
 
-                    // Change text value of the list item
-                    dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
-                    refValue.GetComponent<UnityEngine.UI.Text>().text = entity.reference.ToString();
-                    clientValue.GetComponent<UnityEngine.UI.Text>().text = entity.customer.ToString();
-                    sellerValue.GetComponent<UnityEngine.UI.Text>().text = entity.user.matricule.ToString();
+                    if (requestCustomer.isNetworkError || requestCustomer.isHttpError)
+                    {
+                        Debug.Log("ERROR: " + requestCustomer.error);
+                    }
+                    else
+                    {
+                        if (requestCustomer.isDone)
+                        {
+                            string jsonResultCustomer = System.Text.Encoding.UTF8.GetString(requestCustomer.downloadHandler.data);          // Get JSON file
+                            Debug.Log(jsonResultCustomer);
 
-                    // ID to keep for view project sheet or deleting project
-                    listItem.GetComponent<ItemListProject>().id = entity._id.ToString();
-                    listItem.GetComponent<ItemListProject>().date = dateValueText;
-                    listItem.GetComponent<ItemListProject>().clientName = clientValue.GetComponent<UnityEngine.UI.Text>().text;
-                    listItem.GetComponent<ItemListProject>().referentName = sellerValue.GetComponent<UnityEngine.UI.Text>().text;
+                            RequestACustomer entityCustomer = JsonUtility.FromJson<RequestACustomer>(jsonResultCustomer);
+                            Customer customer = entityCustomer.customer;
 
-                    listProjects.Add(entity);
+                            // Create prefab
+                            GameObject listItem = Instantiate(listItemPrefab, gridList.transform.position, Quaternion.identity);
+                            // Set GridList as parent of prefab in project hierarchy
+                            listItem.transform.SetParent(gridList.transform);
+
+                            // Find children in listItem to use their
+                            GameObject dateValue = GameObject.Find("DateValue");
+                            GameObject refValue = GameObject.Find("RefValue");
+                            GameObject clientValue = GameObject.Find("ClientValue");
+                            GameObject sellerValue = GameObject.Find("SellerValue");
+
+                            // Customize props name of the prefab to find it when it will be create
+                            dateValue.name = dateValue.name + listItem.GetComponent<ItemListProject>().name;
+                            refValue.name = refValue.name + listItem.GetComponent<ItemListProject>().name;
+                            clientValue.name = clientValue.name + listItem.GetComponent<ItemListProject>().name;
+                            sellerValue.name = sellerValue.name + listItem.GetComponent<ItemListProject>().name;
+
+                            // Formating date to French timeset
+                            string dateValueText = entity.date.ToString();
+                            dateValueText = dateValueText.Remove(10, 14);
+                            DateTime dateTimeText = Convert.ToDateTime(dateValueText);
+                            dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+
+                            // Change text value of the list item
+                            dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
+                            refValue.GetComponent<UnityEngine.UI.Text>().text = entity.reference.ToString();
+                            clientValue.GetComponent<UnityEngine.UI.Text>().text = customer.name.ToString();
+                            sellerValue.GetComponent<UnityEngine.UI.Text>().text = entity.user.matricule.ToString();
+
+                            // ID to keep for view project sheet or deleting project
+                            listItem.GetComponent<ItemListProject>().id = entity._id.ToString();
+                            listItem.GetComponent<ItemListProject>().date = dateValueText;
+                            listItem.GetComponent<ItemListProject>().clientName = clientValue.GetComponent<UnityEngine.UI.Text>().text;
+                            listItem.GetComponent<ItemListProject>().referentName = sellerValue.GetComponent<UnityEngine.UI.Text>().text;
+
+                            listProjects.Add(entity);
+                        }
+                    }
                 }
             }
         }
