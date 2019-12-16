@@ -342,6 +342,12 @@ public class UpdateProjectSheet : MonoBehaviour
     //}
     // ________________fin demander a nico c'est quoi parce que ça beug___________________
 
+    public void GoToHomePage()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 3);
+    }
+
     //Get back  button function
     public void BackPage()
     {

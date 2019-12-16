@@ -136,6 +136,12 @@ public class UpdateEstimationView_2 : MonoBehaviour
         finishingint.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().extFinishingValue;
     }
 
+    public void GoToHomePage()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 7);
+    }
+
     //Get back page button function
     public void BackPage()
     {

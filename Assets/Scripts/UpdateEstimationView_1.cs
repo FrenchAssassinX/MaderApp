@@ -179,6 +179,12 @@ public class UpdateEstimationView_1 : MonoBehaviour
         }
     }
 
+    public void GoToHomePage()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 6);
+    }
+
     //Get back  button function
     public void BackPage()
     {
