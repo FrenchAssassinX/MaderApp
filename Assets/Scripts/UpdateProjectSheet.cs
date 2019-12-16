@@ -331,6 +331,17 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
     }
 
+    // ________________demander a nico c'est quoi parce que ça beug___________________
+    /* Function to show the technical folder */
+    //public void ShowPaymentTerms(GameObject pItemSelected)
+    //{
+    //    CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+
+    //    DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
+    //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
+    //}
+    // ________________fin demander a nico c'est quoi parce que ça beug___________________
+
     //Get back  button function
     public void BackPage()
     {
@@ -404,7 +415,7 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm form = new WWWForm();                       // New form for web request
 
         form.AddField("projectID", projectId);    // Add to the form the values of the project to update
-        form.AddField("userID", projectSailorId);
+        form.AddField("userID", sailorID);
         form.AddField("road", project.road);
         form.AddField("roadNum", project.roadNum);
         form.AddField("roadExtra", project.roadExtra);
@@ -637,7 +648,7 @@ public class UpdateProjectSheet : MonoBehaviour
         string osRunning = SystemInfo.operatingSystem; //value that contains the current os
         string[] osTab = osRunning.Split(' ');
         string OS = osTab[0];
-
+        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
         //pdf creation with windows os
         if (OS.Equals("Windows"))
         {
@@ -645,7 +656,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_"+ pItemSelected.GetComponent<ItemListEstimation>().idValue+ ".pdf"; //name of the document
+            string attachName = "Devis_"+ pItemSelected.GetComponent<ItemListEstimation>().idValue+"_"+ Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
@@ -703,7 +714,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + "_" + Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
@@ -763,7 +774,7 @@ public class UpdateProjectSheet : MonoBehaviour
             int titleCaracFont = 13; //font tall for the titles
             int leftPage = 10; //x position for the left page content
             int rightPage = 330; //x position for the right page content
-            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + ".pdf"; //name of the document
+            string attachName = "Devis_" + pItemSelected.GetComponent<ItemListEstimation>().idValue + "_" + Timestamp + ".pdf"; //name of the document
             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter

@@ -27,7 +27,7 @@ public class NewProject : MonoBehaviour
     public Button buttonCreateProject;          // Button to create new project
 
     /* Right canvas */
-    public Canvas canvasNewClient;              // Right canvas to display all fields to create new client
+    public Canvas canvasNewCustomer;              // Right canvas to display all fields to create new client
     public InputField name;                     // Input Field for client name
     public InputField surname;                  // Input Field for client surename
     public InputField roadNum;                  // Input Field for client road number
@@ -43,12 +43,14 @@ public class NewProject : MonoBehaviour
     public GameObject createValideCustomer;     // Customer successfully created
     public GameObject createValideProject;      // Project successfully created
     public GameObject errorCreateCustomer;      // Customer creation failed
+    public GameObject errorCreateProject;      // Project creation failed
 
     public string idClientForForm;
     string IdCustomerGenerated;
     List<string> dropdowncustomer = new List<string>();
 
     string change;
+    string getId;
     string getSurname;
     string getName;
     string newGetSurname;
@@ -59,10 +61,12 @@ public class NewProject : MonoBehaviour
         CONST = GameObject.Find("CONST");               // Get the CONST gameObject
 
         // By default don't display certain elements on start scene
-        canvasNewClient.transform.gameObject.SetActive(false);
+        canvasNewCustomer.transform.gameObject.SetActive(false);
         createValideCustomer.transform.gameObject.SetActive(false);
         errorCreateCustomer.transform.gameObject.SetActive(false);
         createValideProject.transform.gameObject.SetActive(false);
+        errorCreateProject.transform.gameObject.SetActive(false);
+
         referenceProject.enabled = false;
 
         //Active canvasRight for add new customer
@@ -83,35 +87,53 @@ public class NewProject : MonoBehaviour
         {
             DropdownValueChanged(idCustomer);
         });
+
     }
 
     //active CreateNewCient
-    void DisplayCreateNewCustomer()
+    public void DisplayCreateNewCustomer()
     {
-        canvasNewClient.transform.gameObject.SetActive(true);
+        canvasNewCustomer.transform.gameObject.SetActive(true);
     }
 
     //add new project
-    void SendCreateProject()
+    public void SendCreateProject()
     {
-        StartCoroutine(PostFormNewProject());
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
+        if (nameProject.text.Length == 0 || referenceProject.text.Length == 0)
+        {
+            errorCreateProject.transform.gameObject.SetActive(true);
+        }
+        else
+        {
+            StartCoroutine(PostFormNewProject());
+            errorCreateProject.transform.gameObject.SetActive(false);
+        }
     }
 
     //add new customer
-    void SendCreateCustomer()
+    public void SendCreateCustomer()
     {
-        StartCoroutine(PostFormNewCustomer());
+        //Time of a text field is empty (except roadExtra) an error message will be displayed if the user clicks on the button
+        if (name.text.Length == 0 || surname.text.Length == 0 || roadNum.text.Length == 0 || road.text.Length == 0 || zipcode.text.Length == 0 || city.text.Length == 0 || email.text.Length == 0 || phone.text.Length == 0)
+        {
+            errorCreateCustomer.transform.gameObject.SetActive(true);
+        }
+        else
+        {
+            StartCoroutine(PostFormNewCustomer()); // Start create new customer
+            errorCreateCustomer.transform.gameObject.SetActive(false);
+        }
     }
 
     //return to home page
-    void ReturnHomePage()
+    public void ReturnHomePage()
     {
         //Send the previous scene (home page)
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
 
-    IEnumerator PostFormNewCustomer()
+
+    public IEnumerator PostFormNewCustomer()
     {
         WWWForm form = new WWWForm();                   // New form for web request
         form.AddField("name", name.text);
@@ -139,7 +161,8 @@ public class NewProject : MonoBehaviour
             if (request.isNetworkError || request.isHttpError)
             {
                 // error
-                errorCreateCustomer.transform.gameObject.SetActive(true);
+                //errorCreateCustomer.transform.gameObject.SetActive(true);
+                Debug.Log("erreur");
             }
             else
             {
@@ -151,18 +174,19 @@ public class NewProject : MonoBehaviour
                     CreateCustomer entity = JsonUtility.FromJson<CreateCustomer>(jsonResult);
                     //message validate new customer
                     createValideCustomer.transform.gameObject.SetActive(true);
+                    //Actualize customer dropdown
+                    StartCoroutine(GetAllCustomers());
                 }
             }
         }
     }
 
-    IEnumerator PostFormNewProject()
+    public IEnumerator PostFormNewProject()
     {
         /* Converting actual date to string to pass it on form for web request */
         string dateValueText = DateTime.Now.ToString("MM-dd-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
-        Debug.Log("Date convert to string : " + dateValueText);
 
-        WWWForm form = new WWWForm();
+        WWWForm form = new WWWForm(); //New form for web request
         form.AddField("userID", CONST.GetComponent<CONST>().userID);
         form.AddField("date", dateValueText);
         form.AddField("road", road.text);
@@ -171,9 +195,9 @@ public class NewProject : MonoBehaviour
         form.AddField("zipcode", zipcode.text);
         form.AddField("city", city.text);
         form.AddField("customerID", idClientForForm);
-        form.AddField("reference", referenceProject.text);
         form.AddField("projectName", nameProject.text);
-
+        form.AddField("reference", referenceProject.text);
+        
         using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateProject, form))
         {
             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -237,10 +261,10 @@ public class NewProject : MonoBehaviour
                 {
                     // The database return a JSON file of all user infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                    Debug.Log(jsonResult);
                     // Create a root object thanks to the JSON file
                     RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
 
+                    //Get estimation id in CONST
                     Estimation estimation = entity.estimation;
                     CONST.GetComponent<CONST>().selectedEstimationID = estimation._id;
 
@@ -251,7 +275,7 @@ public class NewProject : MonoBehaviour
         }
     }
 
-    IEnumerator GetAllCustomers()
+    public IEnumerator GetAllCustomers()
     {
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -263,7 +287,7 @@ public class NewProject : MonoBehaviour
 
         if (request.isNetworkError || request.isHttpError)
         {
-
+            Debug.Log("ERROR: " + request.error);
         }
         else
         {
@@ -271,16 +295,17 @@ public class NewProject : MonoBehaviour
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);       // Convert JSON file
-
+                dropdowncustomer.Add("Choisir un client");
                 foreach (var item in entities.customers)
                 {
                     //recuperation values in customers
-                    string getId = item._id;
+                    getId = item._id;
                     getSurname = item.surename;
                     getName = item.name;
 
                     //Poster all customers
-                    dropdowncustomer.Add(getName + getSurname);
+                    dropdowncustomer.Add(getName + " " + getSurname);
+                    
 
                     //Select the first letters for name
                     idClientForForm = getId;
@@ -291,29 +316,28 @@ public class NewProject : MonoBehaviour
         }
     }
 
-    void DropdownValueChanged(Dropdown pChange)
+    //Function for create id of project
+    public void DropdownValueChanged(Dropdown pChange)
     {
-        Debug.Log(pChange.options[pChange.value].text);
+        //Get value in dropdown
         change = pChange.options[pChange.value].text;
-        Debug.Log("change : " + change);
 
-        //Select the timestanp
+        //Get timestanp
         var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
         //---------------------------Generate the ID Project-----------------------------------
-        if (getSurname != "" && getSurname != null)
-        {
-            newGetSurname = getSurname.Substring(0, 3);
-        }
 
-        if (getName != "" && getName != null)
-        {
-            newGetName = getName.Substring(0, 1);
-        }
+        //Get 5 first letters of surname in dropdown
+        newGetSurname = change.Substring(0, 5);
+ 
+        //Get value after space in dropdown
+        newGetName = change.Substring(change.IndexOf(" ")+" ".Length);
 
-        IdCustomerGenerated = change + Timestamp;
+        //Create reference project
+        IdCustomerGenerated = newGetSurname + newGetName.Substring(0, 1) + Timestamp;
 
-        //post ref project
+        //Post reference project
         referenceProject.GetComponent<InputField>().text = IdCustomerGenerated;
+
     }
 }

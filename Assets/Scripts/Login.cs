@@ -27,17 +27,18 @@ public class Login : MonoBehaviour
         // Declare button and the behaviour of the button
         Button btn = connection.GetComponent<Button>();
         btn.onClick.AddListener(SendConnection);
+
     }
 
     /* Function starting when the connection button will be pressed */
-    void SendConnection()
+    public void SendConnection()
     {
         //When you click on the login button you start this function
         StartCoroutine(PostLogin());
     }
 
     /* Function to connect user with the database */
-    IEnumerator PostLogin()
+    public IEnumerator PostLogin()
     {
         WWWForm form = new WWWForm();                   // New form for web request
         form.AddField("matricule", username.text);      // Add to the form the value of the UI Element 'Matricule'
@@ -75,6 +76,7 @@ public class Login : MonoBehaviour
                     DontDestroyOnLoad(CONST.transform);
                     // Go to Home Scene
                     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
                 }
 
             }
