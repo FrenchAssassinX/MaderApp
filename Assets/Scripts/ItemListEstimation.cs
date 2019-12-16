@@ -21,7 +21,7 @@ public class ItemListEstimation : MonoBehaviour
     private GameObject buttonPaymentTerms;
     private GameObject buttonTechnicalFile;
     private GameObject buttonShowEstimation;
-
+    private GameObject buttonUpdateEstimation;
 
     // Start is called before the first frame update
     void Start()
@@ -36,50 +36,40 @@ public class ItemListEstimation : MonoBehaviour
         buttonPaymentTerms = GameObject.Find("paymentTermsButton");
         buttonTechnicalFile = GameObject.Find("technicalFileButton");
         buttonShowEstimation = GameObject.Find("showEstimationButton");
+        buttonUpdateEstimation = GameObject.Find("updateButton");
 
-        //Hide the previous buttons
+        //Hide the previous buttons and affect specific onClick behaviours
         if (buttonDelete != null)
         {
             buttonDelete.SetActive(false);
-        }
-        if (buttonEstimation != null)
-        {
-            buttonEstimation.SetActive(false);
-        }
-        if (buttonPaymentTerms != null)
-        {
-            buttonPaymentTerms.SetActive(false);
-        }
-        if (buttonTechnicalFile != null)
-        {
-            buttonTechnicalFile.SetActive(false);
-        }
-        if (buttonShowEstimation != null)
-        {
-            buttonShowEstimation.SetActive(false);
-        }
-
-        /* Affect specific onClick behaviours to the buttons */
-        if (buttonDelete != null)
-        {
             buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
         }
         if (buttonEstimation != null)
         {
+            buttonEstimation.SetActive(false);
             buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
         }
         if (buttonPaymentTerms != null)
         {
+            buttonPaymentTerms.SetActive(false);
             buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
         }
         if (buttonTechnicalFile != null)
         {
+            buttonTechnicalFile.SetActive(false);
             buttonTechnicalFile.GetComponent<Button>().onClick.AddListener(GetTechnicalFile);
         }
         if (buttonShowEstimation != null)
         {
+            buttonShowEstimation.SetActive(false);
             buttonShowEstimation.GetComponent<Button>().onClick.AddListener(ShowEstimation);
         }
+        if (buttonUpdateEstimation != null)
+        {
+            buttonUpdateEstimation.SetActive(false);
+            buttonUpdateEstimation.GetComponent<Button>().onClick.AddListener(UpdateEstimation);
+        }
+        
     }
 
     /* Function for select item detection */
@@ -106,6 +96,10 @@ public class ItemListEstimation : MonoBehaviour
         if (buttonShowEstimation != null)
         {
             buttonShowEstimation.SetActive(true);
+        }
+        if (buttonUpdateEstimation != null)
+        {
+            buttonUpdateEstimation.SetActive(true);
         }
         isSelected = true;
     }
@@ -142,16 +136,25 @@ public class ItemListEstimation : MonoBehaviour
     {
         if (isSelected)
         {
-            Debug.Log("Fenêtre de modalités de paiement ouverte");
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowPaymentTerms(this.gameObject);
         }
     }
 
-    /* Function that gets technical file pdf*/
+    /* Function that gets technical file window*/
     public void GetTechnicalFile()
     {
         if (isSelected)
         {
             GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowTechnicalFolder(this.gameObject);
+        }
+    }
+
+    /* Function that opens create estimation window*/
+    public void UpdateEstimation()
+    {
+        if (isSelected)
+        {
+            GameObject.Find("Canvas").GetComponent<UpdateProjectSheet>().ShowCreateEstimation(this.gameObject);
         }
     }
 }

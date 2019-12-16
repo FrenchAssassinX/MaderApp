@@ -42,6 +42,8 @@ public class UpdateEstimationView_2 : MonoBehaviour
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");           // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
+        requestForEstimation.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
+
         yield return requestForEstimation.SendWebRequest(); //execute the web request
 
         if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError)
@@ -75,6 +77,8 @@ public class UpdateEstimationView_2 : MonoBehaviour
         UnityWebRequest requestForModule = UnityWebRequest.Post(urlToGetModule, moduleForm);     // Create new WebRequest
         requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        requestForModule.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return requestForModule.SendWebRequest(); //execute the web request
 

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class CONST : MonoBehaviour
 {
-    public string url = "http://madera-figueiredo.space/";
+    public string url = "https://madera-figueiredo.space/";
     public string token;
     public string userID;
     public string userName;
@@ -16,4 +17,13 @@ public class CONST : MonoBehaviour
     public string state;
     public List<string> listModulesCreated = new List<string>();
     public Dictionary<string, string> dictComponentsForModule = new Dictionary<string, string>();
+
+    public class BypassCertificate : CertificateHandler
+    {
+        protected override bool ValidateCertificate(byte[] certificateData)
+        {
+            //Simply return true no matter what
+            return true;
+        }
+    }
 }
