@@ -337,7 +337,7 @@ public class Components
     public string name;
     public string type;
     public string cost;
-    public List<Provide> provide;
+    public Provide provide;
 }
 
 [System.Serializable]
