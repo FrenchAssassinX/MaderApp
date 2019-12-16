@@ -168,12 +168,26 @@ public class UpdateProjectList : MonoBehaviour
                             GameObject listItem = Instantiate(listItemPrefab, gridList.transform.position, Quaternion.identity);
                             // Set GridList as parent of prefab in project hierarchy
                             listItem.transform.SetParent(gridList.transform);
+                            listItem.GetComponent<RectTransform>().localScale = gridList.GetComponent<RectTransform>().localScale;
+                            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(gridList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
 
                             // Find children in listItem to use their
                             GameObject dateValue = GameObject.Find("DateValue");
                             GameObject refValue = GameObject.Find("RefValue");
                             GameObject clientValue = GameObject.Find("ClientValue");
                             GameObject sellerValue = GameObject.Find("SellerValue");
+
+                            /* Change size of element to fit on parent size */
+                            /* Local scale */
+                            dateValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                            refValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                            clientValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                            sellerValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                            /* Size delta */
+                            dateValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                            refValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                            clientValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                            sellerValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
                             // Customize props name of the prefab to find it when it will be create
                             dateValue.name = dateValue.name + listItem.GetComponent<ItemListProject>().name;
