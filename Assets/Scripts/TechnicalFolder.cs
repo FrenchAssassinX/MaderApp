@@ -199,6 +199,12 @@ public class TechnicalFolder : MonoBehaviour
         }
     }
 
+    public void GoToHomePage()
+    {
+        DontDestroyOnLoad(CONST);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 8);
+    }
+
     // Function to Go to EstimationView scene
     public void GoToEstimationModality()
     {
