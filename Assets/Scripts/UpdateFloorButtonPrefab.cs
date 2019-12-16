@@ -113,11 +113,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                 form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
                 form.AddField("floorNumber", (CONST.GetComponent<CONST>().floorCounterDatabase - 1).ToString());
 
-                Debug.Log("Estimation ID: " + CONST.GetComponent<CONST>().selectedEstimationID);
-                Debug.Log("floorNumber: " + (CONST.GetComponent<CONST>().floorCounterDatabase - 1).ToString());
-
                 UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl, form);      // New request, passing url
-                Debug.Log("Email: *" + CONST.GetComponent<CONST>().url + updateEstimationFloorUrl + "*");
 
                 request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
                 request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -139,7 +135,6 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
                         floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
                         floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
-                        floorCount.GetComponent<FloorCount>().floorCounter -= 1;
 
                         Destroy(this.gameObject);                                                           // Destroy floor button
                         Destroy(panelFloor);                                                                // Destroy floor panel
@@ -152,7 +147,6 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             {
                 floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
                 floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
-                floorCount.GetComponent<FloorCount>().floorCounter -= 1;
 
                 Destroy(this.gameObject);                                                           // Destroy floor button
                 Destroy(panelFloor);                                                                // Destroy floor panel
@@ -172,26 +166,29 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         /* Rename all the floor buttons and panels */
         foreach (GameObject button in floorCount.GetComponent<FloorCount>().listFloorButtons)               
         {
-            if (counterForeach <= floorCount.GetComponent<FloorCount>().floorCounter)                       // If the counter is less or equal of the number of existing floors: continue
+            if (counterForeach <= floorCount.GetComponent<FloorCount>().floorCounter - 2)                       // If the counter is less or equal of the number of existing floors: continue
             {
-                GameObject panel = null;                                                                    // Declare empty panel
-
-                /* Search panel associate to the button */
-                foreach (GameObject itemPanel in floorCount.GetComponent<FloorCount>().listFloorPanels)
+                if (button.name != "Floor0" && button.name != "Rooftop")
                 {
-                    if (itemPanel.name == "panel" + button.name)
+                    GameObject panel = null;                                                                    // Declare empty panel
+
+                    /* Search panel associate to the button */
+                    foreach (GameObject itemPanel in floorCount.GetComponent<FloorCount>().listFloorPanels)
                     {
-                        panel = itemPanel;                                                                  // If the panel is found on the list, then affected to the empty panel
+                        if (itemPanel.name == "panel" + button.name)
+                        {
+                            panel = itemPanel;                                                                  // If the panel is found on the list, then affected to the empty panel
+                        }
                     }
+
+                    GameObject textButton = GameObject.Find(button.name + "Text");                              // Retrieve the text button on the list
+                    button.name = "Floor" + counterForeach;                                                     // Rename the button with existing floors
+                    panel.name = "panel" + button.name;                                                         // Rename panel with existing floors
+                    textButton.name = button.name + "Text";                                                     // Rename text button with existing floors
+                    textButton.GetComponent<UnityEngine.UI.Text>().text = "Etage" + counterForeach;             // Rename the text displayed in the button with exiting floors
+
+                    counterForeach++;                                                                           // Increase counter of floors
                 }
-
-                GameObject textButton = GameObject.Find(button.name + "Text");                              // Retrieve the text button on the list
-                button.name = "Floor" + counterForeach;                                                     // Rename the button with existing floors
-                panel.name = "panel" + button.name;                                                         // Rename panel with existing floors
-                textButton.name = button.name + "Text";                                                     // Rename text button with existing floors
-                textButton.GetComponent<UnityEngine.UI.Text>().text = "Etage" + counterForeach;             // Rename the text displayed in the button with exiting floors
-
-                counterForeach++;                                                                           // Increase counter of floors
             }
 
         }

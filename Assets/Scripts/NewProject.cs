@@ -217,6 +217,7 @@ public class NewProject : MonoBehaviour
         form.AddField("price", "0");
         form.AddField("discount", "0");
         form.AddField("module", "[]");
+        form.AddField("floorNumber", "2");
 
         using (UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLCreateEstimation, form))
         {

@@ -173,11 +173,13 @@ public class UpdateEstimationCreation : MonoBehaviour
                     newFloor.name = "Rooftop";
                     textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Toiture";
                     panelNewFloor.name = "panelRooftop";
+                    textNewFloor.name = "RooftopText";                                                                                 // Change name of text
                 }
                 /* Rename other floors */
                 else
                 {
                     newFloor.name = "Floor" + (i - 1);
+                    textNewFloor.name = newFloor.name + "Text";
                     textNewFloor.GetComponent<UnityEngine.UI.Text>().text = "Etage " + (i - 1);
                     panelNewFloor.name = "panelFloor" + (i - 1);
                 }
