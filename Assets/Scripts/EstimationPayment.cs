@@ -22,6 +22,7 @@ public class EstimationPayment : MonoBehaviour
     public Dropdown statePayment; //Dropdown for statePayment
     public Button buttonSave; //Button for save 
     public Button buttonReturn; //Button for to TechnicalFolder scene
+    public Button buttonHome; //Button for going to home
     public Slider sliderStatePayment; //ProgressBar for Advancement Payment
     public Text percentageText; //Text for show avencement in % for user
 
@@ -33,7 +34,7 @@ public class EstimationPayment : MonoBehaviour
     public string changePayment; //Define string for get change payment
     public string changeStep; //Define string for get step
     public string changePercent; //Define string for get percent
-    public string stepPayment; //Define string for step in payment
+    public string stepPayment = "plop"; //Define string for step in payment
     public int stepPaymentInt; //Define int for step payment
     public string percentPayment; //Define string for percent in payment
 
@@ -83,9 +84,13 @@ public class EstimationPayment : MonoBehaviour
         Button btnSV = buttonSave.GetComponent<Button>();
         btnSV.onClick.AddListener(SaveAdvancement);
 
-        //return home page
+        //Return To TechnicalFolder
         Button btnRT = buttonReturn.GetComponent<Button>();
         btnRT.onClick.AddListener(ReturnToTechnicalFolder);
+
+        //Return to home
+        Button btnRH = buttonHome.GetComponent<Button>();
+        btnRH.onClick.AddListener(ReturnToHomeScene);
 
         //State payment is not visible for now
         canvasPayment.transform.gameObject.SetActive(false);
@@ -284,10 +289,10 @@ public class EstimationPayment : MonoBehaviour
     {
         Debug.Log("in create payment");
         WWWForm form = new WWWForm(); //New form for web request
-        //TODO step payement est vide a logé pour corrigé
-        form.AddField("step", stepPayment); //Add to the form the value of the UI Element 'stepPyament'
-        form.AddField("percent", percentPayment); //Add to the form the value of the UI Element 'percentPyament'
+        form.AddField("step", stepPayment); //Add to the form the value of the UI Element 'stepPayment'
+        form.AddField("percent", percentPayment); //Add to the form the value of the UI Element 'percentPayment'
         form.AddField("projectID", CONST.GetComponent<CONST>().selectedProjectID); //Add to the form the value of the selectedProjectID in CONST
+        form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID); //Add to the form the value of the selectedEstimationID in CONST
 
         Debug.Log("step log: " + stepPayment);
         Debug.Log("percent log: " + percentPayment);
@@ -546,13 +551,17 @@ public class EstimationPayment : MonoBehaviour
                             getPercent = entities2.payement.percentage;
 
                             Debug.Log("step & percent : " + getStep + " " + getPercent);
-
+                            //TODO VOIR AVEC AURELIEN POUR LE POST QUI RENVOI UNE ERREUR INCONNU !!!!!!!!!!!!!!!!!!!!!!
                             form = new WWWForm(); //New form for web request
                             form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
+                            Debug.Log("probleme estimation IDDD : " + CONST.GetComponent<CONST>().selectedEstimationID);
                             using (UnityWebRequest request3 = UnityWebRequest.Post(url + URLGetEstimationById, form))
                             {
                                 request3.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Complete form with authentication datas
                                 request3.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token); //Token
+
+                                request3.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
                                 yield return request3.SendWebRequest(); //Send request
 
                                 //If connection failed
