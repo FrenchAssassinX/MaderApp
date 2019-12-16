@@ -337,7 +337,7 @@ public class Components
     public string name;
     public string type;
     public string cost;
-    public List<Provide> provide;
+    public Provide provide;
 }
 
 [System.Serializable]
@@ -439,4 +439,11 @@ public class GetPayment
     public string step;
     public string percentage;
     public string date;
+}
+
+[System.Serializable]
+public class RequestACustomer
+{
+    public string message;
+    public Customer customer;
 }

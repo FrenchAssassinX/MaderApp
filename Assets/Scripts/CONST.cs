@@ -15,6 +15,7 @@ public class CONST : MonoBehaviour
     public string estimationPrice;
     public string estimationDiscount;
     public string state;
+    public int floorCounterDatabase;
     public List<string> listModulesCreated = new List<string>();
     public Dictionary<string, string> dictComponentsForModule = new Dictionary<string, string>();
 
