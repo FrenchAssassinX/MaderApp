@@ -15,6 +15,7 @@ public class NewProject : MonoBehaviour
     private string URLCreateProject = "v1/createproject";           // Specific url for create project
     private string URLGetCustomers = "v1/getallcustomer";           // Specific url for get all customers
     private string URLCreateEstimation = "v1/createestimation";     // Specific url for create estimation
+    private string URLGetCustomerByID = "v1/getcustomerbyid";       // Specific url for get customer
 
     /* Top Canvas */
     public Button buttonReturn;
@@ -221,6 +222,35 @@ public class NewProject : MonoBehaviour
 
                     Project project = entity.project;
                     CONST.GetComponent<CONST>().selectedProjectID = project._id;
+                    CONST.GetComponent<CONST>().projectName = project.name;
+
+                    WWWForm formCustomer = new WWWForm();
+                    formCustomer.AddField("customerID", project.customer);
+
+                    using (UnityWebRequest requestCustomer = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + URLGetCustomerByID, formCustomer))
+                    {
+                        requestCustomer.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        requestCustomer.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                        requestCustomer.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+                        yield return requestCustomer.SendWebRequest();
+                        if (requestCustomer.isNetworkError || requestCustomer.isHttpError)
+                        {
+                            Debug.Log("ERROR: " + requestCustomer.error);
+                        }
+                        else
+                        {
+                            if (request.isDone)
+                            {
+                                string jsonResultCustomer = System.Text.Encoding.UTF8.GetString(requestCustomer.downloadHandler.data);
+                                RequestACustomer requestACustomer = JsonUtility.FromJson<RequestACustomer>(jsonResultCustomer);
+                                Customer customer = requestACustomer.customer;
+
+                                CONST.GetComponent<CONST>().customerName = customer.name;
+                            }
+                        }
+                    }
 
                     StartCoroutine(CreateNewEstimation(CONST.GetComponent<CONST>().selectedProjectID));
 
