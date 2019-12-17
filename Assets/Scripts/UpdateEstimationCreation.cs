@@ -27,6 +27,10 @@ public class UpdateEstimationCreation : MonoBehaviour
     public GameObject deletePanelErrorMessage;          // Text message to display when an error appeared
     public GameObject deletePanelMessage;               // Text message to display confirm message before delete
 
+    public GameObject sendDatasPanel;                   // Panel to send datas
+    public GameObject sendDatasPanelErrorMessage;       // Text message to display when an error appeared
+    public GameObject sendDatasPanelMessage;            // Text message to display confirm message before sending datas
+
     public GameObject list;                             // List containing gridList
     public GameObject gridList;                         // Grid to insert project prefab items
     public GameObject floorCount;                       // Counter to set name of the floor
@@ -73,8 +77,10 @@ public class UpdateEstimationCreation : MonoBehaviour
 
         moduleCounter = 1;                      // Starting counter for module name                                                       
 
+        sendDatasPanel.SetActive(false);        // Disable send datas panel by default
         deletePanel.SetActive(false);           // Disable delete panel by default
         textErrorAddModule.SetActive(false);    // Disable text error by default
+
 
         /* Add listener to dropdowns */
         dropdownRanges.onValueChanged.AddListener(delegate {
@@ -229,6 +235,19 @@ public class UpdateEstimationCreation : MonoBehaviour
 
             floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
         }
+    }
+
+    /* Function to display send datas panel */
+    public void DisplaySendDatasPanel()
+    {
+        sendDatasPanel.SetActive(true);                        // Display send datas panel
+        sendDatasPanelErrorMessage.SetActive(false);           // Don't display error message on send datas panel
+    }
+
+    /* Function to HideDeletePanel */
+    public void HideSendDatasPanel()
+    {
+        sendDatasPanel.SetActive(false);
     }
 
     /* Function to display delete panel */
@@ -509,7 +528,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                                     moduleComponents = item.Value;
                                 }
                             }
-
+                            
                             WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
                             form.AddField("name", module.name);                                                         // Module name
                             form.AddField("cost", modelModule.cost);                                                    // Module cost
@@ -525,21 +544,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                             form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
                             form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
                             form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
-
-                            Debug.Log("Module name: " + module.name);
-                            Debug.Log("Module cost: " + modelModule.cost);
-                            Debug.Log("Module angle: " + module.GetComponent<RectTransform>().eulerAngles.z.ToString());
-                            Debug.Log("Module cut: " + dropdownCuts.options[dropdownCuts.value].text);
-                            Debug.Log("Module range: " + modelModule.range);
-                            Debug.Log("Module components: " + moduleComponents);
-                            Debug.Log("Module estimationID: " + CONST.GetComponent<CONST>().selectedEstimationID);
-                            Debug.Log("Module rangeName: " + modelModule.rangeName);
-                            Debug.Log("Module rangeAttributes: " + rangeAttributesForm);
-                            Debug.Log("Module x: " + module.GetComponent<RectTransform>().position.x.ToString());
-                            Debug.Log("Module y: " + module.GetComponent<RectTransform>().position.y.ToString());
-                            Debug.Log("Module destFloor: " + module.GetComponent<UpdateModule2D>().destinationFloor);
-                            Debug.Log("Module width: " + module.GetComponent<RectTransform>().sizeDelta.x.ToString());
-                            Debug.Log("Module height: " + module.GetComponent<RectTransform>().sizeDelta.y.ToString());
 
                             UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
                             request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
@@ -560,8 +564,10 @@ public class UpdateEstimationCreation : MonoBehaviour
                                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                                     Debug.Log(jsonResult);
 
-                                    /* VERIFY UTILITY */
-                                    RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResult);                 // Convert JSON to entity object
+                                    CONST.GetComponent<CONST>().estimationDiscount = "0";
+
+                                            /* VERIFY UTILITY */
+                                            RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResult);                 // Convert JSON to entity object
                                     Module moduleResult = entityModule.module;                                                      // Convert entity object to module object
                                     module.GetComponent<UpdateModule2D>().id = moduleResult._id;
                                     /* END VERIFY UTILITY */
@@ -599,6 +605,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 Debug.Log(jsonResult);
+                GoToEstimationView();
             }
         }
     }
