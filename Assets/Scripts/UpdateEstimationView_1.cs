@@ -22,7 +22,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
     public GameObject listItemPrefab;                  // Prefab item that represents a component
     public GameObject componentList;                   //panel wich will contain all the components of the estimation
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -39,7 +39,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
         if (discountInt != 0) //if the price isn't null we calculate the discounted price
         {
             int mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
-            int sub = mult/100; //secondly we divide the result per 100. It wil give the amount of the discount
+            int sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
 
@@ -60,7 +60,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
         WWWForm estimationForm = new WWWForm();                       // New form for web request
         estimationForm.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);    // Add to the form the value of the ID of the estimation to get
-        
+
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToGetEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");           // Complete form with authentication datas
         requestForEstimation.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -69,7 +69,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
         yield return requestForEstimation.SendWebRequest(); //execute the web request
 
-        if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError) 
+        if (requestForEstimation.isNetworkError || requestForEstimation.isHttpError)
         {
             Debug.Log(requestForEstimation.error);
         }
@@ -80,10 +80,10 @@ public class UpdateEstimationView_1 : MonoBehaviour
             RequestAnEstimation estimationEntity = JsonUtility.FromJson<RequestAnEstimation>(jsonResultFromEstimation);         // Convert JSON file
 
             Estimation estimation = estimationEntity.estimation; //Create a serialized estimation object 
-            
-            foreach(var moduleItem in estimation.module) //bubkle into all the modules of the current estimation
+
+            foreach (var moduleItem in estimation.module) //bubkle into all the modules of the current estimation
             {
-                
+
                 StartCoroutine(GetModules(moduleItem.id)); //start the search of the current module datas
             }
         }
@@ -96,6 +96,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
         var urlToGetModule = CONST.GetComponent<CONST>().url + "v1/getmodulebyid"; //http road to get the module datas by giving its ID
 
         WWWForm moduleForm = new WWWForm();                       // New form for web request
+        Debug.Log("module : " + moduleId);
         moduleForm.AddField("moduleID", moduleId);    // Add to the form the value of the ID of the module to get
 
         UnityWebRequest requestForModule = UnityWebRequest.Post(urlToGetModule, moduleForm);     // Create new WebRequest
@@ -158,6 +159,9 @@ public class UpdateEstimationView_1 : MonoBehaviour
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(componentList.transform);
 
+            listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
+            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
             // Find children in listItem to use them
             GameObject nameValue = GameObject.Find("nameText");
             GameObject quantityValue = GameObject.Find("quantityText");
@@ -170,12 +174,22 @@ public class UpdateEstimationView_1 : MonoBehaviour
             unitValue.name = unitValue.name + listItem.GetComponent<ItemListComponent>().name;
             priceValue.name = priceValue.name + listItem.GetComponent<ItemListComponent>().name;
 
+            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            unitValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+
+            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+
             // Change text value of the list item
             nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
             quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
             unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.price +"€";
-            
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.price + "€";
+
         }
     }
 
@@ -231,7 +245,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
         WWWForm estimationForm = new WWWForm();                       // New form for web request
         estimationForm.AddField("discount", CONST.GetComponent<CONST>().selectedEstimationID);    // Add to the form the value of the ID of the project to get
-        estimationForm.AddField("estimationID", discountSt); 
+        estimationForm.AddField("estimationID", discountSt);
 
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToUpdateEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas

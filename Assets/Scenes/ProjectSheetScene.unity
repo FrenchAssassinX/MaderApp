@@ -2360,6 +2360,7 @@ MonoBehaviour:
   confirmDeletePanel: {fileID: 1322970064}
   deletePanelConfirmButton: {fileID: 1590367798}
   deletePanelCancelButton: {fileID: 1645894968}
+  addButton: {fileID: 696870665}
 --- !u!1 &466071060
 GameObject:
   m_ObjectHideFlags: 0
