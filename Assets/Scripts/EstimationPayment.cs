@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -33,7 +32,7 @@ public class EstimationPayment : MonoBehaviour
     public string changePayment; //Define string for get change payment
     public string changeStep; //Define string for get step
     public string changePercent; //Define string for get percent
-    public string stepPayment = "plop"; //Define string for step in payment
+    public string stepPayment; //Define string for step in payment
     public int stepPaymentInt; //Define int for step payment
     public string percentPayment; //Define string for percent in payment
 
@@ -108,9 +107,6 @@ public class EstimationPayment : MonoBehaviour
         {
             StateAdvancementModif(statePayment);
         });
-
-
-
     }
 
     void Update()
@@ -155,7 +151,11 @@ public class EstimationPayment : MonoBehaviour
             //Start CreatePayment if "Accepté" is selected
             //if "Accepté" is selected dropdown state esimation is disabled
             stateEstimation.enabled = false;
+            //And value to "A la signature" id per default
             sliderStatePayment.value = 0.03f;
+            stepPayment = "1"; //Number for step
+            stepPaymentInt = Int32.Parse(stepPayment); //Parse stepPayment
+            percentPayment = "3%"; //Percent for advancement payment
 
         }
         else
@@ -173,10 +173,8 @@ public class EstimationPayment : MonoBehaviour
         statePayment.AddOptions(dropdownStatePayment);
         //Change state
         changePayment = pChangePayment.options[pChangePayment.value].text;
-        //-----------ici----------
         changePercent = percentPayment;
         changeStep = stepPayment;
-        //-----------ici----------
         Debug.Log("change payment step & percent: " + changePayment + changePercent + changeStep);
 
         //Max slider is 1, it's full position
@@ -202,6 +200,7 @@ public class EstimationPayment : MonoBehaviour
                     percentPayment = "10%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.1f; //Value to advance the progress bar  
                     break;
+
                 }
             case "Ouverture du chantier":
                 {
@@ -211,6 +210,7 @@ public class EstimationPayment : MonoBehaviour
                     percentPayment = "15%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.15f; //Value to advance the progress bar   
                     break;
+
                 }
             case "Achèvement des fondations":
                 {
@@ -323,14 +323,25 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log("jsons result payment: " + jsonResult);
                     //Get id payment for convert in payment Id for update payment
                     RequestCreatePayment entity = JsonUtility.FromJson<RequestCreatePayment>(jsonResult); //Convert JSON file
-                    //---------------ici------------------
+                    // Get step & percentage
                     CreatePayement payement = entity.payement;
                     getPaymentStep = payement.step;
                     getPaymentPercent = payement.percentage;
 
                     Debug.Log("getPaymentStep: " + getPaymentStep);
                     Debug.Log("getPaymentPercent: " + getPaymentPercent);
-                    //-----------------ici-------------------
+
+                    textSavePayment.transform.gameObject.SetActive(true);
+                    
+
+                    //for(int i = 0; i < 5; i++)
+                    //{
+                    //    Thread.Sleep(3000);
+                    //    textSavePayment.transform.gameObject.SetActive(true);
+                    //}
+                    //Console.WriteLine("Main thread exits.");
+                    //textSavePayment.transform.gameObject.SetActive(false);
+
                 }
             }
         }
@@ -508,14 +519,12 @@ public class EstimationPayment : MonoBehaviour
                 Debug.Log("BigCoroutine : " + jsonResult);
 
                 RequestAProject entities = JsonUtility.FromJson<RequestAProject>(jsonResult);
-                Debug.Log("entities.payment : " + entities.result.payement[entities.result.payement.Count - 1].id);
                 //Get jsonresult in requestAProject
                 requestAProject = entities;
                 Debug.Log("start update");
 
                 form = new WWWForm(); //New form for web request
                 form.AddField("payementID", requestAProject.result.payement[requestAProject.result.payement.Count - 1].id); //Add to the form the value of the paymentID in CONST
-
 
                 // New webrequest with: CONST url, local url and the form
                 using (UnityWebRequest request2 = UnityWebRequest.Post(url + URLGetPaymentById, form))
@@ -550,7 +559,6 @@ public class EstimationPayment : MonoBehaviour
                             getPercent = entities2.payement.percentage;
 
                             Debug.Log("step & percent : " + getStep + " " + getPercent);
-                            //TODO VOIR AVEC AURELIEN POUR LE POST QUI RENVOI UNE ERREUR INCONNU !!!!!!!!!!!!!!!!!!!!!!
                             form = new WWWForm(); //New form for web request
                             form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
                             Debug.Log("probleme estimation IDDD : " + CONST.GetComponent<CONST>().selectedEstimationID);

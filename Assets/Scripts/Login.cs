@@ -19,6 +19,7 @@ public class Login : MonoBehaviour
     void Start()
     {
         CONST.GetComponent<CONST>().url = "https://madera-figueiredo.space/";
+
         // Get the url of CONST
         url = CONST.GetComponent<CONST>().url;
 
