@@ -57,12 +57,12 @@ public class CreateModule : MonoBehaviour
     string rangeIDForForm;          //  Range ID to send datas to database
     string getModelForForm;         //ddmodel
 
-    string getWUForForm;            //ddwoodenUpright
-    string getIPForForm;            //ddinsulationPanels
-    string getRBForForm;            //ddrainBarrier
-    string getITPForForm;           //ddintermediatePanels
-    string getHPForForm;            //ddhatchPanels
-    string getFloorForForm;         //ddfloor
+    string getWUForForm = "";            //ddwoodenUpright
+    string getIPForForm = "";            //ddinsulationPanels
+    string getRBForForm = "";            //ddrainBarrier
+    string getITPForForm = "";           //ddintermediatePanels
+    string getHPForForm = "";            //ddhatchPanels
+    string getFloorForForm = "";         //ddfloor
 
     string code;
     string unit;
@@ -74,6 +74,8 @@ public class CreateModule : MonoBehaviour
     string angleModule = "";
     string cutModule = "";
     string componentsSelected = "[]";
+
+    int timerBadSendModule = 120;
 
     //Define Dropdown Left value
     List<string> dropdownranges = new List<string>();
@@ -124,7 +126,18 @@ public class CreateModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (badSendModule.transform.gameObject.active)
+        {
+            if (timerBadSendModule > 0)
+            {
+                timerBadSendModule--;
+            }
+            else
+            {
+                badSendModule.transform.gameObject.SetActive(false);
+                timerBadSendModule = 120;
+            }
+        }
     }
 
     // Function to go to Create Estimation scene
