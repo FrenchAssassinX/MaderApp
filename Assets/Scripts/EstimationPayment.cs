@@ -43,7 +43,7 @@ public class EstimationPayment : MonoBehaviour
     public string getPaymentStep; //get step in database
     public string getPaymentPercent; //get percent in database
     public string getStateEstimation; //get entities to GetEstimationBYId
-    RequestAProject requestAProject; //get entities to RequestAProject
+    public RequestAProject requestAProject; //get entities to RequestAProject
 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
