@@ -93,6 +93,9 @@ public class TechnicalFolder : MonoBehaviour
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(modulesList.transform);
 
+            listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
+            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
             // Find children in listItem to use them
             GameObject nameValue = GameObject.Find("nameText");
 
@@ -101,6 +104,10 @@ public class TechnicalFolder : MonoBehaviour
 
             // Change text value of the list item
             nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
+
+            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+
+            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
             // ID to keep for buckel in the module components 
             listItem.GetComponent<ItemListModulesForTech>().idValue = module._id;
@@ -184,6 +191,9 @@ public class TechnicalFolder : MonoBehaviour
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(componentsList.transform);
 
+            listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
+            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
             // Find children in listItem to use them
             GameObject nameValue = GameObject.Find("nameText");
             GameObject quantityValue = GameObject.Find("quantityText");
@@ -191,6 +201,12 @@ public class TechnicalFolder : MonoBehaviour
             // Customize props name of the prefab to find it when it will be create
             nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
             quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
+
+            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+
+            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
             // Change text value of the list item
             nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;

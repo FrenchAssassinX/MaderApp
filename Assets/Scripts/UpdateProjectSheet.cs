@@ -108,6 +108,8 @@ public class UpdateProjectSheet : MonoBehaviour
     private Project project;
     private Customer customer;
 
+    public Button addButton;
+
     EstimationSelected estimationSelected = new EstimationSelected();
 
     // Start is called before the first frame update
@@ -119,6 +121,8 @@ public class UpdateProjectSheet : MonoBehaviour
         confirmDeletePanel.SetActive(false);
 
         CONST = GameObject.Find("CONST");                       // Get const object
+
+        addButton.onClick.AddListener(AddNewEstimation);
 
         deletePanelCancelButton.onClick.AddListener(cancelDeleteEstimation);
         deletePanelConfirmButton.onClick.AddListener(confirmDeleteEstimation);
@@ -222,6 +226,10 @@ public class UpdateProjectSheet : MonoBehaviour
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(estimationList.transform);
 
+
+            listItem.GetComponent<RectTransform>().localScale = estimationList.GetComponent<RectTransform>().localScale;
+            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(estimationList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
             // Find children in listItem to use them
             GameObject idValue = GameObject.Find("idText");
             GameObject priceValue = GameObject.Find("priceText");
@@ -245,6 +253,16 @@ public class UpdateProjectSheet : MonoBehaviour
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
+
+            idValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            stateValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            dateValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+
+            idValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            stateValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            dateValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
             // ID to keep for view estimation sheet or deleting estimation
             listItem.GetComponent<ItemListEstimation>().idValue = estimation._id;
@@ -331,14 +349,54 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
     }
 
-    /* Function to show the technical folder */
-    //public void ShowPaymentTerms(GameObject pItemSelected)
-    //{
-    //    CONST.GetComponent<CONST>().selectedEstimationID = pItemSelected.GetComponent<ItemListEstimation>().idValue;   // Assign the values for the next scene
+    public void AddNewEstimation()
+    {
+        StartCoroutine(CreateNewEstimation(projectId));
+    }
 
-    //    DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
-    //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
-    //}
+    /*Function to create a new Estimation */
+    private IEnumerator CreateNewEstimation(string pProjectID)
+    {
+        
+        WWWForm form = new WWWForm();                               // New form for web request
+
+        form.AddField("projectID", pProjectID);
+        form.AddField("price", "0");
+        form.AddField("discount", "0");
+        form.AddField("module", "[]");
+        form.AddField("floorNumber", "2");
+
+        UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + "v1/createestimation", form);
+        
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+        yield return request.SendWebRequest();
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("ERROR: " + request.error);
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                // The database return a JSON file of all user infos
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
+                // Create a root object thanks to the JSON file
+                RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
+
+                //Get estimation id in CONST
+                Estimation estimation = entity.estimation;
+                CONST.GetComponent<CONST>().selectedEstimationID = estimation._id;
+
+                DontDestroyOnLoad(CONST);                                               // Keep the CONST object between scenes
+                SceneManager.LoadScene(5);   // Load Create Module scene
+            }
+        }
+        
+    }
 
     public void GoToHomePage()
     {

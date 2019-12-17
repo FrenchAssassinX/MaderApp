@@ -104,6 +104,9 @@ public class UpdateEstimationView_2 : MonoBehaviour
             // Set estimationListPanel as parent of prefab in project hierarchy
             listItem.transform.SetParent(componentList.transform);
 
+            listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
+            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
             // Find children in listItem to use them
             GameObject nameValue = GameObject.Find("moduleName");
 
@@ -112,6 +115,10 @@ public class UpdateEstimationView_2 : MonoBehaviour
 
             // Change text value of the list item
             nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
+
+            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+            
+            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
             // ID to keep for view range datas
             listItem.GetComponent<ItemListModules>().frameQualityValue = rangeAttribute.frameQuality;
