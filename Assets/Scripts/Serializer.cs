@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Serializer
 {
@@ -32,6 +33,11 @@ public class Text
 {
     public string text;
     internal object transform;
+
+    internal object GetComponent<T>()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 /* User constructor */

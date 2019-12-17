@@ -331,7 +331,6 @@ public class UpdateProjectSheet : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 5); //load the next scene
     }
 
-    // ________________demander a nico c'est quoi parce que ça beug___________________
     /* Function to show the technical folder */
     //public void ShowPaymentTerms(GameObject pItemSelected)
     //{
@@ -340,7 +339,6 @@ public class UpdateProjectSheet : MonoBehaviour
     //    DontDestroyOnLoad(CONST);                                                   // Keep the CONST object between scenes
     //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 6); //load the next scene
     //}
-    // ________________fin demander a nico c'est quoi parce que ça beug___________________
 
     public void GoToHomePage()
     {
