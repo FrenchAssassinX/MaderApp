@@ -47,15 +47,16 @@ public class NewProject : MonoBehaviour
     public GameObject errorCreateProject;      // Project creation failed
 
     public string idClientForForm;
-    string IdCustomerGenerated;
-    List<string> dropdowncustomer = new List<string>();
+    public string IdCustomerGenerated;
+    public List<string> dropdowncustomer = new List<string>();
 
-    string change;
-    string getId;
-    string getSurname;
-    string getName;
-    string newGetSurname;
-    string newGetName;
+    public string change;
+    public string getId;
+    public string getSurname;
+    public string getName;
+    public string newGetSurname;
+    public string newGetName;
+    public int timer = 120;
 
     void Start()
     {
@@ -89,6 +90,62 @@ public class NewProject : MonoBehaviour
             DropdownValueChanged(idCustomer);
         });
 
+    }
+
+    void Update()
+    {
+        
+        if (createValideCustomer.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                createValideCustomer.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (errorCreateCustomer.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                errorCreateCustomer.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (createValideProject.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                createValideProject.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (errorCreateProject.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                errorCreateProject.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
     }
 
     //active CreateNewCient
@@ -247,7 +304,7 @@ public class NewProject : MonoBehaviour
                                 RequestACustomer requestACustomer = JsonUtility.FromJson<RequestACustomer>(jsonResultCustomer);
                                 Customer customer = requestACustomer.customer;
 
-                                CONST.GetComponent<CONST>().customerName = customer.name;
+                                CONST.GetComponent<CONST>().customerName = newGetName;
                             }
                         }
                     }
@@ -310,7 +367,6 @@ public class NewProject : MonoBehaviour
         UnityWebRequest request = UnityWebRequest.Get(CONST.GetComponent<CONST>().url + URLGetCustomers);
         request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
         request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
 
         yield return request.SendWebRequest();
@@ -330,16 +386,20 @@ public class NewProject : MonoBehaviour
                 {
                     //recuperation values in customers
                     getId = item._id;
+                    Debug.Log("get id : " + getId);
                     getSurname = item.surename;
+                    Debug.Log("getSurname : " + getSurname);
                     getName = item.name;
+                    Debug.Log("getName : " + getName);
+
+                    CONST.GetComponent<CONST>().customerName = newGetName;
 
                     //Poster all customers
                     dropdowncustomer.Add(getName + " " + getSurname);
                     
-
-                    //Select the first letters for name
                     idClientForForm = getId;
                 }
+                Debug.Log("jsonresult : " + jsonResult);
                 idCustomer.options.Clear();
                 idCustomer.AddOptions(dropdowncustomer);
             }

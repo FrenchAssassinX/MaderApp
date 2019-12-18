@@ -22,7 +22,8 @@ public class EstimationPayment : MonoBehaviour
     public Button buttonReturn; //Button for to TechnicalFolder scene
     public Button buttonHome; //Button for going to home
     public Slider sliderStatePayment; //ProgressBar for Advancement Payment
-    public Text percentageText; //Text for show avencement in % for user
+    public GameObject percText; //Game object for percentage text
+    public int timer = 120; // Timer for message
 
     public List<string> dropdownStateEstimation; //List for dropdown Estimation
     public List<string> dropdownStatePayment; //List for dropdown Payment
@@ -35,7 +36,6 @@ public class EstimationPayment : MonoBehaviour
     public string stepPayment; //Define string for step in payment
     public int stepPaymentInt; //Define int for step payment
     public string percentPayment; //Define string for percent in payment
-
     public GameObject textSavePayment; //valide message
 
     public string getStep; //get step in database
@@ -43,7 +43,7 @@ public class EstimationPayment : MonoBehaviour
     public string getPaymentStep; //get step in database
     public string getPaymentPercent; //get percent in database
     public string getStateEstimation; //get entities to GetEstimationBYId
-    RequestAProject requestAProject; //get entities to RequestAProject
+    public RequestAProject requestAProject; //get entities to RequestAProject
 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
@@ -54,6 +54,8 @@ public class EstimationPayment : MonoBehaviour
         string state = CONST.GetComponent<CONST>().state; //Get state in const
         url = CONST.GetComponent<CONST>().url; //Url get CONST
 
+        percText = GameObject.Find("TextPercent");
+        Debug.Log("perctext : " + percText);
         //Add value in dropdown estimation and payment
         DropdownList();
 
@@ -107,11 +109,23 @@ public class EstimationPayment : MonoBehaviour
         {
             StateAdvancementModif(statePayment);
         });
+
     }
 
     void Update()
     {
-
+        if (textSavePayment.transform.gameObject.active)
+        {
+            if(timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                textSavePayment.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
     }
 
     //Options for dropdown
@@ -125,7 +139,7 @@ public class EstimationPayment : MonoBehaviour
             //Add option in dropdown state Estimation
             stateEstimation.options.Add(new Dropdown.OptionData(option));
         }
-        List<string> dropdownStatePayment = new List<string> { "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" }; //Create dropdown for state estimation
+        List<string> dropdownStatePayment = new List<string> {"Choisir un etat", "A la signature", "Obtension du permis de construire", "Ouverture du chantier", "Achèvement des fondations", "Achèvement des murs", "Mise hors d'eau/hors d'aire", "Achèvement des travaux d'équipement", "Remise des clés" }; //Create dropdown for state estimation
         //var dropdown = GetComponent<Dropdown>();
         statePayment.options.Clear();
         foreach (string option in dropdownStatePayment)
@@ -152,10 +166,7 @@ public class EstimationPayment : MonoBehaviour
             //if "Accepté" is selected dropdown state esimation is disabled
             stateEstimation.enabled = false;
             //And value to "A la signature" id per default
-            sliderStatePayment.value = 0.03f;
-            stepPayment = "1"; //Number for step
-            stepPaymentInt = Int32.Parse(stepPayment); //Parse stepPayment
-            percentPayment = "3%"; //Percent for advancement payment
+            //sliderStatePayment.value = 0.03f;
 
         }
         else
@@ -189,6 +200,7 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log(stepPaymentInt);
                     percentPayment = "3%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.03f; //Value to advance the progress bar 
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
 
                 }
@@ -199,6 +211,7 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log(stepPaymentInt);
                     percentPayment = "10%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.1f; //Value to advance the progress bar  
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
 
                 }
@@ -208,7 +221,8 @@ public class EstimationPayment : MonoBehaviour
                     stepPaymentInt = Int32.Parse(stepPayment);
                     Debug.Log(stepPaymentInt);
                     percentPayment = "15%"; //Percent for advancement payment
-                    sliderStatePayment.value = 0.15f; //Value to advance the progress bar   
+                    sliderStatePayment.value = 0.15f; //Value to advance the progress bar  
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
 
                 }
@@ -218,7 +232,8 @@ public class EstimationPayment : MonoBehaviour
                     stepPaymentInt = Int32.Parse(stepPayment);
                     Debug.Log(stepPaymentInt);
                     percentPayment = "25%"; //Percent for advancement payment
-                    sliderStatePayment.value = 0.25f; //Value to advance the progress bar   
+                    sliderStatePayment.value = 0.25f; //Value to advance the progress bar 
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
                 }
             case "Achèvement des murs":
@@ -227,7 +242,8 @@ public class EstimationPayment : MonoBehaviour
                     stepPaymentInt = Int32.Parse(stepPayment);
                     Debug.Log(stepPaymentInt);
                     percentPayment = "40%"; //Percent for advancement payment
-                    sliderStatePayment.value = 0.40f; //Value to advance the progress bar   
+                    sliderStatePayment.value = 0.40f; //Value to advance the progress bar  
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
                 }
             case "Mise hors d'eau/hors d'aire":
@@ -237,7 +253,8 @@ public class EstimationPayment : MonoBehaviour
                     stepPaymentInt = Int32.Parse(stepPayment);
                     Debug.Log(stepPaymentInt);
                     percentPayment = "75%"; //Percent for advancement payment
-                    sliderStatePayment.value = 0.75f; //Value to advance the progress bar 
+                    sliderStatePayment.value = 0.75f; //Value to advance the progress bar
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
                 }
             case "Achèvement des travaux d'équipement":
@@ -248,6 +265,7 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log(stepPaymentInt);
                     percentPayment = "95%"; //Percent for advancement payment
                     sliderStatePayment.value = 0.95f; //Value to advance the progress bar
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
                 }
             case "Remise des clés":
@@ -258,6 +276,7 @@ public class EstimationPayment : MonoBehaviour
                     Debug.Log(stepPaymentInt);
                     percentPayment = "100%"; //Percent for advancement payment
                     sliderStatePayment.value = 1.0f; //Value to advance the progress bar
+                    percText.GetComponent<UnityEngine.UI.Text>().text = percentPayment; //Text percentage
                     break;
                 }
         }
@@ -341,6 +360,8 @@ public class EstimationPayment : MonoBehaviour
                     //}
                     //Console.WriteLine("Main thread exits.");
                     //textSavePayment.transform.gameObject.SetActive(false);
+
+                    
 
                 }
             }

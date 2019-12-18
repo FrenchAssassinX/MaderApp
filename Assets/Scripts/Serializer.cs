@@ -38,6 +38,11 @@ public class Text
     {
         throw new NotImplementedException();
     }
+
+    public static implicit operator Text(string v)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 /* User constructor */
