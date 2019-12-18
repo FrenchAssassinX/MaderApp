@@ -107,6 +107,7 @@ public class UpdateProjectSheet : MonoBehaviour
     private string projectSailorId;
     private Project project;
     private Customer customer;
+    private User2 user;
 
     public GameObject notifText;
     public Button okNotifyButton;
@@ -169,6 +170,7 @@ public class UpdateProjectSheet : MonoBehaviour
                 RequestAProject entityProject = JsonUtility.FromJson<RequestAProject>(jsonResult);         // Convert JSON file
                 project = entityProject.result; //Instanciate the project object
                 customer = entityProject.customer; //Instanciate the customer object
+                user = project.user; 
 
                 List <EstimationId> estimationIdList = project.estimation;
 
@@ -177,7 +179,7 @@ public class UpdateProjectSheet : MonoBehaviour
                 projectIdGO.GetComponent<UnityEngine.UI.Text>().text = projectId;
                 projectNameGO.GetComponent<UnityEngine.UI.Text>().text = project.name;
                 projectDateGO.GetComponent<UnityEngine.UI.Text>().text = project.date;
-                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = project.reference;
+                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = user.id;
                 clientIdGO.GetComponent<UnityEngine.UI.Text>().text = customer._id;
                 clientNameGO.GetComponent<UnityEngine.UI.Text>().text = customer.name;
                 clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = customer.surename;
@@ -482,6 +484,7 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm form = new WWWForm();                       // New form for web request
 
         form.AddField("projectID", projectId);    // Add to the form the values of the project to update
+        Debug.Log("USER ID : "+sailorID);
         form.AddField("userID", sailorID);
         form.AddField("road", project.road);
         form.AddField("roadNum", project.roadNum);
@@ -674,10 +677,44 @@ public class UpdateProjectSheet : MonoBehaviour
         confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
 
-    //Funtion that get all the informations to show into the pdf of the estimation, and that creates it
     public void EditEstimation(GameObject pItemSelected)
     {
-        StartCoroutine(InstanciateUserDatas(project.user.id));//call the function that Instanciate the referent informations
+        StartCoroutine(EditPdf(pItemSelected));
+    }
+    //Funtion that get all the informations to show into the pdf of the estimation, and that creates it
+    public IEnumerator EditPdf(GameObject pItemSelected)
+    {
+        //http road to get the project datas
+        var urlToGetUser = CONST.GetComponent<CONST>().url + "v1/getuserbyid";
+
+        WWWForm form = new WWWForm();                       // New form for web request
+        form.AddField("userID", user.id);    // Add to the form the value of the ID of the project to get
+
+        UnityWebRequest request = UnityWebRequest.Post(urlToGetUser, form);     // Create new form
+        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+        yield return request.SendWebRequest();
+
+        if (request.isNetworkError || request.isHttpError)
+        {
+            Debug.Log("*** ERROR: " + request.error + " ***");
+        }
+        else
+        {
+            if (request.isDone)
+            {
+                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+
+                RequestAUser entity = JsonUtility.FromJson<RequestAUser>(jsonResult);         // Convert JSON file
+                User user = entity.user; //Instanciate the customer object
+                Debug.Log("matricule : " + user.matricule);
+                projectReferent = user.matricule; //Instanciate the referent informations to show on the estimation pdf
+
+            }
+        }
 
         //Instanciate parameters to show up into the pdf
         customerSurename = clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text;
@@ -699,13 +736,14 @@ public class UpdateProjectSheet : MonoBehaviour
         estimationPriceWtTaxes = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
         estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
 
-        int priceWtTaxes = Int32.Parse(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
-        int discount = Int32.Parse(estimationDiscount);  //int value of the discount used for the calculations
+        double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+        double discount = Convert.ToDouble(estimationDiscount);  //int value of the discount used for the calculations
         double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
+        Debug.Log("Prix HT : " + priceWtotTaxes);
         //calculation of the price discounted
-        int mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
-        int sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
-        int priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
+        double mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
+        double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+        double priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
 
         estimationPriceWtTaxes = priceWtTaxes.ToString();//string object that contains the price with the taxes
         estimationPriceToPay = priceToPay.ToString(); //string object that contains the price discounted
@@ -761,11 +799,11 @@ public class UpdateProjectSheet : MonoBehaviour
             myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
             myFirstPage.addText("Date : "+ estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
             myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
-            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes+"€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix HT : " + priceWtotTaxes + "€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
             myFirstPage.addText("TVA : 20% " , rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
-            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes+"€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
-            myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
-            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix avant remise : " + estimationPriceWtTaxes+"€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Remise : -" + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
+            myFirstPage.addText("Prix TTC : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
 
             myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
             myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
@@ -779,7 +817,6 @@ public class UpdateProjectSheet : MonoBehaviour
             Debug.Log(pathNotif);
             notifyCanvas.SetActive(true);
             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
-
         }
         //pdf creation with mac os
         else if (OS.Equals("Mac"))
@@ -900,42 +937,6 @@ public class UpdateProjectSheet : MonoBehaviour
             myDoc.createPDF(@"\" + attachName);
             /*Set Header's Style*/
             myDoc.createPDF(attachName);
-        }
-    }
-
-    //Instanciate the referent informations to show on the estimation pdf
-    public IEnumerator InstanciateUserDatas(string userId)
-    {
-        //http road to get the project datas
-        var urlToGetUser = CONST.GetComponent<CONST>().url + "v1/getuserbyid";
-
-        WWWForm form = new WWWForm();                       // New form for web request
-        form.AddField("userID", userId);    // Add to the form the value of the ID of the project to get
-
-        UnityWebRequest request = UnityWebRequest.Post(urlToGetUser, form);     // Create new form
-        request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
-        request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-        request.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
-
-        yield return request.SendWebRequest();
-
-        if (request.isNetworkError || request.isHttpError)
-        {
-            Debug.Log("*** ERROR: " + request.error + " ***");
-        }
-        else
-        {
-            if (request.isDone)
-            {
-                string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-
-                RequestAUser entity = JsonUtility.FromJson<RequestAUser>(jsonResult);         // Convert JSON file
-                User user = entity.user; //Instanciate the customer object
-
-                projectReferent = user.nom + " " + user.prenom; //Instanciate the referent informations to show on the estimation pdf
-
-            }
         }
     }
 
