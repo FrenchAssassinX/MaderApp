@@ -17,36 +17,35 @@ public class UpdateEstimationView_1 : MonoBehaviour
     public GameObject projectName;
     public GameObject totalAfterDiscount;
     public GameObject totalBeforeDiscount;
-    public GameObject discount;
+    public InputField discount;
 
 
     public GameObject listItemPrefab;                  // Prefab item that represents a component
     public GameObject componentList;                   //panel wich will contain all the components of the estimation
-
+    double estimationPrice = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         CONST = GameObject.Find("CONST"); //CONST initialize
-
+        
         string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice; //string that receives the price of the estimation  before any discount
         string discountSt = CONST.GetComponent<CONST>().estimationDiscount; //string that receives the discount value
-        int discountInt = Int32.Parse(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
-        int totalBeforeDiscountInt = Int32.Parse(totalBeforeDiscountSt); //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
+        double discountInt = Convert.ToDouble(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
+        double totalBeforeDiscountInt = estimationPrice; //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
 
-        int totalAfterDiscountInt = totalBeforeDiscountInt; //Initantiate the price after the discount as the start original price
+        double totalAfterDiscountInt = totalBeforeDiscountInt; //Initantiate the price after the discount as the start original price
 
         if (discountInt != 0) //if the price isn't null we calculate the discounted price
         {
-            int mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
-            int sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+            double mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
+            double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
 
         totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
         totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
-
         customer.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().customerName; //get the customers name and shows it
         projectName.GetComponent<UnityEngine.UI.Text>().text = CONST.GetComponent<CONST>().projectName; //get the project names and shows it
 
@@ -81,25 +80,79 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
             Estimation estimation = estimationEntity.estimation; //Create a serialized estimation object 
 
+            
             foreach (var moduleItem in estimation.module) //bubkle into all the modules of the current estimation
             {
+                var urlToGetModule = CONST.GetComponent<CONST>().url + "v1/getmodulebyid"; //http road to get the module datas by giving its ID
 
-                StartCoroutine(GetModules(moduleItem.id)); //start the search of the current module datas
+                WWWForm moduleForm = new WWWForm();                       // New form for web request
+                moduleForm.AddField("moduleID", moduleItem.id);    // Add to the form the value of the ID of the module to get
+
+                UnityWebRequest requestForModule = UnityWebRequest.Post(urlToGetModule, moduleForm);     // Create new WebRequest
+                requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+                requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                requestForModule.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+                yield return requestForModule.SendWebRequest(); //execute the web request
+
+                if (requestForModule.isNetworkError || requestForModule.isHttpError)
+                {
+                    Debug.Log(requestForModule.error);
+                }
+                else
+                {
+                    string jsonResultFromModule = System.Text.Encoding.UTF8.GetString(requestForModule.downloadHandler.data);          // Get JSON file
+
+                    RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
+                    Module module = moduleEntity.module; //create a serealized module object 
+
+                    double moduleCost = Int32.Parse(module.cost);
+                    estimationPrice += moduleCost;
+                    Debug.Log("module price : " + moduleCost);
+                    foreach (var componentItem in module.components)//bubkle into all the components of the current module
+                    {
+                        StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
+                    }
+                }
             }
+
+            estimationPrice = estimationPrice * 2.60;
+            Debug.Log("estimationPrice : " + estimationPrice);
+
+            string totalBeforeDiscountSt = estimationPrice.ToString(); //string that receives the price of the estimation  before any discount
+            string discountSt = CONST.GetComponent<CONST>().estimationDiscount; //string that receives the discount value
+            double discountInt = Convert.ToDouble(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
+            double totalBeforeDiscountInt = estimationPrice; //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
+
+            double totalAfterDiscountInt = totalBeforeDiscountInt; //Initantiate the price after the discount as the start original price
+
+            if (discountInt != 0) //if the price isn't null we calculate the discounted price
+            {
+                double mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
+                double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+                totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
+            }
+
+            totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
+            discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
+            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
+
+            StartCoroutine(UpdateEstimationPrice(estimationPrice, estimation));
         }
     }
 
     //get the module datas and will buckle into for searching the components datas
-    public IEnumerator GetModules(string moduleId)
+    public IEnumerator UpdateEstimationPrice(double estimationPrice, Estimation estimation)
     {
 
-        var urlToGetModule = CONST.GetComponent<CONST>().url + "v1/getmodulebyid"; //http road to get the module datas by giving its ID
+        var urlToUpdate = CONST.GetComponent<CONST>().url + "v1/updateestimationprice"; //http road to get the module datas by giving its ID
 
-        WWWForm moduleForm = new WWWForm();                       // New form for web request
-        Debug.Log("module : " + moduleId);
-        moduleForm.AddField("moduleID", moduleId);    // Add to the form the value of the ID of the module to get
+        WWWForm estimationForm = new WWWForm();                       // New form for web request
+        estimationForm.AddField("estimationID", estimation._id);    // Add to the form the value of the ID of the module to get
+        estimationForm.AddField("price", estimationPrice.ToString());
 
-        UnityWebRequest requestForModule = UnityWebRequest.Post(urlToGetModule, moduleForm);     // Create new WebRequest
+        UnityWebRequest requestForModule = UnityWebRequest.Post(urlToUpdate, estimationForm);     // Create new WebRequest
         requestForModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
         requestForModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
@@ -111,19 +164,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         {
             Debug.Log(requestForModule.error);
         }
-        else
-        {
-            string jsonResultFromModule = System.Text.Encoding.UTF8.GetString(requestForModule.downloadHandler.data);          // Get JSON file
-
-            RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
-            Module module = moduleEntity.module; //create a serealized module object 
-
-            foreach (var componentItem in module.components)//bubkle into all the components of the current module
-            {
-                StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
-            }
-        }
     }
+
 
     //get the component datas and show them into the grid list
     public IEnumerator GetComponent(string componentId, string componentQte)
@@ -219,19 +261,19 @@ public class UpdateEstimationView_1 : MonoBehaviour
     {
         string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice; //string that receives the price of the estimation  before any discount
         string discountSt = discount.GetComponent<UnityEngine.UI.Text>().text; //string that receives the discount value
-        int discountInt = Int32.Parse(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
-        int totalBeforeDiscountInt = Int32.Parse(totalBeforeDiscountSt); //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
+        double discountInt = Convert.ToDouble(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
+        double totalBeforeDiscountInt = estimationPrice; //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
 
-        int totalAfterDiscountInt = totalBeforeDiscountInt; //Initantiate the price after the discount as the start original price
+        double totalAfterDiscountInt = totalBeforeDiscountInt; //Initantiate the price after the discount as the start original price
 
-        if (discountInt != 0)//if the price isn't null we calculate the discounted price
+        if (discountInt != 0) //if the price isn't null we calculate the discounted price
         {
-            int mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
-            int sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
-            totalAfterDiscountInt = totalBeforeDiscountInt - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
+            double mult = totalBeforeDiscountInt * discountInt; //firstly we multiply the original price with the discount number
+            double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+            totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
 
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt;  //Shows the value of the original price
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
         totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
 
@@ -244,8 +286,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
         var urlToUpdateEstimation = CONST.GetComponent<CONST>().url + "v1/updateestimationdiscount"; //http road to update the estimation by giving its Id
 
         WWWForm estimationForm = new WWWForm();                       // New form for web request
-        estimationForm.AddField("discount", CONST.GetComponent<CONST>().selectedEstimationID);    // Add to the form the value of the ID of the project to get
-        estimationForm.AddField("estimationID", discountSt);
+        estimationForm.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);    // Add to the form the value of the ID of the project to get
+        estimationForm.AddField("discount", discountSt);
 
         UnityWebRequest requestForEstimation = UnityWebRequest.Post(urlToUpdateEstimation, estimationForm);     // Create new WebRequest
         requestForEstimation.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas

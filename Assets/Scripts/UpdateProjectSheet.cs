@@ -108,6 +108,10 @@ public class UpdateProjectSheet : MonoBehaviour
     private Project project;
     private Customer customer;
 
+    public GameObject notifText;
+    public Button okNotifyButton;
+    public GameObject notifyCanvas;
+
     public Button addButton;
 
     EstimationSelected estimationSelected = new EstimationSelected();
@@ -119,11 +123,12 @@ public class UpdateProjectSheet : MonoBehaviour
         updateClientPanel.SetActive(false);
         updateProjectPanel.SetActive(false);
         confirmDeletePanel.SetActive(false);
+        notifyCanvas.SetActive(false);
 
         CONST = GameObject.Find("CONST");                       // Get const object
 
         addButton.onClick.AddListener(AddNewEstimation);
-
+        okNotifyButton.onClick.AddListener(CloseNotifyWindow);
         deletePanelCancelButton.onClick.AddListener(cancelDeleteEstimation);
         deletePanelConfirmButton.onClick.AddListener(confirmDeleteEstimation);
 
@@ -711,6 +716,7 @@ public class UpdateProjectSheet : MonoBehaviour
         string[] osTab = osRunning.Split(' ');
         string OS = osTab[0];
         var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+        
         //pdf creation with windows os
         if (OS.Equals("Windows"))
         {
@@ -768,6 +774,12 @@ public class UpdateProjectSheet : MonoBehaviour
 
             /*Set Header's Style*/
             myDoc.createPDF(@"C:\Users\Public\" + attachName);
+            string pathNotif = "C:\\Users\\Public\\" + attachName;
+
+            Debug.Log(pathNotif);
+            notifyCanvas.SetActive(true);
+            notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
+
         }
         //pdf creation with mac os
         else if (OS.Equals("Mac"))
@@ -885,7 +897,7 @@ public class UpdateProjectSheet : MonoBehaviour
             myFirstPage.addText(pdfEditor, 340, 375, predefinedFont.csHelvetica, titleCaracFont, color);
 
             /*Set Header's Style*/
-            myDoc.createPDF(@"C:\Users\Public\" + attachName);
+            myDoc.createPDF(@"\" + attachName);
             /*Set Header's Style*/
             myDoc.createPDF(attachName);
         }
@@ -925,6 +937,11 @@ public class UpdateProjectSheet : MonoBehaviour
 
             }
         }
+    }
+
+    public void CloseNotifyWindow()
+    {
+        notifyCanvas.SetActive(false);
     }
 }
 

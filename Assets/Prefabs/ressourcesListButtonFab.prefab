@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 6419409953233258522}
   - component: {fileID: 315273672149451327}
   - component: {fileID: 7523023431254991741}
-  - component: {fileID: 4367922290119005752}
-  - component: {fileID: 4536148339652042982}
+  - component: {fileID: 7032236903057980114}
   m_Layer: 5
   m_Name: ressourcesListButtonFab
   m_TagString: Untagged
@@ -147,26 +146,7 @@ MonoBehaviour:
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &4367922290119005752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 269991929180985667}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99cfde3196dfff54282a9fd251d59577, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rowListItem: {fileID: 0}
-  isSelected: 0
-  idValue: 
-  priceValue: 
-  stateValue: 
-  dateValue: 
-  discountValue: 
---- !u!114 &4536148339652042982
+--- !u!114 &7032236903057980114
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
