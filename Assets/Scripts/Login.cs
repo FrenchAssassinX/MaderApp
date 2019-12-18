@@ -15,6 +15,7 @@ public class Login : MonoBehaviour
     public InputField password;                 /*                            */
     public Button connection;                   /******************************/
     public GameObject textConnectionError;      // Error message display if connection failed
+    public int timer;                           // Timer for message
 
     void Start()
     {
@@ -30,6 +31,22 @@ public class Login : MonoBehaviour
         Button btn = connection.GetComponent<Button>();
         btn.onClick.AddListener(SendConnection);
 
+    }
+
+    void Update()
+    {
+        if (textConnectionError.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                textConnectionError.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
     }
 
     /* Function starting when the connection button will be pressed */

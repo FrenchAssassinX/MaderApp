@@ -56,6 +56,7 @@ public class NewProject : MonoBehaviour
     public string getName;
     public string newGetSurname;
     public string newGetName;
+    public int timer = 120;
 
     void Start()
     {
@@ -89,6 +90,62 @@ public class NewProject : MonoBehaviour
             DropdownValueChanged(idCustomer);
         });
 
+    }
+
+    void Update()
+    {
+        
+        if (createValideCustomer.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                createValideCustomer.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (errorCreateCustomer.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                errorCreateCustomer.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (createValideProject.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                createValideProject.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
+
+        if (errorCreateProject.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                errorCreateProject.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
     }
 
     //active CreateNewCient
