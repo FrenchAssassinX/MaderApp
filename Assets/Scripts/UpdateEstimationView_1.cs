@@ -17,7 +17,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
     public GameObject projectName;
     public GameObject totalAfterDiscount;
     public GameObject totalBeforeDiscount;
-    public InputField discount;
+    public GameObject discount;
 
 
     public GameObject listItemPrefab;                  // Prefab item that represents a component
