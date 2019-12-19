@@ -8,4 +8,34 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ConnectionScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/HomeScene.unity
+    guid: 15ad5243e5ebdb94493e2c53c2b30e7b
+  - enabled: 1
+    path: Assets/Scenes/NewProjectScene.unity
+    guid: fa08a7452efaea4499c4ec257ca32ecb
+  - enabled: 1
+    path: Assets/Scenes/ProjectsListScene.unity
+    guid: 1bf1f19e4ac9e0a408fa3178a89b7500
+  - enabled: 1
+    path: Assets/Scenes/ProjectSheetScene.unity
+    guid: 52c1f2ab1cf40a341b7f123497c64228
+  - enabled: 1
+    path: Assets/Scenes/CreateModuleScene.unity
+    guid: 30cba7ef7ea85964f9fffdc481f7c4de
+  - enabled: 1
+    path: Assets/Scenes/CreateEstimationScene.unity
+    guid: f762f465632e8724292a1127f51521ab
+  - enabled: 1
+    path: Assets/Scenes/EstimationView_1Scene.unity
+    guid: c7ed5d049c8e0d3429c84a68772b28a3
+  - enabled: 1
+    path: Assets/Scenes/EstimationView_2Scene.unity
+    guid: 33a0fc80be830d74ebc4da78e84defaf
+  - enabled: 1
+    path: Assets/Scenes/TechnicalFolderScene.unity
+    guid: 0566234a619e28d4c9add7dd834a278e
+  - enabled: 1
+    path: Assets/Scenes/EstimationModalityPaymentScene.unity
+    guid: 75a40fe1306d24048bdb850ac0523cec
   m_configObjects: {}
