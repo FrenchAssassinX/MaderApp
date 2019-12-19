@@ -9902,7 +9902,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Veuillez choisir un mod\xE8le de module pour l'ajouter \xE0 la sc\xE8ne"
+  m_Text: Veuillez remplir tous les champs pour ajouter un module
 --- !u!222 &1588520764
 CanvasRenderer:
   m_ObjectHideFlags: 0
