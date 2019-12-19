@@ -109,7 +109,6 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
                     double moduleCost = Int32.Parse(module.cost);
                     estimationPrice += moduleCost;
-                    Debug.Log("module price : " + moduleCost);
                     foreach (var componentItem in module.components)//bubkle into all the components of the current module
                     {
                         StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
@@ -118,7 +117,6 @@ public class UpdateEstimationView_1 : MonoBehaviour
             }
 
             estimationPrice = estimationPrice * 2.60;
-            Debug.Log("estimationPrice : " + estimationPrice);
 
             string totalBeforeDiscountSt = estimationPrice.ToString(); //string that receives the price of the estimation  before any discount
             string discountSt = CONST.GetComponent<CONST>().estimationDiscount; //string that receives the discount value
@@ -272,11 +270,11 @@ public class UpdateEstimationView_1 : MonoBehaviour
             double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
-
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
+        
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = estimationPrice.ToString(); //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
         totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
-
+        CONST.GetComponent<CONST>().estimationPrice = estimationPrice.ToString();
         StartCoroutine(UpdateEstimation(discountSt));
     }
 

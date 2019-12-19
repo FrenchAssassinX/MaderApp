@@ -438,6 +438,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     {
         StartCoroutine(AddModulesToEstimation());
         StartCoroutine(AddFloorNumberToEstimation());
+        CONST.GetComponent<CONST>().estimationDiscount = "0";
+        CONST.GetComponent<CONST>().estimationPrice = "0";
     }
 
     /* Intermediary function to start GetAllRanges function */
