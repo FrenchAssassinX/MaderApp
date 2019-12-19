@@ -24,6 +24,9 @@ public class Login : MonoBehaviour
         // Get the url of CONST
         url = CONST.GetComponent<CONST>().url;
 
+        // Initialize timer
+        timer = 120;
+
         // Disable error message by default
         textConnectionError.transform.gameObject.SetActive(false);
 

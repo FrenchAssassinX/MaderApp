@@ -455,6 +455,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Intermediary function to start GetAllCuts function */
     public void StartDeleteModuleFromEstimation()
     {
+        Debug.Log("Test");
         StartCoroutine(DeleteModuleFromEstimation());
     }
 
