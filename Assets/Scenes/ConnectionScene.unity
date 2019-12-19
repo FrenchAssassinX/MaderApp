@@ -154,8 +154,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: -0.000024796, y: 253.4}
-  m_SizeDelta: {x: 750, y: 61}
+  m_AnchoredPosition: {x: -0.000024796, y: 224.9}
+  m_SizeDelta: {x: 750, y: 118.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &78617186
 MonoBehaviour:
@@ -179,7 +179,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7f8eb9c69dff0ab4695f759a488adc12, type: 3}
-    m_FontSize: 35
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
@@ -357,7 +357,7 @@ MonoBehaviour:
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 0}
+  m_TargetGraphic: {fileID: 362593890}
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
@@ -376,7 +376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.7686275, b: 0.38431376, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -417,6 +417,7 @@ MonoBehaviour:
   password: {fileID: 1350893161}
   connection: {fileID: 362593889}
   textConnectionError: {fileID: 78617184}
+  timer: 0
 --- !u!1 &464462077
 GameObject:
   m_ObjectHideFlags: 0
