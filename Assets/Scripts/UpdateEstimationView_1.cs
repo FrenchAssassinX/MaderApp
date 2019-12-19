@@ -31,6 +31,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
         
         string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice; //string that receives the price of the estimation  before any discount
         string discountSt = CONST.GetComponent<CONST>().estimationDiscount; //string that receives the discount value
+        Debug.Log("discount : " + discountSt);
         double discountInt = Convert.ToDouble(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
         double totalBeforeDiscountInt = estimationPrice; //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
 
@@ -261,6 +262,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
     {
         string totalBeforeDiscountSt = CONST.GetComponent<CONST>().estimationPrice; //string that receives the price of the estimation  before any discount
         string discountSt = discount.GetComponent<UnityEngine.UI.Text>().text; //string that receives the discount value
+        Debug.Log(discountSt);
         double discountInt = Convert.ToDouble(discountSt); //parsing the string discount to an int for the calculation of the estimation price after the discount
         double totalBeforeDiscountInt = estimationPrice; //parsing the totalBeforeDiscountSt to an int for the calculation of the estimation price after the discount
 
@@ -273,10 +275,11 @@ public class UpdateEstimationView_1 : MonoBehaviour
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
 
+        Debug.Log("total price : " + totalBeforeDiscountSt);
         totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
         totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
-
+        CONST.GetComponent<CONST>().estimationPrice = estimationPrice.ToString();
         StartCoroutine(UpdateEstimation(discountSt));
     }
 
