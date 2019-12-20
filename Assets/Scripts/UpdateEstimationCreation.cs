@@ -59,6 +59,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     private List<string> listCuts;                      // String elements for dropdownCuts
 
     public GameObject textErrorAddModule;               // UI Element text to display error if module can't be added on 2D scene
+    public int timerErrorMessage;
 
     private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
 
@@ -80,7 +81,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         sendDatasPanel.SetActive(false);        // Disable send datas panel by default
         deletePanel.SetActive(false);           // Disable delete panel by default
         textErrorAddModule.SetActive(false);    // Disable text error by default
-
+        timerErrorMessage = 120;
 
         /* Add listener to dropdowns */
         dropdownRanges.onValueChanged.AddListener(delegate {
@@ -102,6 +103,20 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public void Update()
     {
+        /* Timer for displaying error message */
+        if (textErrorAddModule.active)
+        {
+            if (timerErrorMessage > 0)
+            {
+                timerErrorMessage--;
+            }
+            else
+            {
+                textErrorAddModule.SetActive(false);
+                timerErrorMessage = 120;
+            }
+        }
+
         /* Search wich button is selected */
         foreach (Transform child in middleCanvas.transform)
         {
@@ -288,8 +303,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                 dropdownModels.options[dropdownModels.value].text != null &&
                 dropdownModels.options[dropdownModels.value].text != "Modèle")
         {
-            textErrorAddModule.SetActive(false);
-
             /* Search wich button is selected */
             foreach (Transform child in middleCanvas.transform)
             {
@@ -466,6 +479,7 @@ public class UpdateEstimationCreation : MonoBehaviour
         string idModule = "";                                                                       // String to keep id of the module
         string moduleComponents = "";                                                               // String to keep components of the module from previous scene
 
+        string idCuts = dropdownCuts.options[dropdownCuts.value].text;                              // String to keep id of frame quality before creating a json
         string idFrameQuality = dropdownFrames.options[dropdownFrames.value].text;                  // String to keep id of frame quality before creating a json
         string idWindowFrameQuality = "";                                                           // String to keep id of window frame quality before creating a json
         string idInsulating = dropdownInsulatings.options[dropdownInsulatings.value].text;          // String to keep id of insulating before creating a json
@@ -474,112 +488,121 @@ public class UpdateEstimationCreation : MonoBehaviour
         string idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;      // String to keep id of finishing interior before creating a json
         string rangeAttributesForm = "";                                                            // String to create a json file to send rangeAttributes in form
 
-        /* Foreach instruction to verify all module added to 2D scene */
-        foreach (Transform child in middleCanvas.transform)
+        /* Verify if all values of dropdowns are sets */
+        if (idFrameQuality != "Qualité des huisseries" && idInsulating != "Type de remplissage"
+                && idFinishingExt != "Finition extérieure" && idFinishingInt != "Finition intérieure")
         {
-            GameObject panel = child.gameObject;
-
-            foreach (Transform panelChild in panel.transform)
+            /* Foreach instruction to verify all module added to 2D scene */
+            foreach (Transform child in middleCanvas.transform)
             {
-                GameObject module = panelChild.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
+                GameObject panel = child.gameObject;
 
-                /* Register module only if it is not already exist on database */
-                if (module.GetComponent<UpdateModule2D>().id == "" || module.GetComponent<UpdateModule2D>().id == null)
+                foreach (Transform panelChild in panel.transform)
                 {
-                    /* Foreach to retrieve the id of the module model using to create the module */
-                    foreach (KeyValuePair<string, string> item in dictModuleIDName)
+                    GameObject module = panelChild.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
+
+                    /* Register module only if it is not already exist on database */
+                    if (module.GetComponent<UpdateModule2D>().id == "" || module.GetComponent<UpdateModule2D>().id == null)
                     {
-                        if (item.Value == module.GetComponent<UpdateModule2D>().modelName)
+                        /* Foreach to retrieve the id of the module model using to create the module */
+                        foreach (KeyValuePair<string, string> item in dictModuleIDName)
                         {
-                            idModule = item.Key;
+                            if (item.Value == module.GetComponent<UpdateModule2D>().modelName)
+                            {
+                                idModule = item.Key;
+                            }
                         }
-                    }
 
-                    // First request to find module property
-                    WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
-                    formModule.AddField("moduleID", idModule);
+                        // First request to find module property
+                        WWWForm formModule = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
+                        formModule.AddField("moduleID", idModule);
 
-                    UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
-                    requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
-                    requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+                        UnityWebRequest requestModule = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + getModuleByIDUrl, formModule);   // Create new form
+                        requestModule.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                    // Complete form with authentication datas
+                        requestModule.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-                    requestModule.certificateHandler = new CONST.BypassCertificate();   // Bypass certificate for https
+                        requestModule.certificateHandler = new CONST.BypassCertificate();   // Bypass certificate for https
 
-                    yield return requestModule.SendWebRequest();          // Send request                                                              
+                        yield return requestModule.SendWebRequest();          // Send request                                                              
 
-                    if (requestModule.isNetworkError || requestModule.isHttpError)
-                    {
-                        Debug.Log("*** ERROR: " + requestModule.error + " ***");
-                    }
-                    else
-                    {
-                        if (requestModule.isDone)
+                        if (requestModule.isNetworkError || requestModule.isHttpError)
                         {
-                            string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);      // Get JSON file
-                            Debug.Log(jsonResultModule);
-                            RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                         // Convert JSON to manipulating C# object
-                            Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
-
-                            // Creating json as string with the id retrieve in the last foreach
-                            rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
-
-                            /* Retrieve components of the module with id of module in dictionnary */
-                            foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
+                            Debug.Log("*** ERROR: " + requestModule.error + " ***");
+                        }
+                        else
+                        {
+                            if (requestModule.isDone)
                             {
-                                if (item.Key == modelModule._id)
+                                string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);      // Get JSON file
+                                Debug.Log(jsonResultModule);
+                                RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                         // Convert JSON to manipulating C# object
+                                Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
+
+                                // Creating json as string with the id retrieve in the last foreach
+                                rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
+
+                                /* Retrieve components of the module with id of module in dictionnary */
+                                foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
                                 {
-                                    moduleComponents = item.Value;
+                                    if (item.Key == modelModule._id)
+                                    {
+                                        moduleComponents = item.Value;
+                                    }
                                 }
-                            }
-                            
-                            WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
-                            form.AddField("name", module.name);                                                         // Module name
-                            form.AddField("cost", modelModule.cost);                                                    // Module cost
-                            form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      // Module angle in 2D scene
-                            form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                        // Module cut
-                            form.AddField("range", modelModule.range);                                                  // Module range
-                            form.AddField("components", moduleComponents);                                              // Module components from previous scene
-                            form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);            // Estimation ID where the module is created
-                            form.AddField("rangeName", modelModule.rangeName);                                          // Name of the range module
-                            form.AddField("rangeAttributes", rangeAttributesForm);                                      // All values from dropdown (Finishing int..)
-                            form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());           // Position X of the module in 2D scene
-                            form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());           // Position Y of the module in 2D scene
-                            form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
-                            form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
-                            form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
 
-                            UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
-                            request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
-                            request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+                                WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
+                                form.AddField("name", module.name);                                                         // Module name
+                                form.AddField("cost", modelModule.cost);                                                    // Module cost
+                                form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      // Module angle in 2D scene
+                                form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                        // Module cut
+                                form.AddField("range", modelModule.range);                                                  // Module range
+                                form.AddField("components", moduleComponents);                                              // Module components from previous scene
+                                form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);            // Estimation ID where the module is created
+                                form.AddField("rangeName", modelModule.rangeName);                                          // Name of the range module
+                                form.AddField("rangeAttributes", rangeAttributesForm);                                      // All values from dropdown (Finishing int..)
+                                form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());           // Position X of the module in 2D scene
+                                form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());           // Position Y of the module in 2D scene
+                                form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
+                                form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
+                                form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
 
-                            request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
+                                UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
+                                request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
+                                request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
 
-                            yield return request.SendWebRequest();          // Send request                                                              
+                                request.certificateHandler = new CONST.BypassCertificate();    // Bypass certificate for https
 
-                            if (request.isNetworkError || request.isHttpError)
-                            {
-                                Debug.Log("*** ERROR: " + request.error + " ***");
-                            }
-                            else
-                            {
-                                if (request.isDone)
+                                yield return request.SendWebRequest();          // Send request                                                              
+
+                                if (request.isNetworkError || request.isHttpError)
                                 {
-                                    string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                                    Debug.Log(jsonResult);
+                                    Debug.Log("*** ERROR: " + request.error + " ***");
+                                }
+                                else
+                                {
+                                    if (request.isDone)
+                                    {
+                                        string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
+                                        Debug.Log(jsonResult);
 
-                                    CONST.GetComponent<CONST>().estimationDiscount = "0";
+                                        CONST.GetComponent<CONST>().estimationDiscount = "0";
 
-                                            /* VERIFY UTILITY */
-                                            RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResult);                 // Convert JSON to entity object
-                                    Module moduleResult = entityModule.module;                                                      // Convert entity object to module object
-                                    module.GetComponent<UpdateModule2D>().id = moduleResult._id;
-                                    /* END VERIFY UTILITY */
+                                        /* VERIFY UTILITY */
+                                        RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResult);                 // Convert JSON to entity object
+                                        Module moduleResult = entityModule.module;                                                      // Convert entity object to module object
+                                        module.GetComponent<UpdateModule2D>().id = moduleResult._id;
+                                        /* END VERIFY UTILITY */
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }  
+            }
+        }
+        else
+        {
+            textErrorAddModule.SetActive(true);
         }
     }
 
@@ -716,7 +739,9 @@ public class UpdateEstimationCreation : MonoBehaviour
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllRange entities = JsonUtility.FromJson<RequestGetAllRange>(jsonResult);             // Convert JSON file to serializable object
-                
+
+                listRanges.Add("Gamme");
+
                 /* Get all ranges */
                 foreach (var item in entities.range)
                 {
@@ -765,6 +790,12 @@ public class UpdateEstimationCreation : MonoBehaviour
                         listInsulatings.Clear();
                         listFinishingExt.Clear();
                         listFinishingInt.Clear();
+
+                        /* Fill first value of list with title */
+                        listFrames.Add("Qualité des huisseries");
+                        listInsulatings.Add("Type de remplissage");
+                        listFinishingExt.Add("Finition extérieure");
+                        listFinishingInt.Add("Finition intérieure");
 
                         /* Get all Frames Quality for range */
                         foreach (var frameQuality in range.framequality)
@@ -830,7 +861,9 @@ public class UpdateEstimationCreation : MonoBehaviour
                 RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
 
                 //Debug.Log(jsonResult);
-                
+
+                listCuts.Add("Coupe de principe");
+
                 /* Get all cuts */
                 foreach (var item in entities.cuts)
                 {
@@ -869,6 +902,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
                 listModels.Clear();                         // Unfill list before feeling it with new datas
+                listModels.Add("Modèle");
 
                 /* Get all modules */
                 foreach (var item in entities.modules)

@@ -17,12 +17,26 @@ public class Login : MonoBehaviour
     public GameObject textConnectionError;      // Error message display if connection failed
     public int timer;                           // Timer for message
 
+    public GameObject buttonExit;               // Button to quit app on windows
+
     void Start()
     {
         CONST.GetComponent<CONST>().url = "https://madera-figueiredo.space/";
 
         // Get the url of CONST
         url = CONST.GetComponent<CONST>().url;
+
+        // By default disable exit button 
+        buttonExit.SetActive(false);
+
+        /* Display exit button only if app run on Windows OS */
+        #if UNITY_STANDALONE_WIN
+                buttonExit.SetActive(true);
+        #endif
+
+        #if UNITY_EDITOR_WIN
+                buttonExit.SetActive(true);
+        #endif
 
         // Initialize timer
         timer = 120;
@@ -98,11 +112,14 @@ public class Login : MonoBehaviour
                     DontDestroyOnLoad(CONST.transform);
                     // Go to Home Scene
                     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-
                 }
 
             }
         }
     }
 
+    public void QuitApp()
+    {
+        Application.Quit();
+    }
 }

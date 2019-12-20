@@ -20,7 +20,10 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     private Button button;                  // Button variable to get component on start
 
     Vector2 moduleInitialPos;               // Keep initial position of module to avoid to place out of panel
-    bool outOfSection;                      // boolean to detect
+    public bool outOfSection;               // boolean to detect
+
+    public GameObject colliderObject;       // Child GameObject to change collider        
+    public BoxCollider2D collider;          // Collider to control collisions of module
 
     public string destinationFloor;         // String to keep floor of module 2D: useful for loading scene
     public string modelName;                // String to keep name of the model using to create the module
@@ -41,11 +44,13 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
         Debug.Log("Parent name: " + panelScene.name);
 
         isSelected = false;                                                                 // On start, component is not selected
+
+        collider = colliderObject.GetComponent<BoxCollider2D>();                            // Retrieve box collider of module
     }
 
     void Update()
     {
-
+        UpdateCollider();
     }
 
     /* Function to select component on scene */
@@ -78,6 +83,15 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
             sectionInput.text = "";
             angleInput.text = "";
         }
+    }
+
+    /* Function to update size and rotation of the collider */
+    public void UpdateCollider()
+    {
+        colliderObject.GetComponent<RectTransform>().sizeDelta = button.GetComponent<RectTransform>().sizeDelta;
+        collider.size = button.GetComponent<RectTransform>().sizeDelta;
+        colliderObject.GetComponent<RectTransform>().rotation = button.GetComponent<RectTransform>().rotation;
+
     }
 
     /* Function to drag element on scene */
