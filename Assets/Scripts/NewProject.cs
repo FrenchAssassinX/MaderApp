@@ -210,8 +210,15 @@ public class NewProject : MonoBehaviour
         }
         else
         {
-            StartCoroutine(PostFormNewProject());
-            errorCreateProject.transform.gameObject.SetActive(false);
+            if (change == "Choisir un client")
+            {
+                errorCreateProject.transform.gameObject.SetActive(true);
+            }
+            else
+            {
+                StartCoroutine(PostFormNewProject());
+                errorCreateProject.transform.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -219,7 +226,8 @@ public class NewProject : MonoBehaviour
     public void SendCreateCustomer()
     {
         //Time of a text field is empty (except roadExtra) an error message will be displayed if the user clicks on the button
-        if (name.text.Length == 0 || surname.text.Length == 0 || roadNum.text.Length == 0 || road.text.Length == 0 || zipcode.text.Length == 0 || city.text.Length == 0 || email.text.Length == 0 || phone.text.Length == 0)
+        if (name.text.Length == 0 || surname.text.Length == 0 || roadNum.text.Length == 0 || road.text.Length == 0 || zipcode.text.Length == 0 ||
+                city.text.Length == 0 || email.text.Length == 0 || phone.text.Length == 0)
         {
             errorCreateCustomer.transform.gameObject.SetActive(true);
         }
@@ -228,6 +236,7 @@ public class NewProject : MonoBehaviour
             StartCoroutine(PostFormNewCustomer()); // Start create new customer
             errorCreateCustomer.transform.gameObject.SetActive(false);
         }
+
     }
 
     //return to home page
@@ -430,6 +439,7 @@ public class NewProject : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);       // Convert JSON file
                 dropdowncustomer.Add("Choisir un client");
+
                 foreach (var item in entities.customers)
                 {
                     //recuperation values in customers
@@ -450,6 +460,8 @@ public class NewProject : MonoBehaviour
                 Debug.Log("jsonresult : " + jsonResult);
                 idCustomer.options.Clear();
                 idCustomer.AddOptions(dropdowncustomer);
+
+
             }
         }
     }
