@@ -188,7 +188,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
             nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
             quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
             unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.price + "€";
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.cost + "€";
 
         }
     }

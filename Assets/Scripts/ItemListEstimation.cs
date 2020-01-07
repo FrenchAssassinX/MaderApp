@@ -6,9 +6,11 @@ using UnityEngine.UI;
 
 public class ItemListEstimation : MonoBehaviour
 {
-    public Button rowListItem;                              // The item in the list to manipulate (this object)
-    public bool isSelected;                                 // Boolean to detect when the item is select on the list
-
+    public Button rowListItem;   
+    // The item in the list to manipulate (this object)
+    public bool isSelected;
+    // Boolean to detect when the item is select on the list
+    public GameObject CONST;
     public string idValue;                                       // Variable to pass the project on the next scene and find it by ID
     public string priceValue;
     public string stateValue;
@@ -28,7 +30,9 @@ public class ItemListEstimation : MonoBehaviour
     {
         rowListItem = GetComponent<Button>();               // Retrieve the item in the list
         rowListItem.onClick.AddListener(SelectItem);        // Affect specific onClick behaviour to the button
-        isSelected = false;                                 // Initialize the boolean to false
+        isSelected = false;
+        // Initialize the boolean to false
+        CONST = GameObject.Find("CONST");
 
         /* Retrieve the buttons in the scene */
         buttonDelete = GameObject.Find("deleteButton");
@@ -76,6 +80,7 @@ public class ItemListEstimation : MonoBehaviour
     public void SelectItem()
     {
         Debug.Log("selected : " + this.gameObject.GetComponent<ItemListEstimation>().idValue);
+        CONST.GetComponent<CONST>().selectedEstimationID = this.gameObject.GetComponent<ItemListEstimation>().idValue;
 
         if (buttonDelete != null)
         {
