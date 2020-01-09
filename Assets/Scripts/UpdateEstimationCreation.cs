@@ -63,7 +63,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
     public int moduleCounter;                          // Counter to rename module and retrieve easily on scene
 
-    private Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
+    public Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -367,14 +367,11 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to unselect module */
     public void UnselectModule()
     {
-        Debug.Log("Unselect module event start");
-
         /* Check all modules in panel */
         foreach (Transform child in destinationPanel.transform)
         {
             GameObject module = child.gameObject;                           // Convert child to module object
             module.GetComponent<UpdateModule2D>().isSelected = false;       // Unselect module
-            Debug.Log("***" + module.name + " unselected");
         }
     }
 
@@ -548,6 +545,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 /* Retrieve components of the module with id of module in dictionnary */
                                 foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
                                 {
+                                    // TO DO Modify "==" by "Equals" 
                                     if (item.Key == modelModule._id)
                                     {
                                         moduleComponents = item.Value;
@@ -932,6 +930,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                         }
                     }
                 }
+
                 dropdownModels.options.Clear();                    // Clear dropdown
                 dropdownModels.AddOptions(listModels);            // Fill dropdown with module list
             }

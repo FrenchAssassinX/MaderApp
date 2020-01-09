@@ -51,11 +51,6 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     void Update()
     {
         UpdateCollider();
-
-        if (isSelected)
-        {
-            Debug.Log(this.gameObject.name + " selected");
-        }
     }
 
     /* Function to select component on scene */
