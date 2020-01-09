@@ -51,6 +51,11 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     void Update()
     {
         UpdateCollider();
+
+        if (isSelected)
+        {
+            Debug.Log(this.gameObject.name + " selected");
+        }
     }
 
     /* Function to select component on scene */
@@ -123,6 +128,10 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         Debug.Log("Collision !");
 
-        outOfSection = true;        // Boolean pass to true
+        /* If the collision object is a Module, then do not consired it as a collision */
+        if (!collision.gameObject.name.Contains("Module"))
+        {
+            outOfSection = true;        // Boolean pass to true
+        }
     }
 }
