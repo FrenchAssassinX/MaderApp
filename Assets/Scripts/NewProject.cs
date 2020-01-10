@@ -41,12 +41,12 @@ public class NewProject : MonoBehaviour
     public InputField phone;                    // Input Field for client phone number
     public Button buttonCreateNewCustomer;      // Button to create new client
 
-    public Canvas CanvasRightDestinationAdress;
-    public InputField roadNumDA;
-    public InputField roadDA;
-    public InputField zipcodeDA;
-    public InputField cityDA;
-    public InputField roadExtraDA;
+    public Canvas CanvasRightDestinationAdress; // Right canvas to display all fields to create new client destination adress
+    public InputField roadNumDA;                // Input Field for client road number destination adress
+    public InputField roadDA;                   // Input Field for client road destination adress
+    public InputField zipcodeDA;                // Input Field for client zipecode destination adress
+    public InputField cityDA;                   // Input Field for client city destination adress
+    public InputField roadExtraDA;              // Input Field for client road extra destination adress
 
     /* Text messages displayed when create action are successful or failure */
     public GameObject createValideCustomer;     // Customer successfully created
@@ -259,7 +259,7 @@ public class NewProject : MonoBehaviour
         form.AddField("roadExtra", roadExtra.text);
         form.AddField("phone", phone.text);
         form.AddField("email", email.text);
-        form.AddField("_id", "12345");
+        form.AddField("_id", getId);
         form.AddField("__v", "0");
 
 
