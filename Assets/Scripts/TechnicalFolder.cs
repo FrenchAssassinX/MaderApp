@@ -87,31 +87,33 @@ public class TechnicalFolder : MonoBehaviour
             RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
             Module module = moduleEntity.module;
 
-            // Create prefab
-            GameObject listItem = Instantiate(modulesListItemPrefab, Vector3.zero, Quaternion.identity);
+            if (module.type == "custom")
+            {
+                // Create prefab
+                GameObject listItem = Instantiate(modulesListItemPrefab, Vector3.zero, Quaternion.identity);
 
-            // Set estimationListPanel as parent of prefab in project hierarchy
-            listItem.transform.SetParent(modulesList.transform);
+                // Set estimationListPanel as parent of prefab in project hierarchy
+                listItem.transform.SetParent(modulesList.transform);
 
-            listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
-            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+                listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
+                listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
 
-            // Find children in listItem to use them
-            GameObject nameValue = GameObject.Find("nameText");
+                // Find children in listItem to use them
+                GameObject nameValue = GameObject.Find("nameText");
 
-            // Customize props name of the prefab to find it when it will be create
-            nameValue.name = nameValue.name + listItem.GetComponent<ItemListModulesForTech>().name;
+                // Customize props name of the prefab to find it when it will be create
+                nameValue.name = nameValue.name + listItem.GetComponent<ItemListModulesForTech>().name;
 
-            // Change text value of the list item
-            nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
+                // Change text value of the list item
+                nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
 
-            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
 
-            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
-            // ID to keep for buckel in the module components 
-            listItem.GetComponent<ItemListModulesForTech>().idValue = module._id;
-
+                // ID to keep for buckel in the module components 
+                listItem.GetComponent<ItemListModulesForTech>().idValue = module._id;
+            }
         }
     }
 
@@ -150,6 +152,11 @@ public class TechnicalFolder : MonoBehaviour
             RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
             Module module = moduleEntity.module; //create a serealized module object 
 
+            foreach (Transform childList in componentsList.transform)
+            {
+                GameObject.Destroy(childList.gameObject);
+            }
+
             foreach (var componentItem in module.components)//bubkle into all the components of the current module
             {
                 StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
@@ -184,34 +191,36 @@ public class TechnicalFolder : MonoBehaviour
             RequestAComponent componentEntity = JsonUtility.FromJson<RequestAComponent>(jsonResultFromComponent);         // Convert JSON file
 
             ComponentToShow component = componentEntity.component;
+            
 
-            // Create prefab
-            GameObject listItem = Instantiate(componentListItemPrefab, Vector3.zero, Quaternion.identity);
+            if(!(component.name.Equals("AUCUN(E)"))) { 
+                // Create prefab
+                GameObject listItem = Instantiate(componentListItemPrefab, Vector3.zero, Quaternion.identity);
 
-            // Set estimationListPanel as parent of prefab in project hierarchy
-            listItem.transform.SetParent(componentsList.transform);
+                // Set estimationListPanel as parent of prefab in project hierarchy
+                listItem.transform.SetParent(componentsList.transform);
 
-            listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
-            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+                listItem.GetComponent<RectTransform>().localScale = modulesList.GetComponent<RectTransform>().localScale;
+                listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(modulesList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
 
-            // Find children in listItem to use them
-            GameObject nameValue = GameObject.Find("nameText");
-            GameObject quantityValue = GameObject.Find("quantityText");
+                // Find children in listItem to use them
+                GameObject nameValue = GameObject.Find("nameText");
+                GameObject quantityValue = GameObject.Find("quantityText");
 
-            // Customize props name of the prefab to find it when it will be create
-            nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
-            quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
+                // Customize props name of the prefab to find it when it will be create
+                nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
+                quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponentForTech>().name;
 
-            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
 
-            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
-            // Change text value of the list item
-            nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
-            quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
-
+                // Change text value of the list item
+                nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
+                quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
+            }
         }
     }
 

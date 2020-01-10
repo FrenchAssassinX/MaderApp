@@ -107,11 +107,14 @@ public class UpdateEstimationView_1 : MonoBehaviour
                     RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
                     Module module = moduleEntity.module; //create a serealized module object 
 
-                    double moduleCost = Int32.Parse(module.cost);
-                    estimationPrice += moduleCost;
-                    foreach (var componentItem in module.components)//bubkle into all the components of the current module
+                    if (module.type == "custom")
                     {
-                        StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
+                        double moduleCost = Int32.Parse(module.cost);
+                        estimationPrice += moduleCost;
+                        foreach (var componentItem in module.components)//bubkle into all the components of the current module
+                        {
+                            StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
+                        }
                     }
                 }
             }
@@ -193,43 +196,45 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
             ComponentToShow component = componentEntity.component;
 
-            // Create prefab
-            GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
+            if (!(component.name.Equals("AUCUN(E)")))
+            {
+                // Create prefab
+                GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
 
-            // Set estimationListPanel as parent of prefab in project hierarchy
-            listItem.transform.SetParent(componentList.transform);
+                // Set estimationListPanel as parent of prefab in project hierarchy
+                listItem.transform.SetParent(componentList.transform);
 
-            listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
-            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+                listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
+                listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
 
-            // Find children in listItem to use them
-            GameObject nameValue = GameObject.Find("nameText");
-            GameObject quantityValue = GameObject.Find("quantityText");
-            GameObject unitValue = GameObject.Find("unitText");
-            GameObject priceValue = GameObject.Find("priceText");
+                // Find children in listItem to use them
+                GameObject nameValue = GameObject.Find("nameText");
+                GameObject quantityValue = GameObject.Find("quantityText");
+                GameObject unitValue = GameObject.Find("unitText");
+                GameObject priceValue = GameObject.Find("priceText");
 
-            // Customize props name of the prefab to find it when it will be create
-            nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponent>().name;
-            quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponent>().name;
-            unitValue.name = unitValue.name + listItem.GetComponent<ItemListComponent>().name;
-            priceValue.name = priceValue.name + listItem.GetComponent<ItemListComponent>().name;
+                // Customize props name of the prefab to find it when it will be create
+                nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponent>().name;
+                quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponent>().name;
+                unitValue.name = unitValue.name + listItem.GetComponent<ItemListComponent>().name;
+                priceValue.name = priceValue.name + listItem.GetComponent<ItemListComponent>().name;
 
-            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            unitValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                unitValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
 
-            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
-            // Change text value of the list item
-            nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
-            quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
-            unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.price + "€";
-
+                // Change text value of the list item
+                nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
+                quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
+                unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
+                priceValue.GetComponent<UnityEngine.UI.Text>().text = component.cost + "€";
+            }
         }
     }
 
