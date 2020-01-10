@@ -459,8 +459,15 @@ public class CreateModule : MonoBehaviour
     //active CreateNewCient
     void DisplayModificationModule()
     {
-        canvasModificationModule.transform.gameObject.SetActive(true);
-        StartCoroutine(GetAllComponent());
+        if (canvasModificationModule.transform.gameObject.active)
+        {
+            canvasModificationModule.transform.gameObject.SetActive(false);
+        }
+        else
+        {
+            canvasModificationModule.transform.gameObject.SetActive(true);
+            StartCoroutine(GetAllComponent());
+        }
     }
     
     void SendFullModule()
