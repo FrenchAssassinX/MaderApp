@@ -5384,6 +5384,7 @@ MonoBehaviour:
   dropdownFinishingInt: {fileID: 1287111976}
   dropdownCuts: {fileID: 1596040586}
   textErrorAddModule: {fileID: 1588520761}
+  timerErrorMessage: 0
 --- !u!1 &933641749
 GameObject:
   m_ObjectHideFlags: 0

@@ -61,9 +61,9 @@ public class UpdateEstimationCreation : MonoBehaviour
     public GameObject textErrorAddModule;               // UI Element text to display error if module can't be added on 2D scene
     public int timerErrorMessage;
 
-    private int moduleCounter;                          // Counter to rename module and retrieve easily on scene
+    public int moduleCounter;                          // Counter to rename module and retrieve easily on scene
 
-    private Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
+    public Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -182,6 +182,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                 panelNewFloor.transform.SetParent(middleCanvas.transform);                                                          // Set prefab as child of MiddleCanvas
                 panelNewFloor.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;     // Set default position as parent position: useful for responsivity
                 panelNewFloor.GetComponent<RectTransform>().sizeDelta = middleCanvas.GetComponent<RectTransform>().sizeDelta;       // Set default size as parent size: useful for responsivity
+                panelNewFloor.GetComponent<Button>().onClick.AddListener(UnselectModule);
                 floorCount.GetComponent<FloorCount>().listFloorPanels.Add(panelNewFloor);                                           // Add new panel on listPanels
 
                 /* Rename initial floors */
@@ -544,6 +545,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 /* Retrieve components of the module with id of module in dictionnary */
                                 foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
                                 {
+                                    // TO DO Modify "==" by "Equals" 
                                     if (item.Key == modelModule._id)
                                     {
                                         moduleComponents = item.Value;
@@ -928,6 +930,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                         }
                     }
                 }
+
                 dropdownModels.options.Clear();                    // Clear dropdown
                 dropdownModels.AddOptions(listModels);            // Fill dropdown with module list
             }
@@ -957,8 +960,9 @@ public class UpdateEstimationCreation : MonoBehaviour
         {
             if (request.isDone)
             {
+                int numberOfModules = 0;                                                                         // Temp variable to keep number of modules
+
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                //Debug.Log(jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
@@ -973,6 +977,12 @@ public class UpdateEstimationCreation : MonoBehaviour
                     floorCount.GetComponent<FloorCount>().floorCounter = int.Parse(estimation.floorNumber);
                 }
 
+                foreach (var item in estimation.module)
+                {
+                    numberOfModules++;
+                }
+
+                moduleCounter = numberOfModules;
                 CONST.GetComponent<CONST>().floorCounterDatabase = int.Parse(estimation.floorNumber);
 
                 RecreateFloors(floorCount.GetComponent<FloorCount>().floorCounter);

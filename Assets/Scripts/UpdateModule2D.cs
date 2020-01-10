@@ -123,6 +123,10 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         Debug.Log("Collision !");
 
-        outOfSection = true;        // Boolean pass to true
+        /* If the collision object is a Module, then do not consired it as a collision */
+        if (!collision.gameObject.name.Contains("Module"))
+        {
+            outOfSection = true;        // Boolean pass to true
+        }
     }
 }
