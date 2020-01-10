@@ -141,8 +141,8 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 30
+    m_Font: {fileID: 12800000, guid: 7f8eb9c69dff0ab4695f759a488adc12, type: 3}
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
@@ -192,7 +192,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 575.6, y: 60}
+  m_SizeDelta: {x: 575.6, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5892218265520661087
 CanvasRenderer:
@@ -288,3 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a448157d93ea2794aaa713ae77a30826, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rowListItem: {fileID: 0}
+  isSelected: 0
+  nameValue: 
+  idValue: 

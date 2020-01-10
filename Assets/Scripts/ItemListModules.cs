@@ -28,7 +28,6 @@ public class ItemListModules : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
-        Debug.Log("shtonk");
         isSelected = true;  //prefab selected
 
         GameObject.Find("Canvas").GetComponent<UpdateEstimationView_2>().ShowRange(this.gameObject);

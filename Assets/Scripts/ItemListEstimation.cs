@@ -45,32 +45,26 @@ public class ItemListEstimation : MonoBehaviour
         //Hide the previous buttons and affect specific onClick behaviours
         if (buttonDelete != null)
         {
-            buttonDelete.SetActive(false);
             buttonDelete.GetComponent<Button>().onClick.AddListener(DeleteEstimation);
         }
         if (buttonEstimation != null)
         {
-            buttonEstimation.SetActive(false);
             buttonEstimation.GetComponent<Button>().onClick.AddListener(GetEstimation);
         }
         if (buttonPaymentTerms != null)
         {
-            buttonPaymentTerms.SetActive(false);
             buttonPaymentTerms.GetComponent<Button>().onClick.AddListener(GetPaymentTerms);
         }
         if (buttonTechnicalFile != null)
         {
-            buttonTechnicalFile.SetActive(false);
             buttonTechnicalFile.GetComponent<Button>().onClick.AddListener(GetTechnicalFile);
         }
         if (buttonShowEstimation != null)
         {
-            buttonShowEstimation.SetActive(false);
             buttonShowEstimation.GetComponent<Button>().onClick.AddListener(ShowEstimation);
         }
         if (buttonUpdateEstimation != null)
         {
-            buttonUpdateEstimation.SetActive(false);
             buttonUpdateEstimation.GetComponent<Button>().onClick.AddListener(UpdateEstimation);
         }
         
@@ -79,33 +73,7 @@ public class ItemListEstimation : MonoBehaviour
     /* Function for select item detection */
     public void SelectItem()
     {
-        Debug.Log("selected : " + this.gameObject.GetComponent<ItemListEstimation>().idValue);
         CONST.GetComponent<CONST>().selectedEstimationID = this.gameObject.GetComponent<ItemListEstimation>().idValue;
-
-        if (buttonDelete != null)
-        {
-            buttonDelete.SetActive(true);
-        }
-        if (buttonEstimation != null)
-        {
-            buttonEstimation.SetActive(true);
-        }
-        if (buttonPaymentTerms != null)
-        {
-            buttonPaymentTerms.SetActive(true);
-        }
-        if (buttonTechnicalFile != null)
-        {
-            buttonTechnicalFile.SetActive(true);
-        }
-        if (buttonShowEstimation != null)
-        {
-            buttonShowEstimation.SetActive(true);
-        }
-        if (buttonUpdateEstimation != null)
-        {
-            buttonUpdateEstimation.SetActive(true);
-        }
         isSelected = true;
     }
 

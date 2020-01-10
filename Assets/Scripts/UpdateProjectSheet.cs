@@ -107,6 +107,11 @@ public class UpdateProjectSheet : MonoBehaviour
     private string projectSailorId;
     private Project project;
     private Customer customer;
+    private User2 user;
+
+    public GameObject notifText;
+    public Button okNotifyButton;
+    public GameObject notifyCanvas;
 
     public Button addButton;
 
@@ -120,11 +125,12 @@ public class UpdateProjectSheet : MonoBehaviour
         updateClientPanel.SetActive(false);
         updateProjectPanel.SetActive(false);
         confirmDeletePanel.SetActive(false);
+        notifyCanvas.SetActive(false);
 
         CONST = GameObject.Find("CONST");                       // Get const object
 
         addButton.onClick.AddListener(AddNewEstimation);
-
+        okNotifyButton.onClick.AddListener(CloseNotifyWindow);
         deletePanelCancelButton.onClick.AddListener(cancelDeleteEstimation);
         deletePanelConfirmButton.onClick.AddListener(confirmDeleteEstimation);
 
@@ -165,6 +171,7 @@ public class UpdateProjectSheet : MonoBehaviour
                 RequestAProject entityProject = JsonUtility.FromJson<RequestAProject>(jsonResult);         // Convert JSON file
                 project = entityProject.result; //Instanciate the project object
                 customer = entityProject.customer; //Instanciate the customer object
+                user = project.user; 
 
                 List <EstimationId> estimationIdList = project.estimation;
 
@@ -173,7 +180,7 @@ public class UpdateProjectSheet : MonoBehaviour
                 projectIdGO.GetComponent<UnityEngine.UI.Text>().text = projectId;
                 projectNameGO.GetComponent<UnityEngine.UI.Text>().text = project.name;
                 projectDateGO.GetComponent<UnityEngine.UI.Text>().text = project.date;
-                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = project.reference;
+                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = user.id;
                 clientIdGO.GetComponent<UnityEngine.UI.Text>().text = customer._id;
                 clientNameGO.GetComponent<UnityEngine.UI.Text>().text = customer.name;
                 clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = customer.surename;
@@ -478,6 +485,7 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm form = new WWWForm();                       // New form for web request
 
         form.AddField("projectID", projectId);    // Add to the form the values of the project to update
+        Debug.Log("USER ID : "+sailorID);
         form.AddField("userID", sailorID);
         form.AddField("road", project.road);
         form.AddField("roadNum", project.roadNum);
@@ -670,18 +678,11 @@ public class UpdateProjectSheet : MonoBehaviour
         confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
 
-    //Funtion that get all the informations to show into the pdf of the estimation, and that creates it
     public void EditEstimation(GameObject pItemSelected)
     {
-        //Debug.Log("Begin coroutine");
-        //StartCoroutine(GetComponent());
-
-        StartCoroutine(InstanciateUserDatas(project.user.id, pItemSelected));//call the function that Instanciate the referent informations
-        
-        //Instanciate parameters to show up into the pdf
-        
+        StartCoroutine(InstanciateUserDatas(project.user.id, pItemSelected));
     }
-
+    
     //Instanciate the referent informations to show on the estimation pdf
     public IEnumerator InstanciateUserDatas(string userId, GameObject pItemSelected)
     {
@@ -1056,6 +1057,11 @@ public class UpdateProjectSheet : MonoBehaviour
             }
         }
     }        
+
+    public void CloseNotifyWindow()
+    {
+        notifyCanvas.SetActive(false);
+    }
 }
 
     

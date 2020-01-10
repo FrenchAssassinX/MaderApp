@@ -15,6 +15,9 @@ public class Login : MonoBehaviour
     public InputField password;                 /*                            */
     public Button connection;                   /******************************/
     public GameObject textConnectionError;      // Error message display if connection failed
+    public int timer;                           // Timer for message
+
+    public GameObject buttonExit;               // Button to quit app on windows
 
     void Start()
     {
@@ -23,6 +26,21 @@ public class Login : MonoBehaviour
         // Get the url of CONST
         url = CONST.GetComponent<CONST>().url;
 
+        // By default disable exit button 
+        buttonExit.SetActive(false);
+
+        /* Display exit button only if app run on Windows OS */
+        #if UNITY_STANDALONE_WIN
+                buttonExit.SetActive(true);
+        #endif
+
+        #if UNITY_EDITOR_WIN
+                buttonExit.SetActive(true);
+        #endif
+
+        // Initialize timer
+        timer = 120;
+
         // Disable error message by default
         textConnectionError.transform.gameObject.SetActive(false);
 
@@ -30,6 +48,22 @@ public class Login : MonoBehaviour
         Button btn = connection.GetComponent<Button>();
         btn.onClick.AddListener(SendConnection);
 
+    }
+
+    void Update()
+    {
+        if (textConnectionError.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                textConnectionError.transform.gameObject.SetActive(false);
+                timer = 120;
+            }
+        }
     }
 
     /* Function starting when the connection button will be pressed */
@@ -78,11 +112,14 @@ public class Login : MonoBehaviour
                     DontDestroyOnLoad(CONST.transform);
                     // Go to Home Scene
                     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-
                 }
 
             }
         }
     }
 
+    public void QuitApp()
+    {
+        Application.Quit();
+    }
 }

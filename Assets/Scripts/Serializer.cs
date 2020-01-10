@@ -38,6 +38,11 @@ public class Text
     {
         throw new NotImplementedException();
     }
+
+    public static implicit operator Text(string v)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 /* User constructor */
@@ -275,7 +280,7 @@ public class Module
     public string cut;
     public string range;
     public string rangeName;
-    public RangeAttribute rangeAttributes;
+    public List<RangeAttribute> rangeAttributes;
     public string x;
     public string y;
     public string height;
