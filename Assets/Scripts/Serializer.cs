@@ -280,7 +280,7 @@ public class Module
     public string cut;
     public string range;
     public string rangeName;
-    public RangeAttribute rangeAttributes;
+    public List<RangeAttribute> rangeAttributes;
     public string x;
     public string y;
     public string height;
@@ -393,7 +393,7 @@ public class ComponentToShow
     public string description;
     public string name;
     public string type;
-    public string price;
+    public string cost;
     public Provide provide;
     public string __v;
 }
