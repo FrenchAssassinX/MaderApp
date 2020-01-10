@@ -249,7 +249,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;      // Set default size as parent size: useful for responsivity
             panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);                                            // Add listener to panel to launch UnselectModule function
 
-            floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
+            //floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
         }
     }
 
@@ -451,9 +451,6 @@ public class UpdateEstimationCreation : MonoBehaviour
     public void StartAddDatasToEstimation()
     {
         StartCoroutine(AddModulesToEstimation());
-        StartCoroutine(AddFloorNumberToEstimation());
-        CONST.GetComponent<CONST>().estimationDiscount = "0";
-        CONST.GetComponent<CONST>().estimationPrice = "0";
     }
 
     /* Intermediary function to start GetAllRanges function */
@@ -502,6 +499,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                 {
                     GameObject module = panelChild.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
 
+                    Debug.Log("Module: " + module.name);
+                    
                     /* Register module only if it is not already exist on database */
                     if (module.GetComponent<UpdateModule2D>().id == "" || module.GetComponent<UpdateModule2D>().id == null)
                     {
@@ -524,7 +523,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
                         requestModule.certificateHandler = new CONST.BypassCertificate();   // Bypass certificate for https
 
-                        yield return requestModule.SendWebRequest();          // Send request                                                              
+                        yield return requestModule.SendWebRequest();                        // Send request                                                              
 
                         if (requestModule.isNetworkError || requestModule.isHttpError)
                         {
@@ -542,15 +541,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 // Creating json as string with the id retrieve in the last foreach
                                 rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
 
-                                /* Retrieve components of the module with id of module in dictionnary */
-                                foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
-                                {
-                                    // TO DO Modify "==" by "Equals" 
-                                    if (item.Key == modelModule._id)
-                                    {
-                                        moduleComponents = item.Value;
-                                    }
-                                }
+                                moduleComponents = CONST.GetComponent<CONST>().dictComponentsForModule[modelModule._id];
 
                                 WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
                                 form.AddField("name", module.name);                                                         // Module name
@@ -601,6 +592,10 @@ public class UpdateEstimationCreation : MonoBehaviour
                     }
                 }
             }
+
+            StartCoroutine(AddFloorNumberToEstimation());
+            CONST.GetComponent<CONST>().estimationDiscount = "0";
+            CONST.GetComponent<CONST>().estimationPrice = "0";
         }
         else
         {
@@ -632,7 +627,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                Debug.Log("Floor: " + jsonResult);
                 GoToEstimationView();
             }
         }
@@ -900,7 +895,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                //Debug.Log(jsonResult);
+                Debug.Log("Modules" + jsonResult);
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
                 listModels.Clear();                         // Unfill list before feeling it with new datas
@@ -1014,7 +1009,7 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
+                Debug.Log("Estimation: " + jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
@@ -1045,8 +1040,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                         {
                             if (requestModule.isDone)
                             {
-                                string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
-                                //Debug.Log(jsonResultModule);                                                                                                        //Debug.Log(jsonResultModule);
+                                string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file                                                                                                      //Debug.Log(jsonResultModule);
+                                Debug.Log("Module: " + jsonResultModule);
 
                                 RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
                                 Module myModule = entityModule.module;
