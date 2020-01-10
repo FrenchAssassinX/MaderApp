@@ -175,11 +175,17 @@ public class UpdateProjectSheet : MonoBehaviour
 
                 List<EstimationId> estimationIdList = project.estimation;
 
+                // Formating date to French timeset
+                string dateValueText = project.date;
+                dateValueText = dateValueText.Remove(10, 14);
+                DateTime dateTimeText = Convert.ToDateTime(dateValueText);
+                dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
+
                 //set the gameObjects content from the client and the project parameters 
                 frameTitle.GetComponent<UnityEngine.UI.Text>().text = "Projet " + projectId;
                 projectIdGO.GetComponent<UnityEngine.UI.Text>().text = projectId;
                 projectNameGO.GetComponent<UnityEngine.UI.Text>().text = project.name;
-                projectDateGO.GetComponent<UnityEngine.UI.Text>().text = project.date;
+                projectDateGO.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
                 projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = user.id;
                 clientIdGO.GetComponent<UnityEngine.UI.Text>().text = customer._id;
                 clientNameGO.GetComponent<UnityEngine.UI.Text>().text = customer.name;
