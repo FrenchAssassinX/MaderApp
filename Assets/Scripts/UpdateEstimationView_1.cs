@@ -171,6 +171,8 @@ public class UpdateEstimationView_1 : MonoBehaviour
     //get the component datas and show them into the grid list
     public IEnumerator GetComponent(string componentId, string componentQte)
     {
+
+        Debug.Log("component : " + componentId);
         var urlToGetComponent = CONST.GetComponent<CONST>().url + "v1/getcomponentbyid";
 
         WWWForm componentForm = new WWWForm();                       // New form for web request

@@ -182,12 +182,12 @@ public class UpdateProjectSheet : MonoBehaviour
                 dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
                 //set the gameObjects content from the client and the project parameters 
-                frameTitle.GetComponent<UnityEngine.UI.Text>().text = "Projet " + projectId;
-                projectIdGO.GetComponent<UnityEngine.UI.Text>().text = projectId;
+                frameTitle.GetComponent<UnityEngine.UI.Text>().text = "Projet " + project.reference;
+                projectIdGO.GetComponent<UnityEngine.UI.Text>().text = project.reference;
                 projectNameGO.GetComponent<UnityEngine.UI.Text>().text = project.name;
                 projectDateGO.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
-                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = user.id;
-                clientIdGO.GetComponent<UnityEngine.UI.Text>().text = customer._id;
+                projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text = user.matricule;
+                //clientIdGO.GetComponent<UnityEngine.UI.Text>().text = customer._id;
                 clientNameGO.GetComponent<UnityEngine.UI.Text>().text = customer.name;
                 clientSurnameGO.GetComponent<UnityEngine.UI.Text>().text = customer.surename;
                 clientRoadGO.GetComponent<UnityEngine.UI.Text>().text = customer.road;
