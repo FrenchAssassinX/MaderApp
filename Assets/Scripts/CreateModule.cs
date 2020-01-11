@@ -365,8 +365,12 @@ public class CreateModule : MonoBehaviour
 
                 //The database return a JSON file of all user infos
                 string jsonResult = System.Text.Encoding.UTF8.GetString(requestComponents.downloadHandler.data);
+                Debug.Log("Requested components: " + jsonResult);
+
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
+
+                listSelectedComponents.Clear();
 
                 /* Retrieve all selected components: if selected component in Dropdwon is equals to current item, then affect ID */
                 foreach (var item in entities.components)
@@ -381,11 +385,9 @@ public class CreateModule : MonoBehaviour
                     {
                         if (item.name != "AUCUN(E)")
                         {
-                            Debug.Log("selected component : " + item.name + " selected");
                             listSelectedComponents.Add(item.name);
                             moduleCost += float.Parse(item.cost);       // Increment module cost with component cost   
                         }
-                        
                     }
                 }
                 foreach (var item in listSelectedComponents)

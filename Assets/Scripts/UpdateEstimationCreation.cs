@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -11,7 +12,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* ------------------------------------     DECLARE DATAS PART     ------------------------------------ */
     public GameObject CONST;                            // CONST object contains server route, token and user infos
 
-    private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to get all projects
+    private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to send module
     private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
     private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
@@ -67,7 +68,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
-    void Start()
+    public void Start()
     {
         CONST = GameObject.Find("CONST");                                                           // Get CONST object
         floorCount = GameObject.Find("FloorCount");                                                 // Retrieve counter on the scene
@@ -98,7 +99,6 @@ public class UpdateEstimationCreation : MonoBehaviour
         listCuts = new List<string>();        
 
         StartCoroutine(GetAllEstimationFloors());   // Function lauching on start to get all floors if it's an existing project
-        StartCoroutine(GetAllEstimationModules());  // Function lauching on start to get all modules if it's an existing project
     }
 
     public void Update()
@@ -114,18 +114,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             {
                 textErrorAddModule.SetActive(false);
                 timerErrorMessage = 120;
-            }
-        }
-
-        /* Search wich button is selected */
-        foreach (Transform child in middleCanvas.transform)
-        {
-            GameObject panel = child.gameObject;        // Convert child to Panel object
-
-            /* Detect wich panel is active */
-            if (panel.activeSelf)
-            {
-                destinationPanel = panel;               // Affect panel as default panel for module destination
             }
         }
     }
@@ -251,6 +239,9 @@ public class UpdateEstimationCreation : MonoBehaviour
 
             floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
         }
+
+        /* Recreating modules */
+        StartCoroutine(GetAllEstimationModules());      // Function lauching on start to get all modules if it's an existing project
     }
 
     /* Function to display send datas panel */
@@ -338,8 +329,6 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Function to replace existing module from database if modules were previously created for an estimation */
     public void RecreateModule(string pModuleID, string pModuleName, string pDestinationPanel, string pPosX, string pPosY, string pWidth, string pHeight, string pAngle)
     {
-        Debug.Log("pDestinationPanel: " + pDestinationPanel);
-
         GameObject destPanel = GameObject.Find(pDestinationPanel);                                                              // Retrieve destination panel on scene with name
 
         if (GameObject.Find(pDestinationPanel) != null)
@@ -451,9 +440,6 @@ public class UpdateEstimationCreation : MonoBehaviour
     public void StartAddDatasToEstimation()
     {
         StartCoroutine(AddModulesToEstimation());
-        StartCoroutine(AddFloorNumberToEstimation());
-        CONST.GetComponent<CONST>().estimationDiscount = "0";
-        CONST.GetComponent<CONST>().estimationPrice = "0";
     }
 
     /* Intermediary function to start GetAllRanges function */
@@ -471,7 +457,6 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* Intermediary function to start GetAllCuts function */
     public void StartDeleteModuleFromEstimation()
     {
-        Debug.Log("Test");
         StartCoroutine(DeleteModuleFromEstimation());
     }
 
@@ -501,7 +486,7 @@ public class UpdateEstimationCreation : MonoBehaviour
                 foreach (Transform panelChild in panel.transform)
                 {
                     GameObject module = panelChild.gameObject;                                                                   // Retrieve the module GameObject in 2D scene
-
+                    
                     /* Register module only if it is not already exist on database */
                     if (module.GetComponent<UpdateModule2D>().id == "" || module.GetComponent<UpdateModule2D>().id == null)
                     {
@@ -524,7 +509,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
                         requestModule.certificateHandler = new CONST.BypassCertificate();   // Bypass certificate for https
 
-                        yield return requestModule.SendWebRequest();          // Send request                                                              
+                        yield return requestModule.SendWebRequest();                        // Send request                                                              
 
                         if (requestModule.isNetworkError || requestModule.isHttpError)
                         {
@@ -535,22 +520,13 @@ public class UpdateEstimationCreation : MonoBehaviour
                             if (requestModule.isDone)
                             {
                                 string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);      // Get JSON file
-                                Debug.Log(jsonResultModule);
                                 RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResultModule);                         // Convert JSON to manipulating C# object
                                 Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
 
                                 // Creating json as string with the id retrieve in the last foreach
                                 rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
 
-                                /* Retrieve components of the module with id of module in dictionnary */
-                                foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
-                                {
-                                    // TO DO Modify "==" by "Equals" 
-                                    if (item.Key == modelModule._id)
-                                    {
-                                        moduleComponents = item.Value;
-                                    }
-                                }
+                                moduleComponents = CONST.GetComponent<CONST>().dictComponentsForModule[modelModule._id];
 
                                 WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
                                 form.AddField("name", module.name);                                                         // Module name
@@ -585,7 +561,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                                     if (request.isDone)
                                     {
                                         string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                                        Debug.Log(jsonResult);
 
                                         CONST.GetComponent<CONST>().estimationDiscount = "0";
 
@@ -601,6 +576,10 @@ public class UpdateEstimationCreation : MonoBehaviour
                     }
                 }
             }
+
+            StartCoroutine(AddFloorNumberToEstimation());
+            CONST.GetComponent<CONST>().estimationDiscount = "0";
+            CONST.GetComponent<CONST>().estimationPrice = "0";
         }
         else
         {
@@ -632,7 +611,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
                 GoToEstimationView();
             }
         }
@@ -674,7 +652,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                         if (request.isDone)
                         {
                             string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                            Debug.Log(jsonResult);
 
                             HideDeletePanel();                                      // Hide delete panel
                             Destroy(module);                                        // Destroy module from scene
@@ -715,7 +692,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
             }
         }
     }
@@ -862,8 +838,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllCuts entities = JsonUtility.FromJson<RequestGetAllCuts>(jsonResult);             // Convert JSON file to serializable object
 
-                //Debug.Log(jsonResult);
-
                 listCuts.Add("Coupe de principe");
 
                 /* Get all cuts */
@@ -900,7 +874,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                //Debug.Log(jsonResult);
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
                 listModels.Clear();                         // Unfill list before feeling it with new datas
@@ -923,7 +896,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 listModels.Add(module.name);                        // Add name of the module in list
                                 dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
                                 string listComponents = CreateJSONComponents(module.components);
-                                Debug.Log("COMPONENTS: " + listComponents);
                                 CONST.GetComponent<CONST>().dictComponentsForModule.Clear();
                                 CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, listComponents);
                             }
@@ -966,6 +938,8 @@ public class UpdateEstimationCreation : MonoBehaviour
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
+
+                Debug.Log("Estimation: " + jsonResult);
 
                 /* If estimation don't have any floor, starting counter to 1 */
                 if (estimation.floorNumber == "" || estimation.floorNumber == null)
@@ -1014,7 +988,6 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (request.isDone)
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                Debug.Log(jsonResult);
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
@@ -1046,7 +1019,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                             if (requestModule.isDone)
                             {
                                 string jsonResultModule = System.Text.Encoding.UTF8.GetString(requestModule.downloadHandler.data);          // Get JSON file
-                                //Debug.Log(jsonResultModule);                                                                                                        //Debug.Log(jsonResultModule);
 
                                 RequestAModule entityModule = JsonUtility.FromJson<RequestAModule>(jsonResultModule);
                                 Module myModule = entityModule.module;
@@ -1070,6 +1042,18 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 }
                             }
                         }
+                    }
+                }
+
+                /* Disable panelFloors on start */
+                foreach (Transform child in middleCanvas.transform)
+                {
+                    GameObject panel = child.gameObject;        // Convert child to Panel object
+
+                    /* Detect wich panel is active */
+                    if (panel.name != "panelFloor0")
+                    {
+                        panel.SetActive(false);
                     }
                 }
 
