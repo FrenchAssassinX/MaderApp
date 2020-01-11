@@ -147,9 +147,9 @@ public class UpdateEstimationView_1 : MonoBehaviour
             {
                 totalAfterDiscountSt = totalAfterDiscountInt.ToString();
             }
-            totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
+            totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt + "€"; //Shows the value of the original price
             discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt; //shows the final price
+            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt + "€"; //shows the final price
 
             StartCoroutine(UpdateEstimationPrice(estimationPrice, estimation));
         }
