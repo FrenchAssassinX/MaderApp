@@ -435,6 +435,9 @@ public class NewProject : MonoBehaviour
             {
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllCustomer entities = JsonUtility.FromJson<RequestGetAllCustomer>(jsonResult);       // Convert JSON file
+
+                idCustomer.options.Clear();
+                dropdowncustomer.Clear();
                 dropdowncustomer.Add("Choisir un client");
 
                 foreach (var item in entities.customers)
@@ -451,10 +454,8 @@ public class NewProject : MonoBehaviour
                     
                     idClientForForm = getId;
                 }
-                idCustomer.options.Clear();
+
                 idCustomer.AddOptions(dropdowncustomer);
-
-
             }
         }
     }

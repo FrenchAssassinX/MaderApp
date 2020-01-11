@@ -28,6 +28,15 @@ public class UpdateModule2D : MonoBehaviour, IDragHandler, IEndDragHandler
     public string destinationFloor;         // String to keep floor of module 2D: useful for loading scene
     public string modelName;                // String to keep name of the model using to create the module
 
+    public string idCuts = "";                          // String to keep id of frame quality before creating a json
+    public string idFrameQuality = "";                  // String to keep id of frame quality before creating a json
+    public string idWindowFrameQuality = "";            // String to keep id of window frame quality before creating a json
+    public string idInsulating = "";                    // String to keep id of insulating before creating a json
+    public string idCovering = "";                      // String to keep id of covering before creating a json
+    public string idFinishingExt = "";                  // String to keep id of finishing exterior before creating a json
+    public string idFinishingInt = "";                  // String to keep id of finishing interior before creating a json
+    public string rangeAttributesForm = "";
+
     void Start()
     {
         moduleInitialPos = this.GetComponent<RectTransform>().position;                     // Get the iniital position of the component

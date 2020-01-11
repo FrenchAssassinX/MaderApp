@@ -311,12 +311,24 @@ public class UpdateEstimationCreation : MonoBehaviour
             if (destinationPanel != null)
             {
                 GameObject newModule = Instantiate(modulePrefab, destinationPanel.transform.position, Quaternion.identity);                     // Create new module
+
                 newModule.transform.SetParent(destinationPanel.transform);                                                                      // Change parent on scene hierarchy
                 newModule.GetComponent<RectTransform>().localScale = destinationPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
                 newModule.GetComponent<RectTransform>().anchoredPosition = destinationPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
                 newModule.name = "Module" + moduleCounter;                                                                                      // Change name of module
                 newModule.GetComponent<UpdateModule2D>().modelName = dropdownModels.options[dropdownModels.value].text;                         // Keep model name of the module
                 newModule.GetComponent<UpdateModule2D>().destinationFloor = destinationPanel.name;                                              // Keep destination floor of the module
+
+                /* Datas for database */
+                newModule.GetComponent<UpdateModule2D>().idCuts = dropdownCuts.options[dropdownCuts.value].text;                                // String to keep id of frame quality before creating a json
+                newModule.GetComponent<UpdateModule2D>().idFrameQuality = dropdownFrames.options[dropdownFrames.value].text;                    // String to keep id of frame quality before creating a json
+                newModule.GetComponent<UpdateModule2D>().idWindowFrameQuality = "";                                                             // String to keep id of window frame quality before creating a json
+                newModule.GetComponent<UpdateModule2D>().idInsulating = dropdownInsulatings.options[dropdownInsulatings.value].text;            // String to keep id of insulating before creating a json
+                newModule.GetComponent<UpdateModule2D>().idCovering = "";                                                                       // String to keep id of covering before creating a json
+                newModule.GetComponent<UpdateModule2D>().idFinishingExt = dropdownFinishingExt.options[dropdownFinishingExt.value].text;        // String to keep id of finishing exterior before creating a json
+                newModule.GetComponent<UpdateModule2D>().idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;        // String to keep id of finishing interior before creating a json
+                newModule.GetComponent<UpdateModule2D>().rangeAttributesForm = "";                                                              // String to create a json file to send rangeAttributes in form
+
                 moduleCounter++;                                                                                                                // Increase counter after rename module
             }
         }
@@ -465,18 +477,11 @@ public class UpdateEstimationCreation : MonoBehaviour
         string idModule = "";                                                                       // String to keep id of the module
         string moduleComponents = "";                                                               // String to keep components of the module from previous scene
 
-        string idCuts = dropdownCuts.options[dropdownCuts.value].text;                              // String to keep id of frame quality before creating a json
-        string idFrameQuality = dropdownFrames.options[dropdownFrames.value].text;                  // String to keep id of frame quality before creating a json
-        string idWindowFrameQuality = "";                                                           // String to keep id of window frame quality before creating a json
-        string idInsulating = dropdownInsulatings.options[dropdownInsulatings.value].text;          // String to keep id of insulating before creating a json
-        string idCovering = "";                                                                     // String to keep id of covering before creating a json
-        string idFinishingExt = dropdownFinishingExt.options[dropdownFinishingExt.value].text;      // String to keep id of finishing exterior before creating a json
-        string idFinishingInt = dropdownFinishingInt.options[dropdownFinishingInt.value].text;      // String to keep id of finishing interior before creating a json
-        string rangeAttributesForm = "";                                                            // String to create a json file to send rangeAttributes in form
-
         /* Verify if all values of dropdowns are sets */
-        if (idFrameQuality != "Qualité des huisseries" && idInsulating != "Type de remplissage"
-                && idFinishingExt != "Finition extérieure" && idFinishingInt != "Finition intérieure")
+        if (dropdownFrames.options[dropdownFrames.value].text != "Qualité des huisseries" 
+                && dropdownInsulatings.options[dropdownInsulatings.value].text != "Type de remplissage"
+                && dropdownFinishingExt.options[dropdownFinishingExt.value].text != "Finition extérieure" 
+                && dropdownFinishingInt.options[dropdownFinishingInt.value].text != "Finition intérieure")
         {
             /* Foreach instruction to verify all module added to 2D scene */
             foreach (Transform child in middleCanvas.transform)
@@ -524,25 +529,32 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 Module modelModule = entity.module;                                                                     // Convert list of C# object to a C# Module object
 
                                 // Creating json as string with the id retrieve in the last foreach
-                                rangeAttributesForm = CreateJSON(idFrameQuality, idInsulating, idCovering, idWindowFrameQuality, idFinishingInt, idFinishingExt);       // Convert all Range Attributes to a JSON string to pass it in form for web request
+                                module.GetComponent<UpdateModule2D>().rangeAttributesForm = CreateJSON(
+                                        module.GetComponent<UpdateModule2D>().idFrameQuality,
+                                        module.GetComponent<UpdateModule2D>().idInsulating,
+                                        module.GetComponent<UpdateModule2D>().idCovering,
+                                        module.GetComponent<UpdateModule2D>().idWindowFrameQuality,
+                                        module.GetComponent<UpdateModule2D>().idFinishingInt,
+                                        module.GetComponent<UpdateModule2D>().idFinishingExt
+                                );
 
                                 moduleComponents = CONST.GetComponent<CONST>().dictComponentsForModule[modelModule._id];
 
-                                WWWForm form = new WWWForm();                                                               // New form for web request to create new module                                                      
-                                form.AddField("name", module.name);                                                         // Module name
-                                form.AddField("cost", modelModule.cost);                                                    // Module cost
-                                form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());      // Module angle in 2D scene
-                                form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                        // Module cut
-                                form.AddField("range", modelModule.range);                                                  // Module range
-                                form.AddField("components", moduleComponents);                                              // Module components from previous scene
-                                form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);            // Estimation ID where the module is created
-                                form.AddField("rangeName", modelModule.rangeName);                                          // Name of the range module
-                                form.AddField("rangeAttributes", rangeAttributesForm);                                      // All values from dropdown (Finishing int..)
-                                form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());           // Position X of the module in 2D scene
-                                form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());           // Position Y of the module in 2D scene
-                                form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);        // Floor where the module is in 2D scene
-                                form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());        // Width of the module in 2D scene
-                                form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());       // Height of the module in 2D scene
+                                WWWForm form = new WWWForm();                                                                   // New form for web request to create new module                                                      
+                                form.AddField("name", module.name);                                                             // Module name
+                                form.AddField("cost", modelModule.cost);                                                        // Module cost
+                                form.AddField("angle", module.GetComponent<RectTransform>().eulerAngles.z.ToString());          // Module angle in 2D scene
+                                form.AddField("cut", dropdownCuts.options[dropdownCuts.value].text);                            // Module cut
+                                form.AddField("range", modelModule.range);                                                      // Module range
+                                form.AddField("components", moduleComponents);                                                  // Module components from previous scene
+                                form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);                // Estimation ID where the module is created
+                                form.AddField("rangeName", modelModule.rangeName);                                              // Name of the range module
+                                form.AddField("rangeAttributes", module.GetComponent<UpdateModule2D>().rangeAttributesForm);    // All values from dropdown (Finishing int..)
+                                form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());                 // Position X of the module in 2D scene
+                                form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());                 // Position Y of the module in 2D scene
+                                form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);            // Floor where the module is in 2D scene
+                                form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());            // Width of the module in 2D scene
+                                form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());           // Height of the module in 2D scene
 
                                 UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + createModuleEstimationUrl, form);  // Create new request to send new module
                                 request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                      // Complete form with authentication datas
