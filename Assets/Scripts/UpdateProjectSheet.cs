@@ -263,11 +263,25 @@ public class UpdateProjectSheet : MonoBehaviour
             dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
             string matriculeToShow = estimation._id.Remove(9);
+            string stateValueSt=""; 
+            if(estimation.state == "1")
+            {
+                stateValueSt = "Signé";
+            }
+            else if (estimation.state == "0")
+            {
+                stateValueSt = "Brouillon";
+            }
+
+            if (!estimation.price.Contains(","))
+            {
+                estimation.price += ",00";
+            }
 
             // Change text value of the list item
             idValue.GetComponent<UnityEngine.UI.Text>().text = matriculeToShow;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
-            stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price+"€";
+            stateValue.GetComponent<UnityEngine.UI.Text>().text = stateValueSt;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
 
             idValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
@@ -680,7 +694,6 @@ public class UpdateProjectSheet : MonoBehaviour
     //function called when the user clicks in the confirm button of the delete estimatio pop-up
     public void confirmDeleteEstimation()
     {
-        Debug.Log("deleted estimation : " + estimationSelected.id);
         StartCoroutine(DeleteEstimation(estimationSelected));
         confirmDeletePanel.SetActive(false); //set non active the delete estimation panel
     }
@@ -726,7 +739,6 @@ public class UpdateProjectSheet : MonoBehaviour
                 urlToGetUser = CONST.GetComponent<CONST>().url + "v1/getmodulebyestimation";
 
                 WWWForm form2 = new WWWForm(); // Add to the form the value of the ID of the project to get
-                //Debug.Log("Selected ESTIMATION ID : " + CONST.GetComponent<CONST>().selectedEstimationID);
                 form2.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID.ToString());
 
                 UnityWebRequest request2 = UnityWebRequest.Post(urlToGetUser, form2);     // Create new form
@@ -746,8 +758,6 @@ public class UpdateProjectSheet : MonoBehaviour
                     if (request2.isDone)
                     {
                         string jsonResult2 = System.Text.Encoding.UTF8.GetString(request2.downloadHandler.data);          // Get JSON file
-                        Debug.Log("get module by estimation result");
-                        Debug.Log(jsonResult2);
                         RequestGetModuleByEstimation entity2 = JsonUtility.FromJson<RequestGetModuleByEstimation>(jsonResult2);         // Convert JSON file
                         List<ModuleGetModuleByEstimation> moduleList = entity2.module;
 
@@ -806,7 +816,6 @@ public class UpdateProjectSheet : MonoBehaviour
                         estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
 
                         double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes.ToString()); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
-                        Debug.Log("test : " + pItemSelected.GetComponent<ItemListEstimation>().discountValue);
                         double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
                         double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
                                                                     //calculation of the price discounted
@@ -893,8 +902,6 @@ public class UpdateProjectSheet : MonoBehaviour
 
 
                             List<ComponentLine> componentLines = new List<ComponentLine>();
-                            Debug.Log("Begin loop components");
-                            Debug.Log(components.Count);
                             foreach (ComponentToShow compo in components)
                             {
                                 if (componentLines.Count == 0)
@@ -936,12 +943,10 @@ public class UpdateProjectSheet : MonoBehaviour
 
                                 y = y - 14;
                             }
-                            Debug.Log("End of document PDF");
                             myDoc.createPDF(@"C:\Users\Public\" + attachName);
 
                             string pathNotif = "C:\\Users\\Public\\" + attachName;
-
-                            Debug.Log(pathNotif);
+                            
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
 
@@ -1015,8 +1020,6 @@ public class UpdateProjectSheet : MonoBehaviour
 
 
                             List<ComponentLine> componentLines = new List<ComponentLine>();
-                            Debug.Log("Begin loop components");
-                            Debug.Log(components.Count);
                             foreach (ComponentToShow compo in components)
                             {
                                 if (componentLines.Count == 0)
@@ -1065,13 +1068,11 @@ public class UpdateProjectSheet : MonoBehaviour
                             myDoc.createPDF(attachName);
 
                             string pathNotif = "@\"\\\"" + attachName;
-
-                            Debug.Log(pathNotif);
+                            
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
 
                         }
-                        Debug.Log("End of loop module");
                     }
                 }
             }

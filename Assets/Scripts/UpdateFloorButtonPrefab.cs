@@ -136,7 +136,6 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                     if (request.isDone)
                     {
                         string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                        Debug.Log("Destroyed floor :" + jsonResult);
 
                         floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
                         floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list

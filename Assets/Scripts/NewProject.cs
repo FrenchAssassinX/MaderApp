@@ -333,7 +333,6 @@ public class NewProject : MonoBehaviour
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                     // Create a root object thanks to the JSON file
                     RequestCreateProject entity = JsonUtility.FromJson<RequestCreateProject>(jsonResult);         // Convert JSON file
-                    Debug.Log("jsonresult new project : " + jsonResult);
                     Project project = entity.project;
                     CONST.GetComponent<CONST>().selectedProjectID = project._id;
                     CONST.GetComponent<CONST>().projectName = project.name;
@@ -377,7 +376,6 @@ public class NewProject : MonoBehaviour
 
     private IEnumerator CreateNewEstimation(string pProjectID)
     {
-        Debug.Log("CreateNewEstimation Start");
 
         WWWForm form = new WWWForm();                               // New form for web request
 
@@ -444,12 +442,9 @@ public class NewProject : MonoBehaviour
                 {
                     //recuperation values in customers
                     getId = item._id;
-                    Debug.Log("get id : " + getId);
                     getSurname = item.surename;
-                    Debug.Log("getSurname : " + getSurname);
                     getName = item.name;
-                    Debug.Log("getName : " + getName);
-
+                    
                     CONST.GetComponent<CONST>().customerName = newGetName;
 
                     //Poster all customers
@@ -457,7 +452,6 @@ public class NewProject : MonoBehaviour
                     
                     idClientForForm = getId;
                 }
-                Debug.Log("jsonresult : " + jsonResult);
                 idCustomer.options.Clear();
                 idCustomer.AddOptions(dropdowncustomer);
 
