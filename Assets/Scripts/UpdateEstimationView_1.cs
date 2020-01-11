@@ -183,8 +183,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
     //get the component datas and show them into the grid list
     public IEnumerator GetComponent(string componentId, string componentQte)
     {
-
-        Debug.Log("component : " + componentId);
+        
         var urlToGetComponent = CONST.GetComponent<CONST>().url + "v1/getcomponentbyid";
 
         WWWForm componentForm = new WWWForm();                       // New form for web request
@@ -206,13 +205,9 @@ public class UpdateEstimationView_1 : MonoBehaviour
         {
             string jsonResultFromComponent = System.Text.Encoding.UTF8.GetString(requestForComponent.downloadHandler.data);          // Get JSON file
 
-            Debug.Log("jsonResult : " + jsonResultFromComponent);
-
             RequestAComponent componentEntity = JsonUtility.FromJson<RequestAComponent>(jsonResultFromComponent);         // Convert JSON file
 
             ComponentToShow component = componentEntity.component;
-
-            Debug.Log("Component : " + component);
 
 
             if (!(component.name.Equals("AUCUN(E)")))
@@ -248,6 +243,10 @@ public class UpdateEstimationView_1 : MonoBehaviour
                 unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
                 priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
+                if (!component.cost.Contains(","))
+                {
+                    component.cost += ",00";
+                }
                 // Change text value of the list item
                 nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
                 quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
@@ -308,9 +307,9 @@ public class UpdateEstimationView_1 : MonoBehaviour
         {
             totalAfterDiscountSt = totalAfterDiscountInt.ToString();
         }
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt+"€"; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt; //shows the final price
+        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt+ "€"; //shows the final price
         CONST.GetComponent<CONST>().estimationPrice = estimationPrice.ToString();
         StartCoroutine(UpdateEstimation(discountSt));
     }

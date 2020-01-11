@@ -31,7 +31,6 @@ public class UpdateHome : MonoBehaviour
         // Go to Home Scene
         CONST.GetComponent<CONST>().state = "create";
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-        Debug.Log("Create project click"); 
     }
 
     //consult projects button function

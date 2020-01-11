@@ -938,9 +938,7 @@ public class UpdateEstimationCreation : MonoBehaviour
 
                 RequestAnEstimation entity = JsonUtility.FromJson<RequestAnEstimation>(jsonResult);
                 Estimation estimation = entity.estimation;
-
-                Debug.Log("Estimation: " + jsonResult);
-
+                
                 /* If estimation don't have any floor, starting counter to 1 */
                 if (estimation.floorNumber == "" || estimation.floorNumber == null)
                 {

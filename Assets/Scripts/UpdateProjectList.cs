@@ -158,8 +158,7 @@ public class UpdateProjectList : MonoBehaviour
                     {
                         if (requestCustomer.isDone)
                         {
-                            string jsonResultCustomer = System.Text.Encoding.UTF8.GetString(requestCustomer.downloadHandler.data);          // Get JSON file
-                            //Debug.Log(jsonResultCustomer);
+                            string jsonResultCustomer = System.Text.Encoding.UTF8.GetString(requestCustomer.downloadHandler.data);          // Get JSON 
 
                             RequestACustomer entityCustomer = JsonUtility.FromJson<RequestACustomer>(jsonResultCustomer);
                             Customer customer = entityCustomer.customer;
@@ -415,8 +414,7 @@ public class UpdateProjectList : MonoBehaviour
         {
             GameObject child = childList.gameObject;                                        // Convert Transform to Game Object to modify it
             string childClientName = child.GetComponent<ItemListProject>().clientName;      // Get client name
-            childClientName = childClientName.ToLower();                                    // ToLower to avoid error of capital characters in the string when searching
-            Debug.Log("Search: " + childClientName);
+            childClientName = childClientName.ToLower();    
 
             /* If the client name doesn't contains the string search: delete the current item from the list */
             if (!childClientName.Contains(pClientName.GetComponent<InputField>().text.ToLower()))

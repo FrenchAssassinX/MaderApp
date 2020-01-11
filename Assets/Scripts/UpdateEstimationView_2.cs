@@ -93,7 +93,6 @@ public class UpdateEstimationView_2 : MonoBehaviour
             
             if (module.type == "custom")
             {
-                Debug.Log("MODULE : " + module.type + "  moduleName : " + module.name);
                 RangeAttribute rangeAttribute = module.rangeAttributes[0]; //Instanciate range attribute object
 
                 // Create prefab
@@ -132,8 +131,12 @@ public class UpdateEstimationView_2 : MonoBehaviour
     //show the range content 
     public void ShowRange(GameObject pItemSelected)
     {
+        rangePanel.SetActive(false);
+        frameQuality.GetComponent<UnityEngine.UI.Text>().text ="";
+        insulating.GetComponent<UnityEngine.UI.Text>().text = "";
+        finishingext.GetComponent<UnityEngine.UI.Text>().text = "";
+        finishingint.GetComponent<UnityEngine.UI.Text>().text = "";
         rangePanel.SetActive(true);
-        //Debug.Log(pItemSelected.GetComponent<ItemListModules>().frameQualityValue);
         frameQuality.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().frameQualityValue;
         insulating.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().insulatingValue;
         finishingext.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().intFinishingValue;
