@@ -118,16 +118,18 @@ public class UpdateEstimationCreation : MonoBehaviour
         }
 
         /* Search wich button is selected */
-        foreach (Transform child in middleCanvas.transform)
-        {
-            GameObject panel = child.gameObject;        // Convert child to Panel object
+        //foreach (Transform child in middleCanvas.transform)
+        //{
+        //    GameObject panel = child.gameObject;        // Convert child to Panel object
 
-            /* Detect wich panel is active */
-            if (panel.activeSelf)
-            {
-                destinationPanel = panel;               // Affect panel as default panel for module destination
-            }
-        }
+        //    /* Detect wich panel is active */
+        //    if (panel.activeSelf)
+        //    {
+        //        destinationPanel = panel;               // Affect panel as default panel for module destination
+
+        //        //Debug.Log("Panel " + destinationPanel.name + " selected");
+        //    }
+        //}
     }
 
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
@@ -249,7 +251,20 @@ public class UpdateEstimationCreation : MonoBehaviour
             panelRooftop.GetComponent<RectTransform>().localScale = middleCanvas.GetComponent<RectTransform>().localScale;      // Set default size as parent size: useful for responsivity
             panelRooftop.GetComponent<Button>().onClick.AddListener(UnselectModule);                                            // Add listener to panel to launch UnselectModule function
 
-            //floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
+            floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
+        }
+
+        /* Disable panelFloors on start */
+        foreach (Transform child in middleCanvas.transform)
+        {
+            GameObject panel = child.gameObject;        // Convert child to Panel object
+
+            /* Detect wich panel is active */
+            if (panel.name != "panelFloor0")
+            {
+                panel.SetActive(false);
+                Debug.Log(panel.name + " disabled");
+            }
         }
     }
 
