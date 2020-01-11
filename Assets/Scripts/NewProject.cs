@@ -77,8 +77,7 @@ public class NewProject : MonoBehaviour
         errorCreateCustomer.transform.gameObject.SetActive(false);
         createValideProject.transform.gameObject.SetActive(false);
         errorCreateProject.transform.gameObject.SetActive(false);
-
-        referenceProject.enabled = false;
+        referenceProject.enabled = false; //Disabled input for referenceProject
 
         //Active canvasRight for add new customer
         buttonDisplayRightCanvas.onClick.AddListener(DisplayCreateNewCustomer);
@@ -108,7 +107,7 @@ public class NewProject : MonoBehaviour
 
     void Update()
     {
-        
+        //for enabled and disabled messages
         if (createValideCustomer.transform.gameObject.active)
         {
             if (timer > 0)
