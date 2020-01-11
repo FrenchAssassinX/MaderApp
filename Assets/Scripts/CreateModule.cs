@@ -375,6 +375,7 @@ public class CreateModule : MonoBehaviour
                 /* Retrieve all selected components: if selected component in Dropdwon is equals to current item, then affect ID */
                 foreach (var item in entities.components)
                 {
+                    Debug.Log("item.name : "+item.name);
                     if (item.name == ddwoodenUpright.options[ddwoodenUpright.value].text ||
                             item.name == ddinsulationPanels.options[ddinsulationPanels.value].text ||
                             item.name == ddrainBarrier.options[ddrainBarrier.value].text ||
@@ -382,13 +383,18 @@ public class CreateModule : MonoBehaviour
                             item.name == ddhatchPanels.options[ddhatchPanels.value].text ||
                             item.name == ddfloor.options[ddfloor.value].text)
                     {
-                        if (item.name == "AUCUN(E)")
+                        if (item.name != "AUCUN(E)")
                         {
                             listSelectedComponents.Add(item.name);
-                            moduleCost += float.Parse(item.cost);       // Increment module cost with component cost
+                            moduleCost += float.Parse(item.cost);       // Increment module cost with component cost   
                         }
                     }
                 }
+                foreach (var item in listSelectedComponents)
+                {
+                    Debug.Log("item list : " + listSelectedComponents);
+                }
+                
                 costModule = moduleCost.ToString();                 // Convert cost to string to pass in form for web request
             }
         }
@@ -407,6 +413,7 @@ public class CreateModule : MonoBehaviour
 
         WWWForm form = new WWWForm(); // New form for web request
 
+        Debug.Log("Module : "+ddmodel.options[ddmodel.value].text);
         form.AddField("name", ddmodel.options[ddmodel.value].text);
         form.AddField("cost", costModule);
         form.AddField("angle", "");
@@ -445,8 +452,7 @@ public class CreateModule : MonoBehaviour
                 {
                     // The database return a JSON file of all modules infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                    Debug.Log("json result in post : " + jsonResult);
-
+                    
                     // Create a root object thanks to the JSON file
                     RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResult);
 
@@ -537,7 +543,7 @@ public class CreateModule : MonoBehaviour
                 sb.Append(endArray);// ]
             }
         }
-
+        Debug.Log( " LISTE :::: "+sb.ToString());
         return sb.ToString();
     }
 }
