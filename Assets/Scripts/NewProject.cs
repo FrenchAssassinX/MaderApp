@@ -58,19 +58,19 @@ public class NewProject : MonoBehaviour
     public string IdCustomerGenerated;
     public List<string> dropdowncustomer = new List<string>();
 
-    public string change;
+    public string change; //value for dropdown
     public string getId;
     public string getSurname;
     public string getName;
     public string newGetSurname;
     public string newGetName;
-    public int timer = 120;
+    public int timer = 120; //timer for messages
 
     void Start()
     {
         CONST = GameObject.Find("CONST");               // Get the CONST gameObject
 
-        // By default don't display certain elements on start scene
+        //By default don't display some elements on start scene
         canvasNewCustomer.transform.gameObject.SetActive(false);
         CanvasRightDestinationAdress.transform.gameObject.SetActive(false);
         createValideCustomer.transform.gameObject.SetActive(false);

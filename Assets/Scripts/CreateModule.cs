@@ -75,7 +75,7 @@ public class CreateModule : MonoBehaviour
     string cutModule = "";
     string componentsSelected = "[]";
 
-    int timerBadSendModule = 120;
+    int timer = 120; //timer for messages
 
     //Define Dropdown Left value
     List<string> dropdownranges = new List<string>();
@@ -106,11 +106,11 @@ public class CreateModule : MonoBehaviour
         goodSendModule.transform.gameObject.SetActive(false);
         badSendModule.transform.gameObject.SetActive(false);
 
-        //return in create project page
+        //Return in create project page
         Button btnHP = buttonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnCreateProjectPage);
 
-        // Go to Create Estimation Scene
+        //Go to Create Estimation Scene
         Button btnNext = buttonNext.GetComponent<Button>();
         btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
@@ -126,16 +126,29 @@ public class CreateModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (badSendModule.transform.gameObject.active)
+        if (badSendModule.transform.gameObject.active) 
         {
-            if (timerBadSendModule > 0)
+            if (timer > 0)
             {
-                timerBadSendModule--;
+                timer--;
             }
             else
             {
                 badSendModule.transform.gameObject.SetActive(false);
-                timerBadSendModule = 120;
+                timer = 120;
+            }
+        }
+
+        if (goodSendModule.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                goodSendModule.transform.gameObject.SetActive(false);
+                timer = 120;
             }
         }
     }
