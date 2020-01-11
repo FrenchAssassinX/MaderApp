@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -11,7 +12,7 @@ public class UpdateEstimationCreation : MonoBehaviour
     /* ------------------------------------     DECLARE DATAS PART     ------------------------------------ */
     public GameObject CONST;                            // CONST object contains server route, token and user infos
 
-    private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to get all projects
+    private string createModuleEstimationUrl = "v1/createmodulewithestimation";         // Specific route to send module
     private string deleteModuleUrl = "v1/deletemoduleonestimation";                     // Specific route to delete one project
     private string getAllRangesUrl = "v1/getallrange";                                  // Specific route to get all ranges
     private string getAllCutsUrl = "v1/getallcut";                                      // Specific route to get all cuts
@@ -98,7 +99,6 @@ public class UpdateEstimationCreation : MonoBehaviour
         listCuts = new List<string>();        
 
         StartCoroutine(GetAllEstimationFloors());   // Function lauching on start to get all floors if it's an existing project
-        StartCoroutine(GetAllEstimationModules());  // Function lauching on start to get all modules if it's an existing project
     }
 
     public void Update()
@@ -116,20 +116,6 @@ public class UpdateEstimationCreation : MonoBehaviour
                 timerErrorMessage = 120;
             }
         }
-
-        /* Search wich button is selected */
-        //foreach (Transform child in middleCanvas.transform)
-        //{
-        //    GameObject panel = child.gameObject;        // Convert child to Panel object
-
-        //    /* Detect wich panel is active */
-        //    if (panel.activeSelf)
-        //    {
-        //        destinationPanel = panel;               // Affect panel as default panel for module destination
-
-        //        //Debug.Log("Panel " + destinationPanel.name + " selected");
-        //    }
-        //}
     }
 
     /* ------------------------------------     DISPLAY ELEMENT PART     ------------------------------------ */
@@ -254,18 +240,8 @@ public class UpdateEstimationCreation : MonoBehaviour
             floorCount.GetComponent<FloorCount>().floorCounter++;                                                               // Increase counter of floors
         }
 
-        /* Disable panelFloors on start */
-        foreach (Transform child in middleCanvas.transform)
-        {
-            GameObject panel = child.gameObject;        // Convert child to Panel object
-
-            /* Detect wich panel is active */
-            if (panel.name != "panelFloor0")
-            {
-                panel.SetActive(false);
-                Debug.Log(panel.name + " disabled");
-            }
-        }
+        /* Recreating modules */
+        StartCoroutine(GetAllEstimationModules());      // Function lauching on start to get all modules if it's an existing project
     }
 
     /* Function to display send datas panel */
@@ -1080,6 +1056,19 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 }
                             }
                         }
+                    }
+                }
+
+                /* Disable panelFloors on start */
+                foreach (Transform child in middleCanvas.transform)
+                {
+                    GameObject panel = child.gameObject;        // Convert child to Panel object
+
+                    /* Detect wich panel is active */
+                    if (panel.name != "panelFloor0")
+                    {
+                        panel.SetActive(false);
+                        Debug.Log(panel.name + " disabled");
                     }
                 }
 
