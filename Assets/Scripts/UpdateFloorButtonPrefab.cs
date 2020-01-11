@@ -14,6 +14,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
     private Button floorButton;                                             // Button on the list
     private GameObject panelFloor;                                          // Panel for the concerned floor
     public GameObject floorCount;                                           // Counter to set name of the floor
+    public GameObject scene2D;                                              // Panel of 2D scene, useful to call functions from UpdateEstimationCreation.cs
 
     private GameObject deleteButton;                                        // Button to delete prefab
 
@@ -34,6 +35,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
         middleCanvas = GameObject.Find("MiddleCanvas");                 // Retrieve the parent canvas on the scene
         panelFloor = GameObject.Find("panel" + floorButton.name);       // Retrieve panel element on the scene
+        scene2D = GameObject.Find("Panel");                             // Retrieve panel of 2D scene
 
         floorCount = GameObject.Find("FloorCount");                     // Retrieve counter on the scene
 
@@ -48,9 +50,6 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
             /* Calling functions to reset displaying settings */
             UnselectAllButtons();
             DisplaySelectedFloorPanel(this.gameObject.name);
-
-            Debug.Log("Selected button:" + this.gameObject.name);
-
             deleteButton.GetComponent<Button>().onClick.AddListener(StartDeleteFloor);       // Event to delete floor
         }
 
@@ -68,9 +67,6 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         foreach (Transform button in gridList.transform)
         {
             button.gameObject.GetComponent<UpdateFloorButtonPrefab>().isSelected = false;       // Unselect all buttons except the current selected button
-
-            Debug.Log("Searching panel: " + button.name);
-
             GameObject panelFloor = GameObject.Find("panel" + button.name);
         }
     }
@@ -197,6 +193,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                     counterForeach++;                                                                           // Increase counter of floors
                 }
             }
+
 
         }
     }
