@@ -134,10 +134,22 @@ public class UpdateEstimationView_1 : MonoBehaviour
                 double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
                 totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
             }
-
+            string totalAfterDiscountSt = "";
+            if (!totalBeforeDiscountSt.Contains(","))
+            {
+                totalBeforeDiscountSt += ",00";
+            }
+            if (!totalAfterDiscountInt.ToString().Contains(","))
+            {
+                totalAfterDiscountSt = totalAfterDiscountInt.ToString() + ",00";
+            }
+            else
+            {
+                totalAfterDiscountSt = totalAfterDiscountInt.ToString();
+            }
             totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
             discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
+            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt; //shows the final price
 
             StartCoroutine(UpdateEstimationPrice(estimationPrice, estimation));
         }
@@ -194,9 +206,14 @@ public class UpdateEstimationView_1 : MonoBehaviour
         {
             string jsonResultFromComponent = System.Text.Encoding.UTF8.GetString(requestForComponent.downloadHandler.data);          // Get JSON file
 
+            Debug.Log("jsonResult : " + jsonResultFromComponent);
+
             RequestAComponent componentEntity = JsonUtility.FromJson<RequestAComponent>(jsonResultFromComponent);         // Convert JSON file
 
             ComponentToShow component = componentEntity.component;
+
+            Debug.Log("Component : " + component);
+
 
             if (!(component.name.Equals("AUCUN(E)")))
             {
@@ -277,10 +294,23 @@ public class UpdateEstimationView_1 : MonoBehaviour
             double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
-        
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = estimationPrice.ToString(); //Shows the value of the original price
+
+        string totalAfterDiscountSt = "";
+        if (!totalBeforeDiscountSt.Contains(","))
+        {
+            totalBeforeDiscountSt += ",00";
+        }
+        if (!totalAfterDiscountInt.ToString().Contains(","))
+        {
+            totalAfterDiscountSt = totalAfterDiscountInt.ToString() + ",00";
+        }
+        else
+        {
+            totalAfterDiscountSt = totalAfterDiscountInt.ToString();
+        }
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
+        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt; //shows the final price
         CONST.GetComponent<CONST>().estimationPrice = estimationPrice.ToString();
         StartCoroutine(UpdateEstimation(discountSt));
     }

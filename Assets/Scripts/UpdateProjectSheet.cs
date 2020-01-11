@@ -262,8 +262,10 @@ public class UpdateProjectSheet : MonoBehaviour
             DateTime dateTimeText = Convert.ToDateTime(dateValueText);
             dateValueText = dateTimeText.ToString("dd-MM-yyyy", CultureInfo.CreateSpecificCulture("fr-FR"));
 
+            string matriculeToShow = estimation._id.Remove(9);
+
             // Change text value of the list item
-            idValue.GetComponent<UnityEngine.UI.Text>().text = estimation._id;
+            idValue.GetComponent<UnityEngine.UI.Text>().text = matriculeToShow;
             priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price;
             stateValue.GetComponent<UnityEngine.UI.Text>().text = estimation.state;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
@@ -491,7 +493,6 @@ public class UpdateProjectSheet : MonoBehaviour
         WWWForm form = new WWWForm();                       // New form for web request
 
         form.AddField("projectID", projectId);    // Add to the form the values of the project to update
-        Debug.Log("USER ID : " + sailorID);
         form.AddField("userID", sailorID);
         form.AddField("road", project.road);
         form.AddField("roadNum", project.roadNum);
