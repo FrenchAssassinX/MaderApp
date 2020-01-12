@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;
 using System;
 
 public class Serializer
@@ -280,12 +279,13 @@ public class Module
     public string cut;
     public string range;
     public string rangeName;
-    public RangeAttribute rangeAttributes;
+    public List<RangeAttribute> rangeAttributes;
     public string x;
     public string y;
     public string height;
     public string width;
     public string floorHouse;
+    public string estimationID;
     public string __v;
 }
 
@@ -393,7 +393,7 @@ public class ComponentToShow
     public string description;
     public string name;
     public string type;
-    public string price;
+    public string cost;
     public Provide provide;
     public string __v;
 }
@@ -457,4 +457,33 @@ public class RequestACustomer
 {
     public string message;
     public Customer customer;
+}
+
+[System.Serializable]
+public class ModuleGetModuleByEstimation
+{
+    public string _id;
+    public string name;
+    public string cost;
+    public string angle;
+    public string cut;
+    public string type;
+    public string range;
+    public string rangeName;
+    public string estimationID;
+    public string __v;
+    public List<ComponentId> components;
+}
+
+[System.Serializable]
+public class RequestGetModuleByEstimation
+{
+    public string message;
+    public List<ModuleGetModuleByEstimation> module;
+}
+
+[System.Serializable] 
+public class ListComponent
+{
+    public List<ComponentId> components;
 }

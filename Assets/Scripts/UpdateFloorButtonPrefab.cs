@@ -14,10 +14,12 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
     private Button floorButton;                                             // Button on the list
     private GameObject panelFloor;                                          // Panel for the concerned floor
     public GameObject floorCount;                                           // Counter to set name of the floor
+    public GameObject scene2D;                                              // Panel of 2D scene, useful to call functions from UpdateEstimationCreation.cs
 
     private GameObject deleteButton;                                        // Button to delete prefab
 
     private string updateEstimationFloorUrl = "v1/updateestimationfloor";   // Specific route to add number of floors in estimation
+    private string deleteEstimationFloorUrl = "v1/deleteestimationfloor";   // Specific route to delete floors in estimation
 
     public bool isSelected;                                                 // Boolean for onClick function
 
@@ -33,6 +35,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
         middleCanvas = GameObject.Find("MiddleCanvas");                 // Retrieve the parent canvas on the scene
         panelFloor = GameObject.Find("panel" + floorButton.name);       // Retrieve panel element on the scene
+        scene2D = GameObject.Find("Panel");                             // Retrieve panel of 2D scene
 
         floorCount = GameObject.Find("FloorCount");                     // Retrieve counter on the scene
 
@@ -46,11 +49,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         {
             /* Calling functions to reset displaying settings */
             UnselectAllButtons();
-            DisplayAllFloorPanels();
-            DisplaySelectedFloorPanel();
-
-            Debug.Log("Selected button:" + this.gameObject.name);
-
+            DisplaySelectedFloorPanel(this.gameObject.name);
             deleteButton.GetComponent<Button>().onClick.AddListener(StartDeleteFloor);       // Event to delete floor
         }
 
@@ -68,6 +67,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
         foreach (Transform button in gridList.transform)
         {
             button.gameObject.GetComponent<UpdateFloorButtonPrefab>().isSelected = false;       // Unselect all buttons except the current selected button
+            GameObject panelFloor = GameObject.Find("panel" + button.name);
         }
     }
 
@@ -82,13 +82,17 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
     }
 
     /* Function to display only the panel of the current selected floor */
-    public void DisplaySelectedFloorPanel()
+    public void DisplaySelectedFloorPanel(string pSelectedFloorName)
     {
+        string panelToDisplay = "panel" + pSelectedFloorName;
+
+        DisplayAllFloorPanels();
+
         /* Verify all the existing floor panels */
         foreach (Transform panel in middleCanvas.transform)
         {
             /* If the name of the panel is different from the currend selected floor: hide it */
-            if (panel.name != panelFloor.name)
+            if (!panelToDisplay.Equals(panel.name))
             {
                 panel.gameObject.SetActive(false);
             }
@@ -112,8 +116,9 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                 WWWForm form = new WWWForm();                                                                                     // New form for web request for module with type basic                                                         
                 form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);
                 form.AddField("floorNumber", (CONST.GetComponent<CONST>().floorCounterDatabase - 1).ToString());
+                form.AddField("panelFloorName", "panel" + this.gameObject.name);
 
-                UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + updateEstimationFloorUrl, form);      // New request, passing url
+                UnityWebRequest request = UnityWebRequest.Post(CONST.GetComponent<CONST>().url + deleteEstimationFloorUrl, form);      // New request, passing url
 
                 request.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                                  // Set request authentications
                 request.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
@@ -131,15 +136,12 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                     if (request.isDone)
                     {
                         string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
-                        Debug.Log("Destroyed floor :" + jsonResult);
 
                         floorCount.GetComponent<FloorCount>().listFloorButtons.Remove(this.gameObject);     // Remove button from the list
                         floorCount.GetComponent<FloorCount>().listFloorPanels.Remove(panelFloor);           // Remove panel from the list
 
                         Destroy(this.gameObject);                                                           // Destroy floor button
                         Destroy(panelFloor);                                                                // Destroy floor panel
-
-                        RenameFloors();                                                                     // Launch function to rename the surviving floors
                     }
                 }
             }
@@ -150,9 +152,9 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
 
                 Destroy(this.gameObject);                                                           // Destroy floor button
                 Destroy(panelFloor);                                                                // Destroy floor panel
-
-                RenameFloors();                                                                     // Launch function to rename the surviving floors
             }
+
+            RenameFloors();                                                                     // Launch function to rename the surviving floors
         }
 
     }
@@ -190,6 +192,7 @@ public class UpdateFloorButtonPrefab : MonoBehaviour
                     counterForeach++;                                                                           // Increase counter of floors
                 }
             }
+
 
         }
     }

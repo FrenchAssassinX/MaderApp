@@ -5384,6 +5384,7 @@ MonoBehaviour:
   dropdownFinishingInt: {fileID: 1287111976}
   dropdownCuts: {fileID: 1596040586}
   textErrorAddModule: {fileID: 1588520761}
+  timerErrorMessage: 0
 --- !u!1 &933641749
 GameObject:
   m_ObjectHideFlags: 0
@@ -9902,7 +9903,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Veuillez choisir un mod\xE8le de module pour l'ajouter \xE0 la sc\xE8ne"
+  m_Text: Veuillez remplir tous les champs pour ajouter un module
 --- !u!222 &1588520764
 CanvasRenderer:
   m_ObjectHideFlags: 0

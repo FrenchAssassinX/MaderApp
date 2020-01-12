@@ -107,11 +107,14 @@ public class UpdateEstimationView_1 : MonoBehaviour
                     RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
                     Module module = moduleEntity.module; //create a serealized module object 
 
-                    double moduleCost = Int32.Parse(module.cost);
-                    estimationPrice += moduleCost;
-                    foreach (var componentItem in module.components)//bubkle into all the components of the current module
+                    if (module.type == "custom")
                     {
-                        StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
+                        double moduleCost = Int32.Parse(module.cost);
+                        estimationPrice += moduleCost;
+                        foreach (var componentItem in module.components)//bubkle into all the components of the current module
+                        {
+                            StartCoroutine(GetComponent(componentItem.id, componentItem.qte));//start the search of the current component datas, sending its id, and its quantity
+                        }
                     }
                 }
             }
@@ -131,10 +134,22 @@ public class UpdateEstimationView_1 : MonoBehaviour
                 double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
                 totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
             }
-
-            totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt; //Shows the value of the original price
+            string totalAfterDiscountSt = "";
+            if (!totalBeforeDiscountSt.Contains(","))
+            {
+                totalBeforeDiscountSt += ",00";
+            }
+            if (!totalAfterDiscountInt.ToString().Contains(","))
+            {
+                totalAfterDiscountSt = totalAfterDiscountInt.ToString() + ",00";
+            }
+            else
+            {
+                totalAfterDiscountSt = totalAfterDiscountInt.ToString();
+            }
+            totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt + "€"; //Shows the value of the original price
             discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
+            totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt + "€"; //shows the final price
 
             StartCoroutine(UpdateEstimationPrice(estimationPrice, estimation));
         }
@@ -168,6 +183,7 @@ public class UpdateEstimationView_1 : MonoBehaviour
     //get the component datas and show them into the grid list
     public IEnumerator GetComponent(string componentId, string componentQte)
     {
+        
         var urlToGetComponent = CONST.GetComponent<CONST>().url + "v1/getcomponentbyid";
 
         WWWForm componentForm = new WWWForm();                       // New form for web request
@@ -193,43 +209,50 @@ public class UpdateEstimationView_1 : MonoBehaviour
 
             ComponentToShow component = componentEntity.component;
 
-            // Create prefab
-            GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
 
-            // Set estimationListPanel as parent of prefab in project hierarchy
-            listItem.transform.SetParent(componentList.transform);
+            if (!(component.name.Equals("AUCUN(E)")))
+            {
+                // Create prefab
+                GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
 
-            listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
-            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+                // Set estimationListPanel as parent of prefab in project hierarchy
+                listItem.transform.SetParent(componentList.transform);
 
-            // Find children in listItem to use them
-            GameObject nameValue = GameObject.Find("nameText");
-            GameObject quantityValue = GameObject.Find("quantityText");
-            GameObject unitValue = GameObject.Find("unitText");
-            GameObject priceValue = GameObject.Find("priceText");
+                listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
+                listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
 
-            // Customize props name of the prefab to find it when it will be create
-            nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponent>().name;
-            quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponent>().name;
-            unitValue.name = unitValue.name + listItem.GetComponent<ItemListComponent>().name;
-            priceValue.name = priceValue.name + listItem.GetComponent<ItemListComponent>().name;
+                // Find children in listItem to use them
+                GameObject nameValue = GameObject.Find("nameText");
+                GameObject quantityValue = GameObject.Find("quantityText");
+                GameObject unitValue = GameObject.Find("unitText");
+                GameObject priceValue = GameObject.Find("priceText");
 
-            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            unitValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
-            priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                // Customize props name of the prefab to find it when it will be create
+                nameValue.name = nameValue.name + listItem.GetComponent<ItemListComponent>().name;
+                quantityValue.name = quantityValue.name + listItem.GetComponent<ItemListComponent>().name;
+                unitValue.name = unitValue.name + listItem.GetComponent<ItemListComponent>().name;
+                priceValue.name = priceValue.name + listItem.GetComponent<ItemListComponent>().name;
 
-            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
-            priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                quantityValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                unitValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+                priceValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
 
-            // Change text value of the list item
-            nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
-            quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
-            unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = component.price + "€";
+                nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                quantityValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                unitValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+                priceValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
 
+                if (!component.cost.Contains(","))
+                {
+                    component.cost += ",00";
+                }
+                // Change text value of the list item
+                nameValue.GetComponent<UnityEngine.UI.Text>().text = component.name;
+                quantityValue.GetComponent<UnityEngine.UI.Text>().text = componentQte;
+                unitValue.GetComponent<UnityEngine.UI.Text>().text = component.unit;
+                priceValue.GetComponent<UnityEngine.UI.Text>().text = component.cost + "€";
+            }
         }
     }
 
@@ -270,10 +293,23 @@ public class UpdateEstimationView_1 : MonoBehaviour
             double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
             totalAfterDiscountInt = totalBeforeDiscountInt - sub; //we substract the amout of the discount from the original price, and we have the price after the discounting
         }
-        
-        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = estimationPrice.ToString(); //Shows the value of the original price
+
+        string totalAfterDiscountSt = "";
+        if (!totalBeforeDiscountSt.Contains(","))
+        {
+            totalBeforeDiscountSt += ",00";
+        }
+        if (!totalAfterDiscountInt.ToString().Contains(","))
+        {
+            totalAfterDiscountSt = totalAfterDiscountInt.ToString() + ",00";
+        }
+        else
+        {
+            totalAfterDiscountSt = totalAfterDiscountInt.ToString();
+        }
+        totalBeforeDiscount.GetComponent<UnityEngine.UI.Text>().text = totalBeforeDiscountSt+"€"; //Shows the value of the original price
         discount.GetComponent<UnityEngine.UI.Text>().text = discountSt; //show the value of the discount 
-        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountInt.ToString(); //shows the final price
+        totalAfterDiscount.GetComponent<UnityEngine.UI.Text>().text = totalAfterDiscountSt+ "€"; //shows the final price
         CONST.GetComponent<CONST>().estimationPrice = estimationPrice.ToString();
         StartCoroutine(UpdateEstimation(discountSt));
     }

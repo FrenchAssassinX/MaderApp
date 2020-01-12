@@ -75,7 +75,7 @@ public class CreateModule : MonoBehaviour
     string cutModule = "";
     string componentsSelected = "[]";
 
-    int timerBadSendModule = 120;
+    int timer = 120; //timer for messages
 
     //Define Dropdown Left value
     List<string> dropdownranges = new List<string>();
@@ -106,11 +106,11 @@ public class CreateModule : MonoBehaviour
         goodSendModule.transform.gameObject.SetActive(false);
         badSendModule.transform.gameObject.SetActive(false);
 
-        //return in create project page
+        //Return in create project page
         Button btnHP = buttonReturn.GetComponent<Button>();
         btnHP.onClick.AddListener(ReturnCreateProjectPage);
 
-        // Go to Create Estimation Scene
+        //Go to Create Estimation Scene
         Button btnNext = buttonNext.GetComponent<Button>();
         btnNext.onClick.AddListener(GoToCreateEstimationScene);
 
@@ -126,16 +126,29 @@ public class CreateModule : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (badSendModule.transform.gameObject.active)
+        if (badSendModule.transform.gameObject.active) 
         {
-            if (timerBadSendModule > 0)
+            if (timer > 0)
             {
-                timerBadSendModule--;
+                timer--;
             }
             else
             {
                 badSendModule.transform.gameObject.SetActive(false);
-                timerBadSendModule = 120;
+                timer = 120;
+            }
+        }
+
+        if (goodSendModule.transform.gameObject.active)
+        {
+            if (timer > 0)
+            {
+                timer--;
+            }
+            else
+            {
+                goodSendModule.transform.gameObject.SetActive(false);
+                timer = 120;
             }
         }
     }
@@ -226,7 +239,6 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 //Create a root object thanks to the JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);
-                Debug.Log("json result model : " + jsonResult);
 
                 dropdownModel.Clear();
 
@@ -256,8 +268,6 @@ public class CreateModule : MonoBehaviour
 
     private void DropdownValueChanged(Dropdown pChange)
     {
-        Debug.Log("pchange " + pChange.options[pChange.value].text);
-
         StartCoroutine(GetAllModule(pChange.options[pChange.value].text));
     }
 
@@ -285,8 +295,7 @@ public class CreateModule : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
-                Debug.Log(jsonResult);
-
+               
                 foreach (var item in entities.components)
                 {
                     Components component = item;
@@ -365,8 +374,11 @@ public class CreateModule : MonoBehaviour
 
                 //The database return a JSON file of all user infos
                 string jsonResult = System.Text.Encoding.UTF8.GetString(requestComponents.downloadHandler.data);
+                
                 //Create a root object thanks to the JSON file
                 RequestAllComponents entities = JsonUtility.FromJson<RequestAllComponents>(jsonResult);
+
+                listSelectedComponents.Clear();
 
                 /* Retrieve all selected components: if selected component in Dropdwon is equals to current item, then affect ID */
                 foreach (var item in entities.components)
@@ -378,10 +390,14 @@ public class CreateModule : MonoBehaviour
                             item.name == ddhatchPanels.options[ddhatchPanels.value].text ||
                             item.name == ddfloor.options[ddfloor.value].text)
                     {
-                        listSelectedComponents.Add(item.name);
-                        moduleCost += float.Parse(item.cost);       // Increment module cost with component cost
+                        if (item.name != "AUCUN(E)")
+                        {
+                            listSelectedComponents.Add(item.name);
+                            moduleCost += float.Parse(item.cost);       // Increment module cost with component cost   
+                        }
                     }
                 }
+                
                 costModule = moduleCost.ToString();                 // Convert cost to string to pass in form for web request
             }
         }
@@ -399,7 +415,7 @@ public class CreateModule : MonoBehaviour
         componentsSelected = CreateJsonToSend(listComponents, listSelectedComponents);
 
         WWWForm form = new WWWForm(); // New form for web request
-
+        
         form.AddField("name", ddmodel.options[ddmodel.value].text);
         form.AddField("cost", costModule);
         form.AddField("angle", "");
@@ -438,8 +454,7 @@ public class CreateModule : MonoBehaviour
                 {
                     // The database return a JSON file of all modules infos
                     string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);
-                    Debug.Log("json result in post : " + jsonResult);
-
+                    
                     // Create a root object thanks to the JSON file
                     RequestAModule entity = JsonUtility.FromJson<RequestAModule>(jsonResult);
 
@@ -459,8 +474,15 @@ public class CreateModule : MonoBehaviour
     //active CreateNewCient
     void DisplayModificationModule()
     {
-        canvasModificationModule.transform.gameObject.SetActive(true);
-        StartCoroutine(GetAllComponent());
+        if (canvasModificationModule.transform.gameObject.active)
+        {
+            canvasModificationModule.transform.gameObject.SetActive(false);
+        }
+        else
+        {
+            canvasModificationModule.transform.gameObject.SetActive(true);
+            StartCoroutine(GetAllComponent());
+        }
     }
     
     void SendFullModule()
@@ -523,7 +545,6 @@ public class CreateModule : MonoBehaviour
                 sb.Append(endArray);// ]
             }
         }
-
         return sb.ToString();
     }
 }

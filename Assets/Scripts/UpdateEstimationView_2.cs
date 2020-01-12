@@ -15,9 +15,7 @@ public class UpdateEstimationView_2 : MonoBehaviour
     public GameObject componentList;                   //panel wich will contain all the listItemPrefabs 
 
     public GameObject frameQuality;           //range attributes game objects to show when a module is selected
-    public GameObject windowsFrameQuality;
     public GameObject insulating;
-    public GameObject covering;
     public GameObject finishingext;
     public GameObject finishingint;
     public GameObject rangePanel;
@@ -89,56 +87,58 @@ public class UpdateEstimationView_2 : MonoBehaviour
         else
         {
             string jsonResultFromModule = System.Text.Encoding.UTF8.GetString(requestForModule.downloadHandler.data);          // Get JSON file
-
+            
             RequestAModule moduleEntity = JsonUtility.FromJson<RequestAModule>(jsonResultFromModule);         // Convert JSON file
             Module module = moduleEntity.module;
-
-            RangeAttribute rangeAttribute = module.rangeAttributes; //Instanciate range attribute object
-
-            Debug.Log("range : " + rangeAttribute);
-            Debug.Log("frame quality  : " + rangeAttribute.frameQuality);
-
-            // Create prefab
-            GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
-
-            // Set estimationListPanel as parent of prefab in project hierarchy
-            listItem.transform.SetParent(componentList.transform);
-
-            listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
-            listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
-
-            // Find children in listItem to use them
-            GameObject nameValue = GameObject.Find("moduleName");
-
-            // Customize props name of the prefab to find it when it will be create
-            nameValue.name = nameValue.name + listItem.GetComponent<ItemListModules>().name;
-
-            // Change text value of the list item
-            nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
-
-            nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
             
-            nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+            if (module.type == "custom")
+            {
+                RangeAttribute rangeAttribute = module.rangeAttributes[0]; //Instanciate range attribute object
 
-            // ID to keep for view range datas
-            listItem.GetComponent<ItemListModules>().frameQualityValue = rangeAttribute.frameQuality;
-            listItem.GetComponent<ItemListModules>().windowsFrameQualityValue = rangeAttribute.windowsframequality;
-            listItem.GetComponent<ItemListModules>().insulatingValue = rangeAttribute.insulating;
-            listItem.GetComponent<ItemListModules>().coveringValue = rangeAttribute.covering;
-            listItem.GetComponent<ItemListModules>().intFinishingValue = rangeAttribute.finishingext;
-            listItem.GetComponent<ItemListModules>().extFinishingValue = rangeAttribute.finishingint;
+                // Create prefab
+                GameObject listItem = Instantiate(listItemPrefab, Vector3.zero, Quaternion.identity);
+
+                // Set estimationListPanel as parent of prefab in project hierarchy
+                listItem.transform.SetParent(componentList.transform);
+
+                listItem.GetComponent<RectTransform>().localScale = componentList.GetComponent<RectTransform>().localScale;
+                listItem.GetComponent<RectTransform>().sizeDelta = new Vector2(componentList.GetComponent<RectTransform>().sizeDelta.x, listItem.GetComponent<RectTransform>().sizeDelta.y);
+
+                // Find children in listItem to use them
+                GameObject nameValue = GameObject.Find("moduleName");
+
+                // Customize props name of the prefab to find it when it will be create
+                nameValue.name = nameValue.name + listItem.GetComponent<ItemListModules>().name;
+
+                // Change text value of the list item
+                nameValue.GetComponent<UnityEngine.UI.Text>().text = module.name;
+
+                nameValue.GetComponent<RectTransform>().localScale = listItem.GetComponent<RectTransform>().localScale;
+
+                nameValue.GetComponent<RectTransform>().sizeDelta = listItem.GetComponent<RectTransform>().sizeDelta;
+
+                // ID to keep for view range datas
+                listItem.GetComponent<ItemListModules>().frameQualityValue = rangeAttribute.frameQuality;
+                listItem.GetComponent<ItemListModules>().windowsFrameQualityValue = rangeAttribute.windowsframequality;
+                listItem.GetComponent<ItemListModules>().insulatingValue = rangeAttribute.insulating;
+                listItem.GetComponent<ItemListModules>().coveringValue = rangeAttribute.covering;
+                listItem.GetComponent<ItemListModules>().intFinishingValue = rangeAttribute.finishingext;
+                listItem.GetComponent<ItemListModules>().extFinishingValue = rangeAttribute.finishingint;
+            }
         }
     }
 
     //show the range content 
     public void ShowRange(GameObject pItemSelected)
     {
+        rangePanel.SetActive(false);
+        frameQuality.GetComponent<UnityEngine.UI.Text>().text ="";
+        insulating.GetComponent<UnityEngine.UI.Text>().text = "";
+        finishingext.GetComponent<UnityEngine.UI.Text>().text = "";
+        finishingint.GetComponent<UnityEngine.UI.Text>().text = "";
         rangePanel.SetActive(true);
-        Debug.Log(pItemSelected.GetComponent<ItemListModules>().frameQualityValue);
         frameQuality.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().frameQualityValue;
-        windowsFrameQuality.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().windowsFrameQualityValue;
         insulating.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().insulatingValue;
-        covering.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().coveringValue;
         finishingext.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().intFinishingValue;
         finishingint.GetComponent<UnityEngine.UI.Text>().text = pItemSelected.GetComponent<ItemListModules>().extFinishingValue;
     }
