@@ -21,6 +21,8 @@ public class Login : MonoBehaviour
 
     void Start()
     {
+        Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
+
         CONST.GetComponent<CONST>().url = "https://madera-figueiredo.space/";
 
         // Get the url of CONST
