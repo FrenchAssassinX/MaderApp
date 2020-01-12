@@ -272,15 +272,21 @@ public class UpdateProjectSheet : MonoBehaviour
             {
                 stateValueSt = "Brouillon";
             }
-
-            if (!estimation.price.Contains(","))
+            string price = estimation.price;
+            
+            if (price.Contains("."))
             {
-                estimation.price += ",00";
+                price = price.Replace(".", ",");
             }
-
+           
+            if (!price.Contains(","))
+            {
+                price += ",00";
+            }
+            
             // Change text value of the list item
             idValue.GetComponent<UnityEngine.UI.Text>().text = matriculeToShow;
-            priceValue.GetComponent<UnityEngine.UI.Text>().text = estimation.price+"€";
+            priceValue.GetComponent<UnityEngine.UI.Text>().text = price+"€";
             stateValue.GetComponent<UnityEngine.UI.Text>().text = stateValueSt;
             dateValue.GetComponent<UnityEngine.UI.Text>().text = dateValueText;
 
@@ -766,31 +772,34 @@ public class UpdateProjectSheet : MonoBehaviour
 
                         foreach (ModuleGetModuleByEstimation module in moduleList)
                         {
-                            List<ComponentId> componentList = module.components;
-
-                            for (int i = 0; i < componentList.Count; i++)
+                            if (module.type == "custom")
                             {
-                                WWWForm form3 = new WWWForm(); // Add to the form the value of the ID of the project to get
-                                form3.AddField("componentID", componentList[i].id);
+                                List<ComponentId> componentList = module.components;
 
-                                UnityWebRequest request3 = UnityWebRequest.Post(urlToGetUser, form3);     // Create new form
-                                request3.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
-                                request3.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
-
-                                request3.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
-
-                                yield return request3.SendWebRequest();
-
-                                if (request3.isNetworkError || request3.isHttpError)
+                                for (int i = 0; i < componentList.Count; i++)
                                 {
-                                    Debug.Log("*** ERROR: " + request3.error + " ***");
-                                }
-                                else
-                                {
-                                    string jsonResult3 = System.Text.Encoding.UTF8.GetString(request3.downloadHandler.data);
-                                    RequestAComponent entity3 = JsonUtility.FromJson<RequestAComponent>(jsonResult3);
+                                    WWWForm form3 = new WWWForm(); // Add to the form the value of the ID of the project to get
+                                    form3.AddField("componentID", componentList[i].id);
 
-                                    components.Add(entity3.component);
+                                    UnityWebRequest request3 = UnityWebRequest.Post(urlToGetUser, form3);     // Create new form
+                                    request3.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");                      // Complete form with authentication datas
+                                    request3.SetRequestHeader("Authorization", CONST.GetComponent<CONST>().token);
+
+                                    request3.certificateHandler = new CONST.BypassCertificate();     // Bypass certificate for https
+
+                                    yield return request3.SendWebRequest();
+
+                                    if (request3.isNetworkError || request3.isHttpError)
+                                    {
+                                        Debug.Log("*** ERROR: " + request3.error + " ***");
+                                    }
+                                    else
+                                    {
+                                        string jsonResult3 = System.Text.Encoding.UTF8.GetString(request3.downloadHandler.data);
+                                        RequestAComponent entity3 = JsonUtility.FromJson<RequestAComponent>(jsonResult3);
+
+                                        components.Add(entity3.component);
+                                    }
                                 }
                             }
                         }
@@ -804,7 +813,7 @@ public class UpdateProjectSheet : MonoBehaviour
                         customerCity = clientCityGO.GetComponent<UnityEngine.UI.Text>().text;
                         customerZipcode = clientZipCodeGO.GetComponent<UnityEngine.UI.Text>().text;
                         projectName = projectNameGO.GetComponent<UnityEngine.UI.Text>().text;
-                        projectRef = projectSailorIdGO.GetComponent<UnityEngine.UI.Text>().text;
+                        projectRef = projectIdGO.GetComponent<UnityEngine.UI.Text>().text;
                         projectRoad = project.road;
                         projectRoadNum = project.roadNum;
                         projectRoadExtra = project.roadExtra;
@@ -815,7 +824,19 @@ public class UpdateProjectSheet : MonoBehaviour
                         estimationPriceWtTaxes = pItemSelected.GetComponent<ItemListEstimation>().priceValue;
                         estimationDiscount = pItemSelected.GetComponent<ItemListEstimation>().discountValue;
 
-                        double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes.ToString()); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                        string moneyUnit = " euros";
+
+                        if (estimationPriceWtTaxes.Contains("."))
+                        {
+                            estimationPriceWtTaxes = estimationPriceWtTaxes.Replace(".", ",");
+                        }
+
+                        if (!estimationPriceWtTaxes.Contains(","))
+                        {
+                            estimationPriceWtTaxes += ",00";
+                        }
+
+                        double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
                         double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
                         double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
                                                                     //calculation of the price discounted
@@ -832,6 +853,37 @@ public class UpdateProjectSheet : MonoBehaviour
                         string[] osTab = osRunning.Split(' ');
                         string OS = osTab[0];
                         var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+                        estimationPriceWtotTaxes = priceWtotTaxes.ToString();
+                        if (estimationPriceWtotTaxes.Contains("."))
+                        {
+                            estimationPriceWtotTaxes = estimationPriceWtTaxes.Replace(".", ",");
+                        }
+
+                        if (!estimationPriceWtotTaxes.Contains(","))
+                        {
+                            estimationPriceWtotTaxes += ",00";
+                        }
+
+                        string[] parts = estimationPriceWtotTaxes.Split(',');
+                        estimationPriceWtotTaxes = parts[0] +","+ parts[1].Remove(2);
+
+                        estimationRef = estimationRef.Remove(9);
+                        estimationPriceWtotTaxes = estimationPriceWtotTaxes + moneyUnit;
+                        estimationPriceWtTaxes  = estimationPriceWtTaxes + moneyUnit;
+
+                        estimationPriceToPay  = estimationPriceToPay + moneyUnit;
+                        if (estimationPriceToPay.Contains("."))
+                        {
+                            estimationPriceToPay = estimationPriceWtTaxes.Replace(".", ",");
+                        }
+
+                        if (!estimationPriceToPay.Contains(","))
+                        {
+                            estimationPriceToPay += ",00";
+                        }
+
+
                         //pdf creation with windows os
                         if (OS.Equals("Windows"))
                         {
@@ -876,11 +928,11 @@ public class UpdateProjectSheet : MonoBehaviour
                             myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Date : " + estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes + "€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes , rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("TVA : 20% ", rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes + "€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes , rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Coût final : " + estimationPriceToPay , rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
 
                             myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
@@ -936,10 +988,12 @@ public class UpdateProjectSheet : MonoBehaviour
                             int y = 712 - 14;
                             foreach (ComponentLine line in componentLines)
                             {
+                                string unitPrice = line.price.ToString() + moneyUnit;
+                                string totalPrice = (line.price * line.qte).ToString() + moneyUnit;
                                 mySecondPage.addText(line.name, leftPage, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(line.qte.ToString(), leftPage + 150, y, predefinedFont.csHelvetica, normalCaracFont, color);
-                                mySecondPage.addText(line.price.ToString(), leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
-                                mySecondPage.addText((line.price * line.qte).ToString(), leftPage + 450, y, predefinedFont.csHelvetica, normalCaracFont, color);
+                                mySecondPage.addText(unitPrice, leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
+                                mySecondPage.addText(totalPrice, leftPage + 450, y, predefinedFont.csHelvetica, normalCaracFont, color);
 
                                 y = y - 14;
                             }
@@ -951,6 +1005,7 @@ public class UpdateProjectSheet : MonoBehaviour
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
 
                         }
+                        
                         //pdf creation with Android os
                         else if (OS.Equals("Android"))
                         {
@@ -994,12 +1049,12 @@ public class UpdateProjectSheet : MonoBehaviour
 
                             myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Date : " + estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes + "€", rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Référence : " + estimationRef.Remove(9), rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes , rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("TVA : 20% ", rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes + "€", rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes , rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("Remise : " + estimationDiscount + "%", rightPage, 461, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Coût final : " + estimationPriceToPay, rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Coût final : " + estimationPriceToPay , rightPage, 447, predefinedFont.csHelvetica, titleCaracFont, color);
 
                             myFirstPage.addText("Date de la signature : ", leftPage, 403, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Signature du client : ", leftPage, 389, predefinedFont.csHelveticaBold, titleCaracFont, color);
@@ -1054,10 +1109,12 @@ public class UpdateProjectSheet : MonoBehaviour
                             int y = 712 - 14;
                             foreach (ComponentLine line in componentLines)
                             {
+                                string unitPrice = line.price.ToString() + moneyUnit;
+                                string totalPrice = (line.price * line.qte).ToString() + moneyUnit;
                                 mySecondPage.addText(line.name, leftPage, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(line.qte.ToString(), leftPage + 150, y, predefinedFont.csHelvetica, normalCaracFont, color);
-                                mySecondPage.addText(line.price.ToString(), leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
-                                mySecondPage.addText((line.price * line.qte).ToString(), leftPage + 450, y, predefinedFont.csHelvetica, normalCaracFont, color);
+                                mySecondPage.addText(unitPrice, leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
+                                mySecondPage.addText(totalPrice, leftPage + 450, y, predefinedFont.csHelvetica, normalCaracFont, color);
 
                                 y = y - 14;
                             }
