@@ -1131,17 +1131,15 @@ public class UpdateProjectSheet : MonoBehaviour
                                 y = y - 14;
                             }
 
-                            /* Default folder for download */
-                            string pathDownload = Application.dataPath;
-                            /*Set Header's Style*/
-                            myDoc.createPDF(pathDownload + attachName);
-                            /*Set Header's Style*/
-                            myDoc.createPDF(attachName);
+                            string m_Path = Application.persistentDataPath;
 
-                            string pathNotif = "@\"\\\"" + attachName;
-                            
+                            string pathNotif = m_Path + "/" + attachName;
+
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
+
+                            myDoc.createPDF(pathNotif);
+                            myDoc.createPDF(attachName);
 
                         }
                     }

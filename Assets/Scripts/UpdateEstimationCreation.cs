@@ -361,17 +361,37 @@ public class UpdateEstimationCreation : MonoBehaviour
             newModule.GetComponent<RectTransform>().anchoredPosition = destPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
 
             /* Replace module on scene depends on screen size */
-            if (screenWidth == 800)
+            if (screenWidth == 800 && screenHeight == 600)
             {
                 resizePosX = float.Parse(pPosX) / 2.4f;
-                resizePosY = float.Parse(pPosY) / 2.25f;
+                resizePosY = float.Parse(pPosY) / 1.8f;
             }
-            else if (screenWidth == 1280)
+            else if (screenWidth == 1024 && screenHeight == 600)
+            {
+                resizePosX = float.Parse(pPosX) / 1.875f;
+                resizePosY = float.Parse(pPosY) / 1.8f;
+            }
+            else if (screenWidth == 1024 && screenHeight == 768)
+            {
+                resizePosX = float.Parse(pPosX) / 1.875f;
+                resizePosY = float.Parse(pPosY) / 1.40625f;
+            }
+            else if (screenWidth == 1280 && screenHeight == 768)
             {
                 resizePosX = float.Parse(pPosX) / 1.5f;
-                resizePosY = float.Parse(pPosY) / 1.5f;
+                resizePosY = float.Parse(pPosY) / 1.40625f;
             }
-            else if (screenWidth == 1080)
+            else if (screenWidth == 1280 && screenHeight == 800)
+            {
+                resizePosX = float.Parse(pPosX) / 1.5f;
+                resizePosY = float.Parse(pPosY) / 1.35f;
+            }
+            else if (screenWidth == 1600 && screenHeight == 900)
+            {
+                resizePosX = float.Parse(pPosX) / 1.2f;
+                resizePosY = float.Parse(pPosY) / 1.2f;
+            }
+            else if (screenWidth == 1920 && screenHeight == 1080)
             {
                 resizePosX = float.Parse(pPosX);
                 resizePosY = float.Parse(pPosY);
@@ -578,17 +598,37 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 float resizePosY = 0.0f;                                                                        // Float to calculate posY of module
 
                                 /* Change position of the module depends of the size of the screen */
-                                if (screenWidth == 800)
+                                if (screenWidth == 800 && screenHeight == 600)
                                 {
                                     resizePosX = module.GetComponent<RectTransform>().position.x * 2.4f;
-                                    resizePosY = module.GetComponent<RectTransform>().position.y * 2.25f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.8f;
                                 }
-                                else if (screenWidth == 1280)
+                                else if (screenWidth == 1024 && screenHeight == 600)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 1.875f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.8f;
+                                }
+                                else if (screenWidth == 1024 && screenHeight == 768)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 1.875f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.40625f;
+                                }
+                                else if (screenWidth == 1280 && screenHeight == 768)
                                 {
                                     resizePosX = module.GetComponent<RectTransform>().position.x * 1.5f;
-                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.5f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.40625f;
                                 }
-                                else if (screenWidth == 1080)
+                                else if (screenWidth == 1280 && screenHeight == 800)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 1.5f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.35f;
+                                }
+                                else if (screenWidth == 1600 && screenHeight == 900)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 1.2f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.2f;
+                                }
+                                else if (screenWidth == 1920 && screenHeight == 1080)
                                 {
                                     resizePosX = module.GetComponent<RectTransform>().position.x;
                                     resizePosY = module.GetComponent<RectTransform>().position.y;
