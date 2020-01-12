@@ -65,6 +65,9 @@ public class UpdateEstimationCreation : MonoBehaviour
     public int moduleCounter;                          // Counter to rename module and retrieve easily on scene
 
     public Dictionary<string, string> dictModuleIDName = new Dictionary<string, string>();    // Dictionnary to keep ID and name of the modules 
+
+    public int screenWidth;
+    public int screenHeight;
     /* ------------------------------------     END DECLARE DATAS PART     ------------------------------------ */
 
     
@@ -76,6 +79,10 @@ public class UpdateEstimationCreation : MonoBehaviour
         addModuleButton.onClick.AddListener(AddModuleOnScene);                                      // Add listener to button to launch AddModuleOnScene function
         deleteModuleButton = GameObject.Find("ButtonConfirmDeletePanel").GetComponent<Button>();    // Retrieve button on scene
         deleteModuleButton.onClick.AddListener(StartDeleteModuleFromEstimation);                    // Add listener to button to launch DeleteModule function
+
+        screenWidth = Screen.width;
+        screenHeight = Screen.height;
+        Debug.Log("Current device resolution is: " + screenWidth + "x" + screenHeight);
 
         moduleCounter = 1;                      // Starting counter for module name                                                       
 
@@ -342,6 +349,8 @@ public class UpdateEstimationCreation : MonoBehaviour
     public void RecreateModule(string pModuleID, string pModuleName, string pDestinationPanel, string pPosX, string pPosY, string pWidth, string pHeight, string pAngle)
     {
         GameObject destPanel = GameObject.Find(pDestinationPanel);                                                              // Retrieve destination panel on scene with name
+        float resizePosX = 0.0f;
+        float resizePosY = 0.0f;
 
         if (GameObject.Find(pDestinationPanel) != null)
         {
@@ -351,7 +360,24 @@ public class UpdateEstimationCreation : MonoBehaviour
             newModule.GetComponent<RectTransform>().localScale = destPanel.GetComponent<RectTransform>().localScale;                 // Set default size as parent size: useful for responsivity
             newModule.GetComponent<RectTransform>().anchoredPosition = destPanel.GetComponent<RectTransform>().anchoredPosition;     // Set default achored position as parent anchored position: useful for responsivity
 
-            newModule.GetComponent<RectTransform>().position = new Vector3(float.Parse(pPosX), float.Parse(pPosY), 0f);             // Replace as good position on 2D scene
+            /* Replace module on scene depends on screen size */
+            if (screenWidth == 800)
+            {
+                resizePosX = float.Parse(pPosX) / 2.4f;
+                resizePosY = float.Parse(pPosY) / 2.25f;
+            }
+            else if (screenWidth == 1280)
+            {
+                resizePosX = float.Parse(pPosX) / 1.5f;
+                resizePosY = float.Parse(pPosY) / 1.5f;
+            }
+            else if (screenWidth == 1080)
+            {
+                resizePosX = float.Parse(pPosX);
+                resizePosY = float.Parse(pPosY);
+            }
+
+            newModule.GetComponent<RectTransform>().position = new Vector3(resizePosX, resizePosY, 0f);             // Replace as good position on 2D scene
             newModule.GetComponent<RectTransform>().sizeDelta = new Vector2(float.Parse(pWidth), float.Parse(pHeight));             // Give saved size to the module
             newModule.GetComponent<RectTransform>().rotation = Quaternion.Euler(0f, 0f, float.Parse(pAngle));                       // Give saved rotation to module
 
@@ -538,7 +564,35 @@ public class UpdateEstimationCreation : MonoBehaviour
                                         module.GetComponent<UpdateModule2D>().idFinishingExt
                                 );
 
-                                moduleComponents = CONST.GetComponent<CONST>().dictComponentsForModule[modelModule._id];
+                                /* Retrieve components of the module with id of module in dictionnary */
+                                foreach (KeyValuePair<string, string> item in CONST.GetComponent<CONST>().dictComponentsForModule)
+                                {
+                                    if (item.Key == modelModule._id)
+                                    {
+                                        moduleComponents = item.Value;
+                                    }
+                                }
+
+
+                                float resizePosX = 0.0f;                                                                        // Float to calculate posX of module
+                                float resizePosY = 0.0f;                                                                        // Float to calculate posY of module
+
+                                /* Change position of the module depends of the size of the screen */
+                                if (screenWidth == 800)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 2.4f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 2.25f;
+                                }
+                                else if (screenWidth == 1280)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x * 1.5f;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y * 1.5f;
+                                }
+                                else if (screenWidth == 1080)
+                                {
+                                    resizePosX = module.GetComponent<RectTransform>().position.x;
+                                    resizePosY = module.GetComponent<RectTransform>().position.y;
+                                }
 
                                 WWWForm form = new WWWForm();                                                                   // New form for web request to create new module                                                      
                                 form.AddField("name", module.name);                                                             // Module name
@@ -550,8 +604,8 @@ public class UpdateEstimationCreation : MonoBehaviour
                                 form.AddField("estimationID", CONST.GetComponent<CONST>().selectedEstimationID);                // Estimation ID where the module is created
                                 form.AddField("rangeName", modelModule.rangeName);                                              // Name of the range module
                                 form.AddField("rangeAttributes", module.GetComponent<UpdateModule2D>().rangeAttributesForm);    // All values from dropdown (Finishing int..)
-                                form.AddField("x", module.GetComponent<RectTransform>().position.x.ToString());                 // Position X of the module in 2D scene
-                                form.AddField("y", module.GetComponent<RectTransform>().position.y.ToString());                 // Position Y of the module in 2D scene
+                                form.AddField("x", resizePosX.ToString());                                                      // Position X of the module in 2D scene
+                                form.AddField("y", resizePosY.ToString());                                                      // Position Y of the module in 2D scene
                                 form.AddField("floorHouse", module.GetComponent<UpdateModule2D>().destinationFloor);            // Floor where the module is in 2D scene
                                 form.AddField("width", module.GetComponent<RectTransform>().sizeDelta.x.ToString());            // Width of the module in 2D scene
                                 form.AddField("height", module.GetComponent<RectTransform>().sizeDelta.y.ToString());           // Height of the module in 2D scene
@@ -888,6 +942,9 @@ public class UpdateEstimationCreation : MonoBehaviour
                 string jsonResult = System.Text.Encoding.UTF8.GetString(request.downloadHandler.data);          // Get JSON file
                 RequestGetAllModule entities = JsonUtility.FromJson<RequestGetAllModule>(jsonResult);           // Convert JSON file to serializable object
 
+                Debug.Log(jsonResult);
+
+                CONST.GetComponent<CONST>().dictComponentsForModule.Clear();
                 listModels.Clear();                         // Unfill list before feeling it with new datas
                 listModels.Add("Modèle");
 
@@ -897,21 +954,14 @@ public class UpdateEstimationCreation : MonoBehaviour
                     Module module = item;                 // Convert root object item to module object
 
                     /* If module from database have the same range as the dropdown */
-                    if (module.rangeName == pRangeName)
+                    if (module.rangeName == pRangeName 
+                            && module.estimationID == CONST.GetComponent<CONST>().selectedEstimationID
+                            && module.type == "basic")
                     {
-                        /* Verify all modules linked to estimation */
-                        foreach (string idModulesInEstimation in CONST.GetComponent<CONST>().listModulesCreated)
-                        {
-                            // If id of module from database is equal to a module linked to estimation..
-                            if (idModulesInEstimation == module._id)
-                            {
-                                listModels.Add(module.name);                        // Add name of the module in list
-                                dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
-                                string listComponents = CreateJSONComponents(module.components);
-                                CONST.GetComponent<CONST>().dictComponentsForModule.Clear();
-                                CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, listComponents);
-                            }
-                        }
+                            listModels.Add(module.name);                        // Add name of the module in list
+                            dictModuleIDName.Add(module._id, module.name);      // Keep module id on dictionnary 
+                            string listComponents = CreateJSONComponents(module.components);
+                            CONST.GetComponent<CONST>().dictComponentsForModule.Add(module._id, listComponents);
                     }
                 }
 
