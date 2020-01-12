@@ -1131,8 +1131,10 @@ public class UpdateProjectSheet : MonoBehaviour
                                 y = y - 14;
                             }
 
+                            /* Default folder for download */
+                            string pathDownload = Application.dataPath;
                             /*Set Header's Style*/
-                            myDoc.createPDF(@"C:\Users\Public\" + attachName);
+                            myDoc.createPDF(pathDownload + attachName);
                             /*Set Header's Style*/
                             myDoc.createPDF(attachName);
 

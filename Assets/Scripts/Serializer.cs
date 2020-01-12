@@ -285,6 +285,7 @@ public class Module
     public string height;
     public string width;
     public string floorHouse;
+    public string estimationID;
     public string __v;
 }
 
