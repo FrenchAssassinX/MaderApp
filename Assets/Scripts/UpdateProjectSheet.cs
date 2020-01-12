@@ -826,17 +826,13 @@ public class UpdateProjectSheet : MonoBehaviour
 
                         string moneyUnit = " euros";
 
-                        if (estimationPriceWtTaxes.Contains("."))
+                        if (!estimationPriceWtTaxes.Contains("."))
                         {
-                            estimationPriceWtTaxes = estimationPriceWtTaxes.Replace(".", ",");
+                            estimationPriceWtTaxes += ".00";
                         }
 
-                        if (!estimationPriceWtTaxes.Contains(","))
-                        {
-                            estimationPriceWtTaxes += ",00";
-                        }
-
-                        double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                        //double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                        double priceWtTaxes = Double.Parse(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
                         double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
                         double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
                                                                     //calculation of the price discounted
@@ -855,32 +851,24 @@ public class UpdateProjectSheet : MonoBehaviour
                         var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
 
                         estimationPriceWtotTaxes = priceWtotTaxes.ToString();
-                        if (estimationPriceWtotTaxes.Contains("."))
+
+                        if (!estimationPriceWtotTaxes.Contains("."))
                         {
-                            estimationPriceWtotTaxes = estimationPriceWtTaxes.Replace(".", ",");
+                            estimationPriceWtotTaxes += ".00";
                         }
 
-                        if (!estimationPriceWtotTaxes.Contains(","))
-                        {
-                            estimationPriceWtotTaxes += ",00";
-                        }
-
-                        string[] parts = estimationPriceWtotTaxes.Split(',');
-                        estimationPriceWtotTaxes = parts[0] +","+ parts[1].Remove(2);
+                        string[] parts = estimationPriceWtotTaxes.Split('.');
+                        estimationPriceWtotTaxes = parts[0] + "." + parts[1];
 
                         estimationRef = estimationRef.Remove(9);
                         estimationPriceWtotTaxes = estimationPriceWtotTaxes + moneyUnit;
                         estimationPriceWtTaxes  = estimationPriceWtTaxes + moneyUnit;
 
                         estimationPriceToPay  = estimationPriceToPay + moneyUnit;
-                        if (estimationPriceToPay.Contains("."))
-                        {
-                            estimationPriceToPay = estimationPriceWtTaxes.Replace(".", ",");
-                        }
 
-                        if (!estimationPriceToPay.Contains(","))
+                        if (!estimationPriceToPay.Contains("."))
                         {
-                            estimationPriceToPay += ",00";
+                            estimationPriceToPay += ".00";
                         }
 
 
@@ -988,8 +976,20 @@ public class UpdateProjectSheet : MonoBehaviour
                             int y = 712 - 14;
                             foreach (ComponentLine line in componentLines)
                             {
-                                string unitPrice = line.price.ToString() + moneyUnit;
-                                string totalPrice = (line.price * line.qte).ToString() + moneyUnit;
+                                string unitPrice = line.price.ToString();
+                                if (!unitPrice.Contains("."))
+                                {
+                                    unitPrice += ".00";
+                                }
+                                unitPrice += moneyUnit;
+
+                                string totalPrice = (line.price * line.qte).ToString();
+                                if (!totalPrice.Contains("."))
+                                {
+                                    totalPrice += ".00";
+                                }
+                                totalPrice += moneyUnit;
+
                                 mySecondPage.addText(line.name, leftPage, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(line.qte.ToString(), leftPage + 150, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(unitPrice, leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
@@ -1109,8 +1109,20 @@ public class UpdateProjectSheet : MonoBehaviour
                             int y = 712 - 14;
                             foreach (ComponentLine line in componentLines)
                             {
-                                string unitPrice = line.price.ToString() + moneyUnit;
-                                string totalPrice = (line.price * line.qte).ToString() + moneyUnit;
+                                string unitPrice = line.price.ToString();
+                                if (!unitPrice.Contains("."))
+                                {
+                                    unitPrice += ".00";
+                                }
+                                unitPrice += moneyUnit;
+
+                                string totalPrice = (line.price * line.qte).ToString();
+                                if (!totalPrice.Contains("."))
+                                {
+                                    totalPrice += ".00";
+                                }
+                                totalPrice += moneyUnit;
+
                                 mySecondPage.addText(line.name, leftPage, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(line.qte.ToString(), leftPage + 150, y, predefinedFont.csHelvetica, normalCaracFont, color);
                                 mySecondPage.addText(unitPrice, leftPage + 300, y, predefinedFont.csHelvetica, normalCaracFont, color);
