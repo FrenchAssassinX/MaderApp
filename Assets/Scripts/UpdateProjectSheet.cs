@@ -1160,13 +1160,13 @@ public class UpdateProjectSheet : MonoBehaviour
 
                                 y = y - 14;
                             }
-                            string m_Path = Application.persistentDataPath;
-                            string pathNotif = m_Path + attachName;
                             
+                            string m_Path = Application.persistentDataPath;
+                            string pathNotif = m_Path + "/" + attachName;
                             myDoc.createPDF(pathNotif);
-
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
+                            
                         }
                     }
                 }
