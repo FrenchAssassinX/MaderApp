@@ -831,50 +831,51 @@ public class UpdateProjectSheet : MonoBehaviour
                             estimationPriceWtTaxes += ".00";
                         }
 
-                        //double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
-                        double priceWtTaxes = Double.Parse(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
-                        double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
-                        double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
-                                                                    //calculation of the price discounted
-                        double mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
-                        double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
-                        double priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
-
-                        estimationPriceWtTaxes = priceWtTaxes.ToString();//string object that contains the price with the taxes
-                        estimationPriceToPay = priceToPay.ToString(); //string object that contains the price discounted
-
-                        string pdfEditor = CONST.GetComponent<CONST>().userName; //string object that contains the connected user name
-
                         string osRunning = SystemInfo.operatingSystem; //value that contains the current os
                         string[] osTab = osRunning.Split(' ');
                         string OS = osTab[0];
-                        var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-
-                        estimationPriceWtotTaxes = priceWtotTaxes.ToString();
-
-                        if (!estimationPriceWtotTaxes.Contains("."))
-                        {
-                            estimationPriceWtotTaxes += ".00";
-                        }
-
-                        string[] parts = estimationPriceWtotTaxes.Split('.');
-                        estimationPriceWtotTaxes = parts[0] + "." + parts[1];
-
-                        estimationRef = estimationRef.Remove(9);
-                        estimationPriceWtotTaxes = estimationPriceWtotTaxes + moneyUnit;
-                        estimationPriceWtTaxes  = estimationPriceWtTaxes + moneyUnit;
-
-                        estimationPriceToPay  = estimationPriceToPay + moneyUnit;
-
-                        if (!estimationPriceToPay.Contains("."))
-                        {
-                            estimationPriceToPay += ".00";
-                        }
 
 
                         //pdf creation with windows os
                         if (OS.Equals("Windows"))
                         {
+                            //double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes.ToString()); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                            double priceWtTaxes = Double.Parse(estimationPriceWtTaxes, new CultureInfo("en-US")); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                            double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
+                            double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
+                                                                        //calculation of the price discounted
+                            double mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
+                            double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+                            double priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
+
+                            estimationPriceWtTaxes = priceWtTaxes.ToString();//string object that contains the price with the taxes
+                            estimationPriceToPay = priceToPay.ToString(); //string object that contains the price discounted
+
+                            string pdfEditor = CONST.GetComponent<CONST>().userName; //string object that contains the connected user name
+                            
+                            var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+                            estimationPriceWtotTaxes = priceWtotTaxes.ToString();
+
+                            if (!estimationPriceWtotTaxes.Contains("."))
+                            {
+                                estimationPriceWtotTaxes += ".00";
+                            }
+
+                            string[] parts = estimationPriceWtotTaxes.Split('.');
+                            estimationPriceWtotTaxes = parts[0] + "." + parts[1];
+
+                            estimationRef = estimationRef.Remove(9);
+                            estimationPriceWtotTaxes = estimationPriceWtotTaxes + moneyUnit;
+                            estimationPriceWtTaxes = estimationPriceWtTaxes + moneyUnit;
+
+                            estimationPriceToPay = estimationPriceToPay + moneyUnit;
+
+                            if (!estimationPriceToPay.Contains("."))
+                            {
+                                estimationPriceToPay += ".00";
+                            }
+
                             int normalCaracFont = 11; //font tall for the classic content
                             int titleCaracFont = 13; //font tall for the titles
                             int leftPage = 10; //x position for the left page content
@@ -998,17 +999,51 @@ public class UpdateProjectSheet : MonoBehaviour
                                 y = y - 14;
                             }
                             myDoc.createPDF(@"C:\Users\Public\" + attachName);
-
-                            string pathNotif = "C:\\Users\\Public\\" + attachName;
-                            
+                            string pathNotif = "C:\\Users\\Public\\" + attachName;                            
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
-
                         }
                         
                         //pdf creation with Android os
                         else if (OS.Equals("Android"))
                         {
+                            //double priceWtTaxes = Convert.ToDouble(estimationPriceWtTaxes.ToString()); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                            double priceWtTaxes = Double.Parse(estimationPriceWtTaxes); //price calculated with taxes. int parameter used for the calculate of the price without taxes and the discounted price
+                            double discount = Convert.ToDouble(estimationDiscount.ToString());  //int value of the discount used for the calculations
+                            double priceWtotTaxes = priceWtTaxes / 1.2; //double that contain the result of the price without taxes
+                                                                        //calculation of the price discounted
+                            double mult = priceWtTaxes * discount; //firstly we multiply the original price with the discount number
+                            double sub = mult / 100; //secondly we divide the result per 100. It wil give the amount of the discount
+                            double priceToPay = priceWtTaxes - sub;  //we substract the amout of the discount from the original price, and we have the price after the discounting
+
+                            estimationPriceWtTaxes = priceWtTaxes.ToString();//string object that contains the price with the taxes
+                            estimationPriceToPay = priceToPay.ToString(); //string object that contains the price discounted
+
+                            string pdfEditor = CONST.GetComponent<CONST>().userName; //string object that contains the connected user name
+
+                            
+                            var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+
+                            estimationPriceWtotTaxes = priceWtotTaxes.ToString();
+
+                            if (!estimationPriceWtotTaxes.Contains("."))
+                            {
+                                estimationPriceWtotTaxes += ".00";
+                            }
+
+                            string[] parts = estimationPriceWtotTaxes.Split('.');
+                            estimationPriceWtotTaxes = parts[0] + "." + parts[1];
+                            
+                            estimationRef = estimationRef.Remove(9);
+                            estimationPriceWtotTaxes = estimationPriceWtotTaxes + moneyUnit;
+                            estimationPriceWtTaxes = estimationPriceWtTaxes + moneyUnit;
+
+                            estimationPriceToPay = estimationPriceToPay + moneyUnit;
+
+                            if (!estimationPriceToPay.Contains("."))
+                            {
+                                estimationPriceToPay += ".00";
+                            }
                             int normalCaracFont = 11; //font tall for the classic content
                             int titleCaracFont = 13; //font tall for the titles
                             int leftPage = 10; //x position for the left page content
@@ -1017,7 +1052,6 @@ public class UpdateProjectSheet : MonoBehaviour
                             pdfDocument myDoc = new pdfDocument("Sample Application", "Me", false); //creation of the pdf entity object
                             pdfPage myFirstPage = myDoc.addPage(); //creation of the first page entity object
                             pdfColor color = new pdfColor(predefinedColor.csBlack); //font color parameter
-
                             //text adding of all the pdf content. 
                             myFirstPage.addText("Devis de maison modulaire", 200, 772, predefinedFont.csHelveticaBold, 20, color);
                             myFirstPage.addText("Entreprise MADERA", leftPage, 740, predefinedFont.csHelveticaBold, titleCaracFont, color);
@@ -1027,7 +1061,6 @@ public class UpdateProjectSheet : MonoBehaviour
                             myFirstPage.addText("Ville : Lille" + "  |  Code postal : 59000" + customerZipcode, leftPage, 685, predefinedFont.csHelvetica, normalCaracFont, color);
                             myFirstPage.addText("SIRET : ------- ", leftPage, 671, predefinedFont.csHelvetica, normalCaracFont, color);
                             myFirstPage.addText("___________________________________________________________________________________________", leftPage, 659, predefinedFont.csHelvetica, normalCaracFont, color);
-
 
                             myFirstPage.addText("CLIENT", leftPage, 645, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Nom : " + customerSurename + "   |     Prénom : " + customerFirstname, leftPage, 630, predefinedFont.csHelvetica, normalCaracFont, color);
@@ -1049,7 +1082,7 @@ public class UpdateProjectSheet : MonoBehaviour
 
                             myFirstPage.addText("DEVIS", rightPage, 545, predefinedFont.csHelveticaBold, titleCaracFont, color);
                             myFirstPage.addText("Date : " + estimationDate, rightPage, 531, predefinedFont.csHelvetica, titleCaracFont, color);
-                            myFirstPage.addText("Référence : " + estimationRef.Remove(9), rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
+                            myFirstPage.addText("Référence : " + estimationRef, rightPage, 517, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("Prix HT : " + estimationPriceWtotTaxes , rightPage, 503, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("TVA : 20% ", rightPage, 489, predefinedFont.csHelvetica, titleCaracFont, color);
                             myFirstPage.addText("Prix TTC : " + estimationPriceWtTaxes , rightPage, 475, predefinedFont.csHelvetica, titleCaracFont, color);
@@ -1071,9 +1104,7 @@ public class UpdateProjectSheet : MonoBehaviour
                             mySecondPage.addText("Prix par unité", leftPage + 300, 726, predefinedFont.csHelvetica, normalCaracFont, color);
                             mySecondPage.addText("Prix total", leftPage + 450, 726, predefinedFont.csHelvetica, normalCaracFont, color);
                             mySecondPage.addText("_____________________________________________________________________________________________", leftPage, 712, predefinedFont.csHelveticaBold, titleCaracFont, color);
-
-
-
+                            
                             List<ComponentLine> componentLines = new List<ComponentLine>();
                             foreach (ComponentToShow compo in components)
                             {
@@ -1105,7 +1136,6 @@ public class UpdateProjectSheet : MonoBehaviour
                                     }
                                 }
                             }
-
                             int y = 712 - 14;
                             foreach (ComponentLine line in componentLines)
                             {
@@ -1130,17 +1160,13 @@ public class UpdateProjectSheet : MonoBehaviour
 
                                 y = y - 14;
                             }
-
+                            
                             string m_Path = Application.persistentDataPath;
-
                             string pathNotif = m_Path + "/" + attachName;
-
+                            myDoc.createPDF(pathNotif);
                             notifyCanvas.SetActive(true);
                             notifText.GetComponent<UnityEngine.UI.Text>().text = pathNotif;
-
-                            myDoc.createPDF(pathNotif);
-                            myDoc.createPDF(attachName);
-
+                            
                         }
                     }
                 }
